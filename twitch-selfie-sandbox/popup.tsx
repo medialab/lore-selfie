@@ -2,7 +2,7 @@ import { useStorage } from "@plasmohq/storage/hook"
 
 
 function IndexPopup() {
-  const [activity] = useStorage("activity");
+  const [activity] = useStorage("stream-selfie-activity");
   return (
     <div
       style={{
