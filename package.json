@@ -5,7 +5,8 @@
   "main": "generateMockData.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite dev",
+    "build": "vite build"
   },
   "repository": {
     "type": "git",
@@ -22,5 +23,10 @@
     "fs-extra": "^11.2.0",
     "uuid": "^9.0.1",
     "voynich-ipsum": "^1.2.0"
+  },
+  "dependencies": {
+    "vite": "^5.2.11",
+    "vite-plugin-web-extension": "^4.1.3",
+    "webextension-polyfill": "^0.11.0"
   }
 }

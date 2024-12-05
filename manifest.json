@@ -1,0 +1,18 @@
+{
+  "name": "Twitch selfie",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "src/background.ts"
+  },
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "storage",
+    "browsingData",
+    "debugger",
+    "idle",
+    "webNavigation"
+  ],
+  "options_page": "src/options.html"
+}
