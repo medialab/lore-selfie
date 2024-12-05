@@ -1,0 +1,60 @@
+{
+  "name": "twitch-selfie-sandbox",
+  "displayName": "Twitch selfie sandbox",
+  "version": "0.0.1",
+  "description": "A twitch selfie sandbox",
+  "author": "Robin de Mourat <robin.demourat@gmail.com>",
+  "scripts": {
+    "dev": "plasmo dev",
+    "dev:firefox": "plasmo dev --target=firefox-mv2",
+    "debug": "plasmo dev --verbose",
+    "debug:firefox": "plasmo dev --target=firefox-mv2 --verbose",
+    "build": "plasmo build",
+    "build:firefox": "plasmo build --target=firefox-mv2",
+    "package": "plasmo package",
+    "package:firefox": "plasmo package --target=firefox-mv2",
+    "start": "web-ext run --source-dir ./build/chrome-mv3-dev -t chromium --start-url chrome://newtab",
+    "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev"
+  },
+  "dependencies": {
+    "@plasmohq/messaging": "^0.6.2",
+    "@plasmohq/storage": "^1.13.0",
+    "plasmo": "0.89.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "4.1.1",
+    "@types/chrome": "0.0.258",
+    "@types/node": "20.11.5",
+    "@types/react": "18.2.48",
+    "@types/react-dom": "18.2.18",
+    "prettier": "3.2.4",
+    "typescript": "5.3.3",
+    "web-ext": "^8.3.0"
+  },
+  "manifest": {
+    "host_permissions": [
+      "https://*/*"
+    ],
+    "permissions": [
+      "scripting",
+      "storage"
+    ],
+    "web_accessible_resources": [
+      {
+        "matches": [
+          "<all_urls>"
+        ],
+        "resources": [
+          "tabs/dev-report.html"
+        ]
+      }
+    ],
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "test@example.com"
+      }
+    }
+  }
+}
