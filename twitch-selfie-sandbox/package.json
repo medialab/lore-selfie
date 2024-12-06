@@ -19,9 +19,16 @@
   "dependencies": {
     "@plasmohq/messaging": "^0.6.2",
     "@plasmohq/storage": "^1.13.0",
+    "d3-array": "^3.2.4",
+    "d3-scale": "^4.0.2",
     "plasmo": "0.89.4",
+    "rc-slider": "^11.1.7",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-code-blocks": "^0.1.6",
+    "react-dom": "18.2.0",
+    "react-file-drop": "^3.1.6",
+    "react-router-dom": "^7.0.2",
+    "react-tooltip": "^5.28.0"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
@@ -49,7 +56,8 @@
           "<all_urls>"
         ],
         "resources": [
-          "tabs/dev-report.html"
+          "tabs/dev-report.html",
+          "tabs/app.html"
         ]
       }
     ],

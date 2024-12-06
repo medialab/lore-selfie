@@ -8,6 +8,14 @@ function IndexPopup() {
       style={{
         padding: 16
       }}>
+        <button
+        onClick={() => {
+          chrome.tabs.create({
+            url: "./tabs/app.html"
+          })
+        }}>
+        ouvrir l'application
+      </button>
        <button
         onClick={() => {
           chrome.tabs.create({

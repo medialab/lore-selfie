@@ -1,0 +1,30 @@
+
+
+.DevReport {
+
+  .ui {
+    ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-flow: row nowrap;
+    }
+
+    .ui-section {
+      background: lightgrey;
+      padding: .5rem;
+      margin-bottom: .5rem;
+    }
+  }
+  .data-preview {
+
+  }
+
+  button {
+    cursor: pointer;
+    &.active {
+      font-weight: 800;
+    }
+  }
+  
+}

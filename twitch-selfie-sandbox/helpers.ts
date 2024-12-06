@@ -84,3 +84,14 @@ export const getPlatform = (url: String): String => {
     return 'tiktok';
   }
 }
+
+export function downloadJSONData(data:Object, filename='selfie-data.json') {
+  
+  let blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  let dlURL = window.URL.createObjectURL(blob);
+  let a = document.createElement('a');
+  a.href = dlURL;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+}

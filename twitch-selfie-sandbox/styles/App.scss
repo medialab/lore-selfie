@@ -1,0 +1,89 @@
+$gutter: .5rem;
+
+.App {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: $gutter;
+  padding-top: $gutter * 10;
+  box-sizing: border-box;
+  overflow: auto;
+  header {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: $gutter;
+    align-items: flex-end;
+    h1 {
+      margin: 0;
+    }
+    ul {
+      list-style: none;
+      display: flex;
+      flex-flow: row nowrap;
+      margin: 0;
+      li {
+        margin-left: $gutter;
+      }
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      &.active {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .Daily {
+    .date-picker-container {
+      ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-flow: row nowrap;
+        margin: 0;
+      }
+    }
+  }
+
+  .DailyVisualizationSession {
+    .session-background {
+      fill: rgba(0,0,0,0.05);
+    }
+    .activity-span {
+      rect {
+        fill: rgba(255,0,0,0.05);
+      }
+    }
+    .browsing-event {
+      text {
+        font-size: .8rem;
+      }
+      &.twitch {
+        .browsing-event-circle {
+          fill: purple;
+        }
+      }
+      &.youtube {
+        .browsing-event-circle {
+          fill: red;
+        }
+      }
+    }
+  }
+
+  button {
+    &.active {
+      font-weight: 800;
+    }
+  }
+}
