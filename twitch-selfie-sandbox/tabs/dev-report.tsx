@@ -1,5 +1,6 @@
 import { useStorage } from "@plasmohq/storage/hook"
 import { Storage } from "@plasmohq/storage"
+import { useState } from "react";
 
 function downloadData(data:Object, filename='selfie-data.json') {
   
@@ -12,8 +13,21 @@ function downloadData(data:Object, filename='selfie-data.json') {
   a.click();
 }
 
+const EVENT_TYPES = [
+  'OPEN_PLATFORM_IN_TAB',
+  'CLOSE_PLATFORM_IN_TAB',
+  'UNFOCUS_TAB',
+  'FOCUS_TAB',
+  'POINTER_ACTIVITY_RECORD',
+  'BROWSE_VIEW'
+]
+
 function DevReport() {
-  const [activity] = useStorage("stream-selfie-activity");
+  const [activity = []] = useStorage("stream-selfie-activity");
+  const [hiddenTypes, setHiddenTypes] = useState(
+    EVENT_TYPES.filter(e => e !== 'BROWSE_VIEW')
+  );
+  console.debug('activity', activity);
   return (
     <div>
       <h1>Dev report</h1>
@@ -32,9 +46,42 @@ function DevReport() {
           Supprimer toutes les données
         </button>
       </div>
+      <div>
+        <p>Cacher les types : </p>
+        <ul>
+          {
+            EVENT_TYPES.map(type => {
+              const checked = hiddenTypes.includes(type);
+              return (
+                <li key={type}>
+                  <span>
+                    <input type="checkbox" checked={checked} onClick={() => {
+                      if (checked) {
+                        setHiddenTypes(
+                          hiddenTypes.filter(t => t !== type)
+                        )
+                      } else {
+                        setHiddenTypes([
+                          ...hiddenTypes,
+                          type
+                        ])
+                      }
+                    }}/>
+                  </span>
+                  <span>
+                    {type}
+                  </span>
+                </li>
+              )
+            })
+          }
+        </ul>
+      </div>
       <pre>
         <code>
-          {JSON.stringify(activity, null, 2)}
+          {JSON.stringify(
+            (activity || []).filter((event) => !hiddenTypes.includes(event.type))
+          , null, 2)}
         </code>
       </pre> 
       <style>{`

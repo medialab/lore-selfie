@@ -100,11 +100,11 @@ const getPlatform = (url: String): String => {
     "https://youtu.be",
   ]
   if (youtubeURLS.find(pattern => url.includes(pattern))) {
-    return 'YOUTUBE';
+    return 'youtube';
   } else if (url.includes('twitch')) {
-    return 'TWITCH';
+    return 'twitch';
   } else if (url.includes('tiktok')) {
-    return 'TIKTOK';
+    return 'tiktok';
   }
 }
 
@@ -116,7 +116,7 @@ const addEvent = async (evt: EventGeneric) => {
   } else {
     updatedData = [evt]
   }
-  // console.debug({existing: data, evt});
+  console.debug('add event to stream-selfie-activity', evt);
   await storage.set("stream-selfie-activity", updatedData);
 }
 
@@ -136,7 +136,7 @@ const main = async () => {
     platform,
   };
   await addEvent(openPlatformInTabEvent);
-  recordNewViewContent({
+  await recordNewViewContent({
     injectionId,
     platform,
     url: window.location.href,
@@ -217,13 +217,11 @@ const main = async () => {
   const bodyList = document.querySelector('body');
   let oldHref = window.location.href;
 
-  const observer = new MutationObserver(function (mutations) {
+  const observer = new MutationObserver(async function (mutations) {
     if (oldHref != document.location.href) {
       oldHref = document.location.href;
-      /* Changed ! your code here */
       console.log('location has been changed, baby: %s', document.location.href);
-      // const newPlatform = getPlatform(document.location.href);
-      recordNewViewContent({
+      await recordNewViewContent({
         injectionId,
         platform,
         url: document.location.href,

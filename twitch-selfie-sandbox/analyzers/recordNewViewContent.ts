@@ -1,15 +1,17 @@
 import { v4 as generateId } from 'uuid';
 import type { BrowseViewEvent } from "~types/captureEventsTypes";
 
-const parseYoutubeURL = url => {
+import parsers from './parsers';
+
+const parseTwitchURL = url => {
   let match;
-  if ((match = url.match(/https?:\/\/www\.youtube\.com\/watch\?v=([^&]+)/)) !== null) {
+  if ((match = url.match(/https?:\/\/www.twitch.tv\/([^\/]+)/)) !== null) {
     console.log(match);
-    const videoId = match[1];
+    const channelId = match[1];
     return {
-      viewType: "video",
+      viewType: "live",
       parsedMetadata: {
-        videoId
+        channelId
       }
     }
   } else {
@@ -27,7 +29,7 @@ function delay(t) {
 }
 
 const tryScrapingYoutubeVideoMetadata = async (currentRetry = 0) => {
-  const maxRetries = 5;
+  const maxRetries = 10;
   console.log('try scraping youtube video metadata try n°%s', currentRetry);
   const title = document.querySelector('yt-formatted-string.ytd-watch-metadata') && document.querySelector('yt-formatted-string.ytd-watch-metadata').textContent.trim();
   if (title) {
@@ -66,6 +68,63 @@ const tryScrapingYoutubeVideoMetadata = async (currentRetry = 0) => {
     throw new Error("no metadata found in time");
   }
 }
+
+
+const tryScrapingTwitchLiveMetadata = async (currentRetry = 0) => {
+  const maxRetries = 10;
+  console.debug('try scraping twitch video metadata try n°%s', currentRetry);
+  const channel = document.querySelector('#live-channel-stream-information h1')?.textContent;
+  console.log('channel: ', channel);
+  if (channel) {
+    return {
+      channel,
+      title: document.querySelector('#live-channel-stream-information h2')?.textContent,
+      viewersCount: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div')?.textContent,
+      liveTimeElapsed: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div:nth-child(2)')?.textContent,
+      tags: Array.from(new Set(Array.from(document.querySelectorAll('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(2) div'))?.slice(2).map(el => el.textContent))).join(', '),
+      category: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1)')?.textContent,
+      categoryHref: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1) a')?.getAttribute('href'),
+    }
+  }
+  if (currentRetry < maxRetries) {
+    await delay(500);
+    currentRetry++;
+    return tryScrapingTwitchLiveMetadata(currentRetry);
+  } else {
+    console.error('no metadata found in time')
+    throw new Error("no metadata found in time");
+  }
+}
+
+const scrapePageMetadata = async ({
+  testFn,
+  scrapeFn,
+  scrapingName,
+  maxRetries = 10,
+  delayTimeMs = 500,
+}, currentRetry = 0) => {
+  console.debug('try scraping page metadata (%s) try n°%s', scrapingName, currentRetry);
+  const canScrape = testFn();
+  if (canScrape) {
+    console.debug('will scrape page metadata (%s) try n°%s', scrapingName, currentRetry)
+    return scrapeFn();
+  }
+  if (currentRetry < maxRetries) {
+    await delay(delayTimeMs);
+    currentRetry++;
+    return scrapePageMetadata({
+      testFn,
+      scrapeFn,
+      scrapingName,
+      maxRetries,
+      delayTimeMs,
+    }, currentRetry);
+  } else {
+    console.error('no metadata found in time (%s)', scrapingName)
+    throw new Error('no metadata found in time (%s)', scrapingName);
+  }
+}
+
 export const recordNewViewContent = async ({
   platform,
   injectionId,
@@ -75,42 +134,30 @@ export const recordNewViewContent = async ({
   await delay(1000);
   let title = document.title;
   let browseViewEvent: BrowseViewEvent;
-  switch (platform) {
-    case 'YOUTUBE':
-      let metadata = {
-        title
-      }
-      const { viewType, parsedMetadata = {} } = parseYoutubeURL(url);
-      metadata = {
-        ...metadata,
-        ...parsedMetadata
-      }
-      switch(viewType) {
-        case 'video':
-          const scrapedMetadata = await tryScrapingYoutubeVideoMetadata();
-          if (scrapedMetadata) {
-            metadata = {
-              ...metadata,
-              ...scrapedMetadata,
-            }
-          }
-          break;
-        default:
-          break;
-      }
-      browseViewEvent = {
-        type: "BROWSE_VIEW",
-        id: generateId(),
-        date: new Date(),
-        url: window.location.href,
-        injectionId,
-        platform,
-        viewType,
-        metadata
-      }
-      addEvent(browseViewEvent);
-      break;
-    default:
-      break;
+  // console.debug('record new view content for platform', platform);
+  const { viewType, parsedMetadata = {} } = await parsers[platform].sniffer(url);
+  let metadata = {
+    title,
+    ...parsedMetadata
   }
+  const scrapedMetadata = await scrapePageMetadata({
+    testFn: parsers[platform].scrapers[viewType].test,
+    scrapeFn: parsers[platform].scrapers[viewType].scrape,
+    scrapingName: `${platform} ${viewType}`,
+  });
+  metadata = {
+    ...metadata,
+    ...scrapedMetadata
+  }
+  browseViewEvent = {
+    type: "BROWSE_VIEW",
+    id: generateId(),
+    date: new Date(),
+    url: window.location.href,
+    injectionId,
+    platform,
+    viewType,
+    metadata
+  }
+  await addEvent(browseViewEvent);
 }
