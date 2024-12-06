@@ -15,15 +15,7 @@ function IndexPopup() {
           })
         }}>
         ouvrir le rapport de dev
-      </button>
-      <div>
-        Données d'activité :
-      </div>
-      <pre>
-        <code>
-          {JSON.stringify(activity)}
-        </code>
-      </pre>      
+      </button>    
     </div>
   )
 }

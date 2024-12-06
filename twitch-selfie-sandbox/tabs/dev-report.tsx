@@ -19,11 +19,18 @@ const EVENT_TYPES = [
   'UNFOCUS_TAB',
   'FOCUS_TAB',
   'POINTER_ACTIVITY_RECORD',
-  'BROWSE_VIEW'
+  'BROWSE_VIEW',
+  'CHAT_ACTIVITY_RECORD'
 ]
 
 function DevReport() {
-  const [activity = []] = useStorage("stream-selfie-activity");
+  // const [activity = []] = useStorage("stream-selfie-activity");
+  const [activity = []] = useStorage({
+    key: "stream-selfie-activity",
+    instance: new Storage({
+      area: "local"
+    })
+  })
   const [hiddenTypes, setHiddenTypes] = useState(
     EVENT_TYPES.filter(e => e !== 'BROWSE_VIEW')
   );
@@ -39,8 +46,14 @@ function DevReport() {
         </button>
         <button
           onClick={() => {
-            const storage = new Storage()
-            storage.clear()
+            
+            const confirmed = confirm("Supprimer toutes les données enregistrées par stream selfie ?")
+            if (confirmed) {
+              const storage = new Storage({
+                area: "local",
+              });
+              storage.clear();
+            }
           }}
         >
           Supprimer toutes les données
@@ -52,21 +65,24 @@ function DevReport() {
           {
             EVENT_TYPES.map(type => {
               const checked = hiddenTypes.includes(type);
+              const handleClick = () => {
+                if (checked) {
+                  setHiddenTypes(
+                    hiddenTypes.filter(t => t !== type)
+                  )
+                } else {
+                  setHiddenTypes([
+                    ...hiddenTypes,
+                    type
+                  ])
+                }
+              }
               return (
                 <li key={type}>
-                  <span>
-                    <input type="checkbox" checked={checked} onClick={() => {
-                      if (checked) {
-                        setHiddenTypes(
-                          hiddenTypes.filter(t => t !== type)
-                        )
-                      } else {
-                        setHiddenTypes([
-                          ...hiddenTypes,
-                          type
-                        ])
-                      }
-                    }}/>
+                  <span
+                  onClick={handleClick}
+                  >
+                    <input type="checkbox" checked={checked} readOnly/>
                   </span>
                   <span>
                     {type}

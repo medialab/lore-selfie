@@ -4,14 +4,13 @@ import { v4 as generateId } from 'uuid';
 import { Storage } from "@plasmohq/storage"
 import { Browser, OpenPlatformInTabEvent, type captureEventsList, type ClosePlatformInTabEvent, type EventGeneric, type FocusTabEvent, type PointerActivityRecordEvent, type UnfocusTabEvent } from "~types/captureEventsTypes"
 import { recordNewViewContent } from "~analyzers/recordNewViewContent";
+import { getPlatform, getBrowser } from "~helpers";
+import { updateLiveTracking } from "~analyzers/livetrackers";
 
-
-const storage = new Storage({
-  copiedKeyList: ["shield-modulation"]
-})
-
+/**
+ * Content script config
+ */
 export const config: PlasmoCSConfig = {
-  // world: "MAIN",
   matches: [
     "https://www.youtube.com/*",
     "http://www.youtube.com/*",
@@ -23,91 +22,16 @@ export const config: PlasmoCSConfig = {
   ],
 }
 
-function getBrowser(): Browser {
-  const ua = navigator.userAgent
-  let browser;
+const storage = new Storage({
+  area: "local",
+  // copiedKeyList: ["shield-modulation"],
+})
 
-  // helper functions to deal with common regex
-  function getFirstMatch(regex) {
-    const match = ua.match(regex);
-    return (match && match.length > 1 && match[1]) || '';
-  }
 
-  function getSecondMatch(regex) {
-    const match = ua.match(regex);
-    return (match && match.length > 1 && match[2]) || '';
-  }
-
-  // start detecting
-  if (/opera|opr/i.test(ua)) {
-    browser = {
-      name: 'Opera',
-      type: 'opera',
-      version: getFirstMatch(/version\/(\d+(\.\d+)?)/i) || getFirstMatch(/(?:opera|opr)[\s\/](\d+(\.\d+)?)/i)
-    }
-  } else if (/msie|trident/i.test(ua)) {
-    browser = {
-      name: 'Internet Explorer',
-      type: 'msie',
-      version: getFirstMatch(/(?:msie |rv:)(\d+(\.\d+)?)/i)
-    }
-  } else if (/chrome.+? edge/i.test(ua)) {
-    browser = {
-      name: 'Microsft Edge',
-      type: 'msedge',
-      version: getFirstMatch(/edge\/(\d+(\.\d+)?)/i)
-    }
-  } else if (/chrome|crios|crmo/i.test(ua)) {
-    browser = {
-      name: 'Google Chrome',
-      type: 'chrome',
-      version: getFirstMatch(/(?:chrome|crios|crmo)\/(\d+(\.\d+)?)/i)
-    }
-  } else if (/firefox/i.test(ua)) {
-    browser = {
-      name: 'Firefox',
-      type: 'firefox',
-      version: getFirstMatch(/(?:firefox)[ \/](\d+(\.\d+)?)/i)
-    }
-  } else if (!(/like android/i.test(ua)) && /android/i.test(ua)) {
-    browser = {
-      name: 'Android',
-      type: 'android',
-      version: getFirstMatch(/version\/(\d+(\.\d+)?)/i)
-    }
-  } else if (/safari/i.test(ua)) {
-    browser = {
-      name: 'Safari',
-      type: 'safari',
-      version: getFirstMatch(/version\/(\d+(\.\d+)?)/i)
-    }
-  } else {
-    browser = {
-      name: getFirstMatch(/^(.*)\/(.*) /),
-      version: getSecondMatch(/^(.*)\/(.*) /)
-    }
-    browser.type = browser.name.toLowerCase().replace(/\s/g, '');
-  }
-  return browser;
-}
-
-const getPlatform = (url: String): String => {
-  const youtubeURLS = [
-    "https://www.youtube.com",
-    "http://www.youtube.com",
-    "https://youtube.com",
-    "http://youtube.com",
-    "https://youtu.be",
-  ]
-  if (youtubeURLS.find(pattern => url.includes(pattern))) {
-    return 'youtube';
-  } else if (url.includes('twitch')) {
-    return 'twitch';
-  } else if (url.includes('tiktok')) {
-    return 'tiktok';
-  }
-}
-
+/**
+ * Adds to local storage a record about an activity from the user
+ * @param evt event to add to local storage activity history
+ */
 const addEvent = async (evt: EventGeneric) => {
   const data: captureEventsList = await storage.get("stream-selfie-activity");
   let updatedData;
@@ -120,6 +44,9 @@ const addEvent = async (evt: EventGeneric) => {
   await storage.set("stream-selfie-activity", updatedData);
 }
 
+
+const MOUSE_TRACK_TIMESPAN = 5000;
+const LIVE_TRACK_TIMESPAN = 10000;
 
 const main = async () => {
   // const data = await storage.get("stream-selfie-activity");
@@ -136,7 +63,7 @@ const main = async () => {
     platform,
   };
   await addEvent(openPlatformInTabEvent);
-  await recordNewViewContent({
+  let activeViewType = await recordNewViewContent({
     injectionId,
     platform,
     url: window.location.href,
@@ -187,7 +114,6 @@ const main = async () => {
     var posY = event.clientY;
     mousePosition = { posX, posY }
   }
-  const MOUSE_TRACK_TIMESPAN = 5000;
   let prevMousePosition = mousePosition;
   setInterval(async () => {
     if (!document.hasFocus()) {
@@ -217,15 +143,25 @@ const main = async () => {
   const bodyList = document.querySelector('body');
   let oldHref = window.location.href;
 
+  /**
+   * Listen to location changes to trigger view change events
+   */
   const observer = new MutationObserver(async function (mutations) {
     if (oldHref != document.location.href) {
       oldHref = document.location.href;
       console.log('location has been changed, baby: %s', document.location.href);
-      await recordNewViewContent({
+      activeViewType = await recordNewViewContent({
         injectionId,
         platform,
         url: document.location.href,
         addEvent,
+      });
+      updateLiveTracking({
+        activeViewType,
+        platform,
+        injectionId,
+        addEvent,
+        liveTrackTimespan: LIVE_TRACK_TIMESPAN
       });
     }
   });
@@ -235,24 +171,14 @@ const main = async () => {
   };
   observer.observe(bodyList, config);
 
-  // function watchHistoryEvents() {
-  //   const { pushState, replaceState } = window.history;
-
-  //   window.history.pushState = function (...args) {
-  //     pushState.apply(window.history, args);
-  //     window.dispatchEvent(new Event('pushState'));
-  //   };
-
-  //   window.history.replaceState = function (...args) {
-  //     replaceState.apply(window.history, args);
-  //     window.dispatchEvent(new Event('replaceState'));
-  //   };
-
-  //   window.addEventListener('popstate', (event) => console.log('popstate event', event));
-  //   window.addEventListener('replaceState', (event) => console.log('replaceState event', event));
-  //   window.addEventListener('pushState', (event) => console.log('pushState event', event.target.location.href));
-  // }
-  // watchHistoryEvents();
+  console.log('active view type', activeViewType);
+  updateLiveTracking({
+    activeViewType,
+    platform,
+    injectionId,
+    addEvent,
+    liveTrackTimespan: LIVE_TRACK_TIMESPAN
+  });
 }
 
 main();

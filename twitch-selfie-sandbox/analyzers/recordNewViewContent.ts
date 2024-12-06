@@ -28,73 +28,73 @@ function delay(t) {
   });
 }
 
-const tryScrapingYoutubeVideoMetadata = async (currentRetry = 0) => {
-  const maxRetries = 10;
-  console.log('try scraping youtube video metadata try n°%s', currentRetry);
-  const title = document.querySelector('yt-formatted-string.ytd-watch-metadata') && document.querySelector('yt-formatted-string.ytd-watch-metadata').textContent.trim();
-  if (title) {
-    return {
-      title,
-      // description: document.querySelector('meta[name="description"]').getAttribute('content'),
-      // keywords: document.querySelector('meta[name="keywords"]').getAttribute('content'),
+// const tryScrapingYoutubeVideoMetadata = async (currentRetry = 0) => {
+//   const maxRetries = 10;
+//   console.log('try scraping youtube video metadata try n°%s', currentRetry);
+//   const title = document.querySelector('yt-formatted-string.ytd-watch-metadata') && document.querySelector('yt-formatted-string.ytd-watch-metadata').textContent.trim();
+//   if (title) {
+//     return {
+//       title,
+//       // description: document.querySelector('meta[name="description"]').getAttribute('content'),
+//       // keywords: document.querySelector('meta[name="keywords"]').getAttribute('content'),
 
-      ...[
-        "description",
-        "keywords",
-        "interactionCount",
-        "datePublished",
-        "uploadDate",
-        "genre"
-      ].reduce((cur, id) => ({
-        ...cur,
-        [id]: document.querySelector(`meta[itemprop="${id}"],meta[name="${id}"]`)?.getAttribute('content')
-      }), {}),
+//       ...[
+//         "description",
+//         "keywords",
+//         "interactionCount",
+//         "datePublished",
+//         "uploadDate",
+//         "genre"
+//       ].reduce((cur, id) => ({
+//         ...cur,
+//         [id]: document.querySelector(`meta[itemprop="${id}"],meta[name="${id}"]`)?.getAttribute('content')
+//       }), {}),
 
-      shortlinkUrl: document.querySelector('link[rel="shortlinkUrl"]')?.getAttribute('href'),
-      image_src: document.querySelector('link[rel="image_src"]')?.getAttribute('href'),
+//       shortlinkUrl: document.querySelector('link[rel="shortlinkUrl"]')?.getAttribute('href'),
+//       image_src: document.querySelector('link[rel="image_src"]')?.getAttribute('href'),
 
-      channelName: document.querySelector('ytd-channel-name a')?.textContent.trim(),
-      channelId: decodeURI(document.querySelector('ytd-channel-name a')?.getAttribute('href'))?.split('@').pop(),
-      ownerSubcount: document.querySelector('#owner-sub-count')?.textContent,
-      likesCount: document.querySelector('.top-level-buttons .smartimation .yt-spec-button-shape-next__button-text-content')?.textContent,
-      // commentsCount: document.querySelector('.count-text.ytd-comments-header-renderer span')?.textContent,
-    }
-  }
-  if (currentRetry < maxRetries) {
-    await delay(500);
-    currentRetry++;
-    return tryScrapingYoutubeVideoMetadata(currentRetry);
-  } else {
-    throw new Error("no metadata found in time");
-  }
-}
+//       channelName: document.querySelector('ytd-channel-name a')?.textContent.trim(),
+//       channelId: decodeURI(document.querySelector('ytd-channel-name a')?.getAttribute('href'))?.split('@').pop(),
+//       ownerSubcount: document.querySelector('#owner-sub-count')?.textContent,
+//       likesCount: document.querySelector('.top-level-buttons .smartimation .yt-spec-button-shape-next__button-text-content')?.textContent,
+//       // commentsCount: document.querySelector('.count-text.ytd-comments-header-renderer span')?.textContent,
+//     }
+//   }
+//   if (currentRetry < maxRetries) {
+//     await delay(500);
+//     currentRetry++;
+//     return tryScrapingYoutubeVideoMetadata(currentRetry);
+//   } else {
+//     throw new Error("no metadata found in time");
+//   }
+// }
 
 
-const tryScrapingTwitchLiveMetadata = async (currentRetry = 0) => {
-  const maxRetries = 10;
-  console.debug('try scraping twitch video metadata try n°%s', currentRetry);
-  const channel = document.querySelector('#live-channel-stream-information h1')?.textContent;
-  console.log('channel: ', channel);
-  if (channel) {
-    return {
-      channel,
-      title: document.querySelector('#live-channel-stream-information h2')?.textContent,
-      viewersCount: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div')?.textContent,
-      liveTimeElapsed: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div:nth-child(2)')?.textContent,
-      tags: Array.from(new Set(Array.from(document.querySelectorAll('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(2) div'))?.slice(2).map(el => el.textContent))).join(', '),
-      category: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1)')?.textContent,
-      categoryHref: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1) a')?.getAttribute('href'),
-    }
-  }
-  if (currentRetry < maxRetries) {
-    await delay(500);
-    currentRetry++;
-    return tryScrapingTwitchLiveMetadata(currentRetry);
-  } else {
-    console.error('no metadata found in time')
-    throw new Error("no metadata found in time");
-  }
-}
+// const tryScrapingTwitchLiveMetadata = async (currentRetry = 0) => {
+//   const maxRetries = 10;
+//   console.debug('try scraping twitch video metadata try n°%s', currentRetry);
+//   const channel = document.querySelector('#live-channel-stream-information h1')?.textContent;
+//   console.log('channel: ', channel);
+//   if (channel) {
+//     return {
+//       channel,
+//       title: document.querySelector('#live-channel-stream-information h2')?.textContent,
+//       viewersCount: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div')?.textContent,
+//       liveTimeElapsed: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div:nth-child(2)')?.textContent,
+//       tags: Array.from(new Set(Array.from(document.querySelectorAll('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(2) div'))?.slice(2).map(el => el.textContent))).join(', '),
+//       category: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1)')?.textContent,
+//       categoryHref: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1) a')?.getAttribute('href'),
+//     }
+//   }
+//   if (currentRetry < maxRetries) {
+//     await delay(500);
+//     currentRetry++;
+//     return tryScrapingTwitchLiveMetadata(currentRetry);
+//   } else {
+//     console.error('no metadata found in time')
+//     throw new Error("no metadata found in time");
+//   }
+// }
 
 const scrapePageMetadata = async ({
   testFn,
@@ -121,7 +121,7 @@ const scrapePageMetadata = async ({
     }, currentRetry);
   } else {
     console.error('no metadata found in time (%s)', scrapingName)
-    throw new Error('no metadata found in time (%s)', scrapingName);
+    // throw new Error('no metadata found in time (%s)', scrapingName);
   }
 }
 
@@ -140,11 +140,15 @@ export const recordNewViewContent = async ({
     title,
     ...parsedMetadata
   }
-  const scrapedMetadata = await scrapePageMetadata({
-    testFn: parsers[platform].scrapers[viewType].test,
-    scrapeFn: parsers[platform].scrapers[viewType].scrape,
-    scrapingName: `${platform} ${viewType}`,
-  });
+  let scrapedMetadata = {}
+
+  if (parsers[platform]?.scrapers[viewType]) {
+    scrapedMetadata = await scrapePageMetadata({
+      testFn: parsers[platform].scrapers[viewType].test,
+      scrapeFn: parsers[platform].scrapers[viewType].scrape,
+      scrapingName: `${platform} ${viewType}`,
+    });
+  }
   metadata = {
     ...metadata,
     ...scrapedMetadata
@@ -160,4 +164,5 @@ export const recordNewViewContent = async ({
     metadata
   }
   await addEvent(browseViewEvent);
+  return viewType;
 }
