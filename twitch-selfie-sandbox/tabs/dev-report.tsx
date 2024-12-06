@@ -3,6 +3,7 @@ import { useStorage } from "@plasmohq/storage/hook"
 import { Storage } from "@plasmohq/storage"
 import { FileDrop } from 'react-file-drop'
 import { CodeBlock, dracula } from "react-code-blocks";
+import {v4 as generateId} from 'uuid';
 
 import { downloadJSONData } from "~helpers";
 
@@ -13,8 +14,10 @@ const PAGINATION_COUNT = 25;
 const EVENT_TYPES = [
   'OPEN_PLATFORM_IN_TAB',
   'CLOSE_PLATFORM_IN_TAB',
-  'UNFOCUS_TAB',
+  'BLUR_TAB',
   'FOCUS_TAB',
+  'FOCUS_ON_REACTION_INPUT',
+  'BLUR_ON_REACTION_INPUT',
   'POINTER_ACTIVITY_RECORD',
   'BROWSE_VIEW',
   'CHAT_ACTIVITY_RECORD'
@@ -23,7 +26,7 @@ const EVENT_TYPES = [
 function DevReport() {
   const fileInputRef = useRef(null);
   // const [activity = []] = useStorage("stream-selfie-activity");
-  const [activity = []] = useStorage({
+  const [activity = [], setActivity] = useStorage({
     key: "stream-selfie-activity",
     instance: new Storage({
       area: "local"
@@ -114,6 +117,42 @@ function DevReport() {
     }
     return pages;
   }, [filteredActivity, PAGINATION_COUNT]);
+
+  const handleDuplicateTodayForPastDays = async (numberOfDays = 100) => {
+    if (!confirm(`Vous allez définitivement modifier l'historique en multipliant sa taille par ${numberOfDays} dans le cadre du test de charge. Continuer ?`)) {
+      return;
+    }
+    const todaySlug = new Date().toJSON().split('T')[0];
+    const todayEvents = activity.filter(event => {
+      const daySlug = new Date(event.date).toJSON().split('T')[0];
+      return todaySlug === daySlug;
+    });
+    const injectionIds = Array.from(new Set(todayEvents.map(e => e.injectionId)));
+    let newEvents = [...todayEvents];
+    for (let i = 1 ; i < numberOfDays ; i++) {
+      const injectionIdMap = injectionIds.reduce((temp, id) => {
+        return {
+          ...temp,
+          [id]: generateId()
+        }
+      }, {});
+      // console.log(injectionIdMap);
+      const DAY = 3600 * 24 * 1000;
+      const thatDayEvents = todayEvents.map(event => {
+        return {
+          ...event,
+          date: new Date(new Date(event.date).getTime() - DAY * i),
+          injectionId: injectionIdMap[event.injectionId],
+          id: generateId()
+        }
+      });
+      newEvents = [...thatDayEvents, ...newEvents];
+    }
+    alert('Données prêtes ! accrochez vos ceintures c\'est parti !')
+    console.debug('setting activity with %s events', newEvents.length);
+    await setActivity(newEvents);
+    console.debug('done');
+  }
   return (
     <div className="DevReport">
       {/* <h1>Dev report</h1> */}
@@ -138,6 +177,26 @@ function DevReport() {
           >
             Supprimer toutes les données
           </button>
+        </div>
+        <div className="ui-section">
+          <h2>Tests de charge</h2>
+          <div>
+          <button
+              onClick={() => handleDuplicateTodayForPastDays(10)}
+            >
+              Dupliquer les données d'aujourd'hui sur les 10 derniers jours
+            </button>
+          <button
+              onClick={() => handleDuplicateTodayForPastDays(100)}
+            >
+              Dupliquer les données d'aujourd'hui sur les 100 derniers jours
+            </button>
+            <button
+              onClick={() => handleDuplicateTodayForPastDays(1000)}
+            >
+              Dupliquer les données d'aujourd'hui sur les 1000 derniers jours
+            </button>
+          </div>
         </div>
         <div className="ui-section">
           <h2>Charger des données existantes</h2>

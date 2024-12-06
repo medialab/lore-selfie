@@ -27,8 +27,8 @@ export interface OpenPlatformInTabEvent extends GenericEvent {
 export interface ClosePlatformInTabEvent extends GenericEvent {
   type: "CLOSE_PLATFORM_IN_TAB"
 }
-export interface UnfocusTabEvent extends GenericEvent {
-  type: "UNFOCUS_TAB"
+export interface BlurTabEvent extends GenericEvent {
+  type: "BLUR_TAB"
 }
 export interface FocusTabEvent extends GenericEvent {
   type: "FOCUS_TAB"
@@ -65,7 +65,10 @@ interface ChatMessage {
 
 export interface ChatActivityRecordEvent extends GenericEvent {
   type: "CHAT_ACTIVITY_RECORD",
-  messages: Array<ChatMessage>,
+  messages?: Array<ChatMessage>,
+  messagesCount: number,
+  messagesAverageCharLength: number,
+  viewersCount?: number,
   timeSpan: Number, // timespan of measure provided, in ms
 }
 

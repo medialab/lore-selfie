@@ -2,7 +2,7 @@ export { }
 import type { PlasmoCSConfig } from "plasmo"
 import { v4 as generateId } from 'uuid';
 import { Storage } from "@plasmohq/storage"
-import { Browser, OpenPlatformInTabEvent, type captureEventsList, type ClosePlatformInTabEvent, type EventGeneric, type FocusTabEvent, type PointerActivityRecordEvent, type UnfocusTabEvent } from "~types/captureEventsTypes"
+import { Browser, OpenPlatformInTabEvent, type captureEventsList, type ClosePlatformInTabEvent, type EventGeneric, type FocusTabEvent, type PointerActivityRecordEvent, type BlurTabEvent } from "~types/captureEventsTypes"
 import { recordNewViewContent } from "~analyzers/recordNewViewContent";
 import { getPlatform, getBrowser } from "~helpers";
 import { updateLiveTracking } from "~analyzers/livetrackers";
@@ -93,15 +93,15 @@ const main = async () => {
     await addEvent(focusTabEvent);
   };
   window.onblur = async function () {
-    const unfocusTabEvent: UnfocusTabEvent = {
-      type: "UNFOCUS_TAB",
+    const blurTabEvent: BlurTabEvent = {
+      type: "BLUR_TAB",
       id: generateId(),
       date: new Date(),
       url: window.location.href,
       injectionId,
       platform,
     };
-    await addEvent(unfocusTabEvent);
+    await addEvent(blurTabEvent);
   };
   // pointer activity monitoring
   interface MousePosition {

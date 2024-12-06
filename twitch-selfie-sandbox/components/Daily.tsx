@@ -1,9 +1,11 @@
 import { useStorage } from "@plasmohq/storage/hook"
 import { Storage } from "@plasmohq/storage"
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import DayVisualization from "./DayVisualization";
+import DatePicker from "react-multi-date-picker"
 
 function Daily() {
+  const calendarRef = useRef(null);
   const [displayedDayDate, setDisplayedDayDate] = useState();
   const [activity = []] = useStorage({
     key: "stream-selfie-activity",
@@ -60,7 +62,6 @@ function Daily() {
       }
     })
   }, [daysMap]);
-  console.log('available days', availableDays)
   const currentDaySessions = useMemo(() => {
     if (displayedDayDate) {
       const sessionsIds = Array.from(daysMap.get(displayedDayDate));
@@ -76,20 +77,48 @@ function Daily() {
   return (
     <div className="Daily">
       <h1>Au jour le jour</h1>
+      
       <div className="date-picker-container">
+      <DatePicker
+        multiple
+        format="DD MMMM YYYY"
+        sort
+        ref={calendarRef}
+        value={availableDays.map(({ date }) => date.getTime())}
+        onChange={(dates) => {
+          const availableDaysSet = new Set(availableDays.map(({ date }) => date.getTime()));
+          const datesSet = new Set(dates.map(d => +d.unix * 1000));
+
+          const hasNot = Array.from(availableDaysSet).find(t => {
+            const picked = datesSet.has(t);
+            return !picked;
+          });
+          const key = new Date(hasNot).toJSON().split('T')[0];
+          setDisplayedDayDate(key);
+          // console.log(key, Array.from(availableDaysSet), Array.from(datesSet));
+          calendarRef.current.closeCalendar();
+          return false;
+        }}
+
+      />
         <ul>
           {
-            availableDays.map(({ key, date, label }) => {
+            availableDays
+            .filter(({key}) => key === displayedDayDate)
+            .map(({ key, date, label }) => {
               const handleClick = () => {
-                setDisplayedDayDate(key);
+                // setDisplayedDayDate(key);
+                calendarRef.current.openCalendar();
+
               }
               return (
                 <li key={key} >
+                  <h3> {label}</h3>
                   <button
-                    className={`available-day ${key === displayedDayDate ? 'active' : ''}`}
+                    // className={`available-day ${key === displayedDayDate ? 'active' : ''}`}
                     onClick={handleClick}
                   >
-                    {label}
+                   Changer de jour
                   </button>
                 </li>
               )

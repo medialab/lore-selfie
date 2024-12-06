@@ -11,6 +11,34 @@ import Session from './DailyVisualizationSession'
 
 const MIN_ZOOM = .8;
 
+function inferTickTimespan(timeSpan, zoomLevel) {
+  const scale = timeSpan / zoomLevel;
+  let span;
+  if (scale < 150000) {
+    span = 15000;
+  } else if (scale < 300000) {
+    span = 30000;
+  }
+  else if (scale < 300000) {
+    span = 30000;
+  } else if (scale < 600000) {
+    span = 60000;
+  } else if (scale < 1000000) {
+    span = 60000 * 2;
+  } else if (scale < 2000000) {
+    span = 60000 * 5;
+  } else if (scale < 5000000) {
+    span = 60000 * 10;
+  } else if (scale < 10000000) {
+    span = 60000 * 15;
+  } else if (scale < 100000000) {
+    span = 3600 * 1000;
+  } else {
+    span = 3600 * 1000 * 3;
+  }
+  return span;
+}
+
 function DayVisualization({
   sessions = new Map(),
   date,
@@ -49,21 +77,15 @@ function DayVisualization({
           }
         })
       }
-      min = new Date(min)
-      min.setMinutes(0);
-      min.setSeconds(0);
+      const inferedTickTimeSpan = inferTickTimespan(max - min, zoomLevel);
+      min = min - min % inferedTickTimeSpan;
+      max = max - max % inferedTickTimeSpan + inferedTickTimeSpan;
 
-      max = new Date(max)
-      max.setHours(max.getHours() + 1);
-      max.setMinutes(0);
-      max.setSeconds(0);
-
-      min = min.getTime();
-      max = max.getTime();
     }
 
     return [min, max]
-  }, [date, sessions, roundDay]);
+  }, [date, sessions, roundDay, zoomLevel]);
+  const tickTimeSpan = useMemo(() => inferTickTimespan(datesDomain[1] - datesDomain[0], zoomLevel), [datesDomain, zoomLevel]);
   const visualizationHeight = useMemo(() => {
     return window.innerHeight * zoomLevel;
   }, [zoomLevel, window.innerHeight]);
@@ -75,10 +97,10 @@ function DayVisualization({
       .range([gutter, visualizationHeight - gutter])
   }, [datesDomain, gutter, visualizationHeight]);
 
-  const hoursTicks = useMemo(() => {
-    const hour = 3600 * 1000;
+  const timeTicks = useMemo(() => {
+    // const hour = 3600 * 1000;
     const ticks = [];
-    for (let t = datesDomain[0]; t <= datesDomain[1] + hour; t += hour) {
+    for (let t = datesDomain[0]; t <= datesDomain[1] + tickTimeSpan; t += tickTimeSpan) {
       ticks.push({
         date: t,
         label: new Date(t).toLocaleTimeString(),
@@ -86,7 +108,7 @@ function DayVisualization({
       })
     }
     return ticks;
-  }, [datesDomain, yScale]);
+  }, [datesDomain, yScale, tickTimeSpan]);
   const computedSessions = useMemo(() => {
     const computed = [];
     for (let [sessionId, events] of sessions.entries()) {
@@ -99,12 +121,36 @@ function DayVisualization({
         let overlaps = false;
         if (min < prevMax && max > prevMax && prevComputed.columnIndex === columnIndex) {
           overlaps = true;
+        } else if (min > prevMin && max < prevMax) {
+          overlaps = true;
         }
         if (overlaps) {
           columnIndex += 1;
         }
       })
       // focused spans
+      const tabFocusEvents = events.filter(event => event.type === 'FOCUS_TAB' || event.type === 'BLUR_TAB');
+      let blurSpans = tabFocusEvents.reduce((current, event) => {
+        if (event.type === 'BLUR_TAB') {
+          if (!current.length || current[current.length - 1].end !== undefined) {
+            const start = new Date(event.date).getTime();
+            return [...current, { start }]
+          }
+        } else if (event.type === 'FOCUS_TAB' && current.length && current[current.length - 1].end === undefined) {
+          current[current.length - 1].end = new Date(event.date).getTime();
+          return current;
+        }
+        return current;
+      }, []);
+      if (blurSpans.length && !blurSpans[blurSpans.length - 1].end) {
+        blurSpans[blurSpans.length - 1].end = dateExtent[1]
+      }
+      blurSpans = blurSpans.map(({ start, end }) => ({
+        start,
+        end,
+        startY: yScale(start),
+        endY: yScale(end),
+      }))
       // activity spans
       const activityEvents = events.filter(event => event.type === 'POINTER_ACTIVITY_RECORD' && event.activityScore === 1);
       const activitySpans = activityEvents.reduce((current, activityEvent) => {
@@ -127,7 +173,7 @@ function DayVisualization({
           endY: yScale(end),
         }))
       // browse events
-      const browsingEvents = events.filter(event => event.type === 'BROWSE_VIEW')
+      let browsingEvents = events.filter(event => event.type === 'BROWSE_VIEW')
         .map(({ platform, metadata, date, url, viewType, id }) => {
           const y = yScale(new Date(date).getTime());
           return {
@@ -140,6 +186,37 @@ function DayVisualization({
             y
           }
         })
+      browsingEvents = browsingEvents
+        .map((event, eventIndex) => {
+          const next = eventIndex < browsingEvents.length - 1 ? browsingEvents[eventIndex + 1] : undefined;
+          if (next) {
+            return {
+              ...event,
+              endDate: next.date,
+              endY: next.y
+            }
+          } else {
+            return {
+              ...event,
+              endDate: dateExtent[1],
+              endY: yScale(dateExtent[1])
+            }
+          }
+        });
+      const chatSlices = events.filter(event => event.type === 'CHAT_ACTIVITY_RECORD')
+        .map(event => {
+          const end = new Date(event.date).getTime();
+          const start = end - event.timeSpan;
+          return {
+            start,
+            end,
+            startY: yScale(start),
+            endY: yScale(end),
+            messagesCount: event.messagesCount || event.messages?.length || 0,
+            platform: event.platform
+          }
+        })
+
       computed.push({
         id: sessionId,
         dateExtent,
@@ -147,10 +224,19 @@ function DayVisualization({
         columnIndex,
         browsingEvents,
         activitySpans,
+        blurSpans,
+        chatSlices,
       })
     }
     return computed;
   }, [sessions, yScale]);
+  const maxChatMessagesNumber = useMemo(() => {
+    return max(
+      computedSessions.reduce((allCounts, session) => [...allCounts, ...session.chatSlices.map(m => m.messagesCount)], [])
+    )
+  }, [computedSessions]);
+
+
 
   const maxColumnIndex = useMemo(() => max(computedSessions.map(c => c.columnIndex)), [computedSessions]);
   const columnsRange = useMemo(() => [gutter * 2, visualizationWidth - gutter], [visualizationWidth, gutter]);
@@ -159,9 +245,14 @@ function DayVisualization({
     return maxColumnIndex === 0 ?
       () => columnsRange[0]
       : scaleLinear()
-        .domain([0, maxColumnIndex])
+        .domain([0, maxColumnIndex + 1])
         .range(columnsRange)
   }, [visualizationWidth, gutter, maxColumnIndex, columnsRange]);
+  const messageBarWidthScale = useMemo(() => {
+    return scaleLinear()
+      .domain([0, maxChatMessagesNumber])
+      .range([0, columnWidth / 2 - gutter])
+  }, [maxChatMessagesNumber, columnWidth])
 
   return (
     <div className="DayVisualization">
@@ -190,8 +281,8 @@ function DayVisualization({
             <Slider
               step={0.5}
               min={0.5}
-              max={10}
-              onChange={(value) => {
+              max={50}
+              onChange={(value: number) => {
                 setZoomLevel(value)
               }}
               value={zoomLevel}
@@ -219,7 +310,7 @@ function DayVisualization({
         {/* <rect x={0} y={0} width={visualizationWidth} height={visualizationHeight} fill="lightgrey" /> */}
         <g className="time-ticks">
           {
-            hoursTicks.map(({ date, label, y }, tickIndex) => {
+            timeTicks.map(({ date, label, y }, tickIndex) => {
               return (
                 <g className="tick-group"
                   key={tickIndex}
@@ -255,7 +346,9 @@ function DayVisualization({
                     ...session,
                     yScale,
                     xScale,
-                    width: columnWidth
+                    width: columnWidth,
+                    gutter,
+                    messageBarWidthScale,
                   }
                   }
                 />
@@ -263,6 +356,7 @@ function DayVisualization({
             })
           }
         </g>
+
       </svg>
       <Tooltip id="daily-vis-tooltip" />
     </div>

@@ -52,6 +52,7 @@ const trackers = {
             }
           }
         });
+        const viewersCount = document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div')?.textContent?.replace(' ', '');
         const chatActivityRecordEvent: ChatActivityRecordEvent = {
           type: "CHAT_ACTIVITY_RECORD",
           id: generateId(),
@@ -60,9 +61,12 @@ const trackers = {
           injectionId,
           timeSpan: liveTrackTimespan,
           platform,
-          messages
+          messages,
+          messagesCount: messages.length,
+          viewersCount: +(viewersCount || 0),
+          messagesAverageCharLength: messages.reduce((sum, m) => sum + (m.message ? m.message.length : 0), 0) / messages.length
         }
-        console.debug('new messages', messages);
+        // console.debug('new messages', messages);
         await addEvent(chatActivityRecordEvent);
       }, liveTrackTimespan)
     }
