@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useStorage } from "@plasmohq/storage/hook"
-import { Storage } from "@plasmohq/storage"
+// import { useStorage } from "@plasmohq/storage/hook"
+import { usePort } from "@plasmohq/messaging/hook"
+// import { Storage } from "@plasmohq/storage"
 import { FileDrop } from 'react-file-drop'
 import { CodeBlock, dracula } from "react-code-blocks";
 import { v4 as generateId } from 'uuid';
 
-import { downloadJSONData } from "~helpers";
+import { downloadTextfile } from "~helpers";
 
 import '~styles/DevDashboard.scss';
+import { useInterval } from "usehooks-ts";
 
 const PAGINATION_COUNT = 25;
 
@@ -23,24 +25,107 @@ const EVENT_TYPES = [
   'CHAT_ACTIVITY_RECORD'
 ]
 
+type DashboardRequestBody = {
+  types: Array<String>
+  reverseOrder: Boolean
+  page: Number
+  itemsPerPage: Number
+}
+
+type DashboardResponseBody = {
+  types: Array<String>
+  items: Array<Object>
+  page: Number
+  filteredCount: Number
+  totalCount: Number
+  pagesCount: Number
+}
+
 function DevDashboard() {
+  const dashboardPort = usePort<DashboardRequestBody, DashboardResponseBody>("devdashboard")
+  const crudPort = usePort("activitycrud")
+
   const fileInputRef = useRef(null);
-  const [activity = [], setActivity] = useStorage({
-    key: "lore-selfie-activity",
-    instance: new Storage({
-      area: "local"
-    })
-  });
+  // const [activity = [], setActivity] = useStorage({
+  //   key: "lore-selfie-activity",
+  //   instance: new Storage({
+  //     area: "local"
+  //   })
+  // });
   const [visibleTypes, setVisibleTypes] = useState(
     ['BROWSE_VIEW']
   );
   const [reverseOrder, setReverseOrder] = useState(false);
   const [uploadMode, setUploadMode] = useState('prepend');
-  const [currentDataPage, setCurrentDataPage] = useState(0);
+  const [currentPreviewPage, setCurrentPreviewPage] = useState(0);
+  const [isLoadingPreview, setIsLoadingPreview] = useState();
+  const [numberOfPages, setNumberOfPages] = useState();
+  const [totalCount, setTotalCount] = useState();
+  const [filteredCount, setFilteredCount] = useState();
+  const [previewedItems, setPreviewedItems] = useState();
+
+  const [isWorking, setIsWorking] = useState(false);
+  const [isWorkingShareStatus, setIsWorkingShareStatus] = useState(0);
+  const [pendingForDownload, setPendingForDownload] = useState(false);
+
+  const requestPreviewUpdate = () => {
+    const payload = {
+      types: visibleTypes,
+      reverseOrder,
+      page: currentPreviewPage,
+      itemsPerPage: PAGINATION_COUNT
+    }
+    setIsLoadingPreview(true);
+    // console.debug('send dashboard preview request', payload);
+    dashboardPort.send(payload)
+  }
+
+  useInterval(() => requestPreviewUpdate(), 2000);
 
   useEffect(() => {
-    setCurrentDataPage(0);
-  }, [activity, reverseOrder])
+    requestPreviewUpdate();
+  }, [reverseOrder, currentPreviewPage, visibleTypes])
+
+  crudPort.listen(data => {
+    // console.log('cudport response data', data);
+    if (data.actionType === 'SERIALIZE_ALL_DATA' && data.result.status === 'success' && pendingForDownload) {
+      downloadTextfile(data.result.data, `lore-selfie-activity-${new Date().toUTCString()}.json`, 'application/json')
+      setPendingForDownload(false);
+      // downloadJSONData(data.result.data, `lore-selfie-activity-${new Date().toUTCString()}`)
+    }
+    else if (data.responseType === 'ACTION_END') {
+      setIsWorking(false);
+      setIsWorkingShareStatus(undefined);
+      requestPreviewUpdate();
+    } else if (data.responseType === 'ACTION_PROGRESS') {
+      setIsWorkingShareStatus({
+        current: data.current,
+        total: data.total
+      });
+    }
+    
+  })
+
+  dashboardPort.listen(data => {
+    // console.log('mailport data', data)
+    if (data) {
+      const {
+        items,
+        page,
+        pagesCount,
+        totalCount,
+        filteredCount,
+        // types
+      } = data;
+      setPreviewedItems(items);
+      setTotalCount(totalCount);
+      setNumberOfPages(pagesCount);
+      setFilteredCount(filteredCount);
+      setCurrentPreviewPage(page);
+      setIsLoadingPreview(false);
+    }
+  });
+
   const onFileInputChange = (event) => {
     const { files } = event.target;
     const [file] = files;
@@ -57,27 +142,49 @@ function DevDashboard() {
             let newActivity;
             switch (uploadMode) {
               case 'prepend':
-                newActivity = [...data, ...activity];
+                // console.log('send prepend request to cudport', data);
+                setIsWorking(true);
+                crudPort.send({
+                  actionType: 'PREPEND_ACTIVITY_EVENTS',
+                  payload: {
+                    data
+                  }
+                })
+                // newActivity = [...data, ...activity];
                 break;
               case 'append':
-                newActivity = [...activity, ...data]
+                // newActivity = [...activity, ...data]
+                setIsWorking(true);
+                crudPort.send({
+                  actionType: 'APPEND_ACTIVITY_EVENTS',
+                  payload: {
+                    data
+                  }
+                })
                 break;
               case 'replace':
                 const confirmed = confirm('L\'entièreté de l\'historique d\'activité actuel va être écrasé et remplacé par celui du fichier versé. Confirmer ?');
                 if (confirmed) {
-                  newActivity = data;
+                  // newActivity = data;
+                  setIsWorking(true);
+                  crudPort.send({
+                    actionType: 'REPLACE_ACTIVITY_EVENTS',
+                    payload: {
+                      data
+                    }
+                  })
                 }
                 break;
               default:
                 break;
             }
-            if (newActivity) {
-              const storage = new Storage({
-                area: "local",
-              });
-              console.info('set activity');
-              storage.set('lore-selfie-activity', newActivity);
-            }
+            // if (newActivity) {
+            //   const storage = new Storage({
+            //     area: "local",
+            //   });
+            //   console.info('set activity');
+            //   storage.set('lore-selfie-activity', newActivity);
+            // }
           } else {
             console.error('Not a lore selfie record');
             alert('Le fichier versé n\'est un historique de lore selfie');
@@ -98,59 +205,32 @@ function DevDashboard() {
   const onTargetClick = () => {
     fileInputRef.current.click()
   }
-  const filteredActivity = useMemo(() => {
-    return (activity || []).filter((event) => visibleTypes.includes(event.type));
-  }, [activity, visibleTypes]);
-
-  const visibleActivity = useMemo(() => {
-    const ordered = reverseOrder ? (filteredActivity || []).reverse() : filteredActivity;
-    const sliced = ordered.slice(currentDataPage * PAGINATION_COUNT, (currentDataPage + 1) * PAGINATION_COUNT)
-    return sliced;
-  }, [reverseOrder, filteredActivity, currentDataPage, PAGINATION_COUNT]);
 
   const paginations = useMemo(() => {
-    const numberOfPages = Math.floor((filteredActivity || []).length / PAGINATION_COUNT);
+    if (!numberOfPages) {
+      return [];
+    }
     let pages = [];
-    for (let i = 0; i <= numberOfPages; i++) {
+    for (let i = 0; i < numberOfPages; i++) {
       pages.push(i);
     }
     return pages;
-  }, [filteredActivity, PAGINATION_COUNT]);
+  }, [numberOfPages]);
 
   const handleDuplicateTodayForPastDays = async (numberOfDays = 100) => {
     if (!confirm(`Vous allez définitivement modifier l'historique en multipliant sa taille par ${numberOfDays} dans le cadre du test de charge. Continuer ?`)) {
       return;
     }
     const todaySlug = new Date().toJSON().split('T')[0];
-    const todayEvents = activity.filter(event => {
-      const daySlug = new Date(event.date).toJSON().split('T')[0];
-      return todaySlug === daySlug;
-    });
-    const injectionIds = Array.from(new Set(todayEvents.map(e => e.injectionId)));
-    let newEvents = [...todayEvents];
-    for (let i = 1; i < numberOfDays; i++) {
-      const injectionIdMap = injectionIds.reduce((temp, id) => {
-        return {
-          ...temp,
-          [id]: generateId()
-        }
-      }, {});
-      // console.log(injectionIdMap);
-      const DAY = 3600 * 24 * 1000;
-      const thatDayEvents = todayEvents.map(event => {
-        return {
-          ...event,
-          date: new Date(new Date(event.date).getTime() - DAY * i),
-          injectionId: injectionIdMap[event.injectionId],
-          id: generateId()
-        }
-      });
-      newEvents = [...thatDayEvents, ...newEvents];
-    }
-    alert('Données prêtes ! accrochez vos ceintures c\'est parti !')
-    console.debug('setting activity with %s events', newEvents.length);
-    await setActivity(newEvents);
-    console.debug('done');
+    setIsWorking(true);
+    crudPort.send({
+      actionType: 'DUPLICATE_DAY_DATA',
+      payload: {
+        daySlug: todaySlug,
+        numberOfDays
+      }
+    })
+    // console.debug('done');
   }
   return (
     <div className="DevDashboard">
@@ -158,7 +238,12 @@ function DevDashboard() {
       <div className="ui">
         <div className="ui-section">
           <button
-            onClick={() => downloadJSONData(activity, `lore-selfie-activity-${new Date().toUTCString()}`)}
+            onClick={() => {
+              crudPort.send({ actionType: 'SERIALIZE_ALL_DATA' })
+              setPendingForDownload(true);
+              // downloadJSONData(activity, `lore-selfie-activity-${new Date().toUTCString()}`)
+
+            }}
           >
             Télécharger les données au format JSON
           </button>
@@ -167,10 +252,9 @@ function DevDashboard() {
 
               const confirmed = confirm("Supprimer toutes les données enregistrées par lore selfie ?")
               if (confirmed) {
-                const storage = new Storage({
-                  area: "local",
-                });
-                storage.clear();
+                // console.log('send cud port action')
+                setIsWorking(true);
+                crudPort.send({ actionType: 'DELETE_ALL_DATA' })
               }
             }}
           >
@@ -279,7 +363,7 @@ function DevDashboard() {
       <div className="data-preview">
         <h2>
           <span>
-            Visualisation de {filteredActivity.length} évènements sur {(activity || []).length}
+            Visualisation de {filteredCount === undefined ? '?' : filteredCount} évènements sur {totalCount === undefined ? '?' : totalCount}
           </span>
           <button style={{ marginLeft: '1rem' }} onClick={() => setReverseOrder(!reverseOrder)}>
             {
@@ -292,7 +376,7 @@ function DevDashboard() {
           {paginations.length > 1 ?
             paginations.map(pageNumber => {
               return (
-                <button onClick={() => setCurrentDataPage(pageNumber)} key={pageNumber} className={`pagination ${currentDataPage === pageNumber ? 'active' : ''}`}>
+                <button onClick={() => setCurrentPreviewPage(pageNumber)} key={pageNumber} className={`pagination ${currentPreviewPage === pageNumber ? 'active' : ''}`}>
                   {pageNumber + 1}
                 </button>
               )
@@ -303,26 +387,32 @@ function DevDashboard() {
         <div>
 
         </div>
-        <CodeBlock
-          text={JSON.stringify(visibleActivity, null, 2)}
-          language={'json'}
-          showLineNumbers
-          theme={dracula}
-        />
-        <div>
+        {
+          isLoadingPreview ? <div>Chargement</div> :
+            <CodeBlock
+              text={JSON.stringify(previewedItems, null, 2)}
+              language={'json'}
+              showLineNumbers
+              theme={dracula}
+            />
+        }
+
+        {/* <div>
           {paginations.length > 1 ?
             paginations.map(pageNumber => {
               return (
-                <button onClick={() => setCurrentDataPage(pageNumber)} key={pageNumber} className={`pagination ${currentDataPage === pageNumber ? 'active' : ''}`}>
+                <button onClick={() => setCurrentPreviewPage(pageNumber)} key={pageNumber} className={`pagination ${currentPreviewPage === pageNumber ? 'active' : ''}`}>
                   {pageNumber + 1}
                 </button>
               )
             })
             : null
           }
-        </div>
+        </div> */}
       </div>
-
+      <div className={`worker-loading-container ${isWorking ? 'active' : ''}`}>
+        Opérations en cours {isWorkingShareStatus ? `${isWorkingShareStatus.current} / ${isWorkingShareStatus.total} (${Math.round(isWorkingShareStatus.current / isWorkingShareStatus.total * 100)}%)` : ''}
+      </div>
     </div>
   )
 }

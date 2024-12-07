@@ -95,3 +95,12 @@ export function downloadJSONData(data:Object, filename='selfie-data.json') {
   document.body.appendChild(a);
   a.click();
 }
+export function downloadTextfile(data:Object, filename='selfie-data.json', mimetype = 'application/json') {
+  let blob = new Blob([data], { type: mimetype });
+  let dlURL = window.URL.createObjectURL(blob);
+  let a = document.createElement('a');
+  a.href = dlURL;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+}

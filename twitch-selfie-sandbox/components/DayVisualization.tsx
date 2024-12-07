@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { scaleLinear } from 'd3-scale';
 import { extent, max } from 'd3-array';
 import { Tooltip } from 'react-tooltip';
+import { useInterval } from 'usehooks-ts'
 
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -43,6 +44,7 @@ function DayVisualization({
   zoomLevel,
   roundDay
 }) {
+  const [nowLineY, setNowLineY] = useState();
   const datesDomain = useMemo(() => {
     let min, max;
     if (roundDay) {
@@ -251,8 +253,26 @@ function DayVisualization({
     return scaleLinear()
       .domain([0, maxChatMessagesNumber])
       .range([0, columnWidth / 2 - gutter])
-  }, [maxChatMessagesNumber, columnWidth])
+  }, [maxChatMessagesNumber, columnWidth]);
 
+  const updateNowLineY = useMemo(() => () => {
+    const now  = new Date().getTime();
+    if (now > datesDomain[0] && now < datesDomain[1]) {
+      const nowY = yScale(now);
+      setNowLineY(nowY);
+    } else if (nowLineY !== undefined) {
+      setNowLineY(undefined);
+    }
+  }, [datesDomain, setNowLineY, yScale, datesDomain]);
+
+  useInterval(
+    () => {
+      updateNowLineY();
+    },
+    10000,
+  )
+  useEffect(() => updateNowLineY(), [datesDomain, yScale])
+  
   return (
     <>
       <svg className="DayVisualization" width={visualizationWidth} height={visualizationHeight}>
@@ -305,6 +325,18 @@ function DayVisualization({
             })
           }
         </g>
+
+        {
+          nowLineY ?
+          <line
+            y1={nowLineY}
+            y2={nowLineY}
+            x1={gutter * 2}
+            x2={visualizationWidth}
+            stroke="red"
+          />
+          : null
+        }
 
       </svg>
       <Tooltip id="daily-vis-tooltip" />

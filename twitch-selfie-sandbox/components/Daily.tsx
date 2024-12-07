@@ -1,8 +1,10 @@
-import { useStorage } from "@plasmohq/storage/hook"
-import { Storage } from "@plasmohq/storage"
+// import { useStorage } from "@plasmohq/storage/hook"
+// import { Storage } from "@plasmohq/storage"
+import { usePort } from "@plasmohq/messaging/hook"
 import { useMemo, useState, useEffect, useRef } from "react";
 import DatePicker from "react-multi-date-picker"
 import Slider from 'rc-slider';
+import { useInterval } from 'usehooks-ts'
 
 import DayVisualization from "./DayVisualization"
 
@@ -15,126 +17,164 @@ function Daily() {
   const [displayedDayDate, setDisplayedDayDate] = useState();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [roundDay, setRoundDay] = useState(false);
-
-  const [activity = []] = useStorage({
-    key: "lore-selfie-activity",
-    instance: new Storage({
-      area: "local"
-    })
-  });
-  const sessionsMap = useMemo(() => {
-    const currentMap = new Map();
-    activity.forEach(event => {
-      const { injectionId } = event;
-      if (currentMap.has(injectionId)) {
-        const prev = currentMap.get(injectionId);
-        currentMap.set(injectionId, [...prev, event]);
-      } else {
-        currentMap.set(injectionId, [event]);
-      }
-    })
-    return currentMap;
-  }, [activity]);
-  const daysMap = useMemo(() => {
-    const currentMap = new Map();
-    for (let [injectionId, events] of sessionsMap.entries()) {
-      if (events.length) {
-        const dateOfFirstEvent = new Date(events[0].date).toJSON().split('T')[0];
-        if (!currentMap.has(dateOfFirstEvent)) {
-          currentMap.set(dateOfFirstEvent, new Set([injectionId]));
-        } else {
-          const existing = currentMap.get(dateOfFirstEvent);
-          existing.add(injectionId);
-          currentMap.set(dateOfFirstEvent, existing);
-        }
-      }
+  const [availableDays, setAvailableDays] = useState([]);
+  const [visibleEvents, setVisibleEvents] = useState([]);
+  const crudPort = usePort("activitycrud")
+  crudPort.listen(response => {
+    console.debug('received data : ', response.actionType, response?.result?.data);
+    if (response.result.status === 'error') {
+      console.error('error : ', response);
+      return;
     }
-    return currentMap;
-  }, [sessionsMap]);
-  useEffect(() => {
-    if (!displayedDayDate && activity.length) {
-      const keys = Array.from(daysMap.keys()).sort();
-      const latestDay = keys.pop();
-      setDisplayedDayDate(latestDay);
-    } else if (!activity.length) {
-      setDisplayedDayDate(undefined);
-    }
-  }, [daysMap, sessionsMap, activity]);
-  const availableDays = useMemo(() => {
-    const dates = Array.from(daysMap.keys()).map(d => ({ key: d, date: new Date(d) }));
+    const { result: { data = [] } } = response;
     const today = new Date().toJSON().split('T')[0];
-    return dates.map(({ key, date }) => {
-      return {
-        key,
-        date,
-        label: key == today ? `aujourd'hui` : date.toLocaleDateString()
+    switch (response.actionType) {
+      case 'GET_ACTIVITY_EVENTS':
+        setVisibleEvents(data);
+        break;
+      case 'GET_BINNED_ACTIVITY_OUTLINE':
+        const formatted = data.map(({ date, eventsCount }) => {
+          const key = new Date(date).toJSON().split('T')[0]
+          return {
+            eventsCount,
+            key,
+            date: new Date(date),
+            label: key == today ? `aujourd'hui` : new Date(date).toLocaleDateString()
+          }
+        });
+        setAvailableDays(formatted);
+        if (!displayedDayDate && formatted.length) {
+          const latestDay = formatted[formatted.length - 1].key;
+          // console.log('set displayed day date to latest day', latestDay)
+          setDisplayedDayDate(latestDay);
+        }
+        break;
+      default:
+        break;
+    }
+  })
+
+  useEffect(() => {
+    const DAY = 24 * 3600 * 1000;
+    crudPort.send({
+      actionType: 'GET_BINNED_ACTIVITY_OUTLINE',
+      payload: {
+        bin: DAY
       }
     })
-  }, [daysMap]);
-  const currentDaySessions = useMemo(() => {
+  }, []);
+
+  useEffect(() => {
     if (displayedDayDate) {
-      const sessionsIds = Array.from(daysMap.get(displayedDayDate));
+      let from = new Date(displayedDayDate)
+      const fromTime = from.getTime();
+      const toTime = fromTime + 24 * 3600 * 1000;
+      crudPort.send({
+        actionType: 'GET_ACTIVITY_EVENTS',
+        payload: {
+          from: fromTime,
+          to: toTime,
+        }
+      })
+    }
+  }, [displayedDayDate])
+
+  const isVisualizingToday = useMemo(() => {
+    const today = new Date().toJSON().split('T')[0];
+    return today === displayedDayDate
+  }, [displayedDayDate])
+
+  useInterval(
+    () => {
+      if (isVisualizingToday) {
+          let from = new Date(displayedDayDate)
+          const fromTime = from.getTime();
+          const toTime = fromTime + 24 * 3600 * 1000;
+          crudPort.send({
+            actionType: 'GET_ACTIVITY_EVENTS',
+            payload: {
+              from: fromTime,
+              to: toTime,
+            }
+          })
+      }
+    },
+    1000,
+  )
+
+  const currentDaySessions = useMemo(() => {
+    if (visibleEvents) {
       const sessions = new Map();
-      sessionsIds.forEach((sessionId) => {
-        sessions.set(sessionId, sessionsMap.get(sessionId));
-      });
+      visibleEvents.forEach(event => {
+        const {injectionId} = event;
+        if (!sessions.has(injectionId)) {
+          sessions.set(injectionId, [event])
+        } else {
+          sessions.set(injectionId, [...sessions.get(injectionId), event])
+        }
+      })
       return sessions;
     }
-  }, [displayedDayDate, daysMap]);
+  }, [visibleEvents]);
+
   return (
     <div className="Daily">
       <h1>Au jour le jour</h1>
+      {
+        availableDays === 'undefined' ?
+        <div>Chargement</div>
+        :
+        <div className="ui">
+        <div className="date-picker-container">
+          <DatePicker
+            multiple
+            format="DD MMMM YYYY"
+            sort
+            ref={calendarRef}
+            value={(availableDays || []).map(({ date }) => date.getTime())}
+            onChange={(dates) => {
+              const availableDaysSet = new Set((availableDays || []).map(({ date }) => date.getTime()));
+              const datesSet = new Set(dates.map(d => +d.unix * 1000));
 
-    
-      <div className="ui">
-      <div className="date-picker-container">
-        <DatePicker
-          multiple
-          format="DD MMMM YYYY"
-          sort
-          ref={calendarRef}
-          value={availableDays.map(({ date }) => date.getTime())}
-          onChange={(dates) => {
-            const availableDaysSet = new Set(availableDays.map(({ date }) => date.getTime()));
-            const datesSet = new Set(dates.map(d => +d.unix * 1000));
+              const hasNot = Array.from(availableDaysSet).find(t => {
+                const picked = datesSet.has(t);
+                return !picked;
+              });
+              const key = new Date(hasNot).toJSON().split('T')[0];
+              setDisplayedDayDate(key);
+              calendarRef.current.closeCalendar();
+              return false;
+            }}
 
-            const hasNot = Array.from(availableDaysSet).find(t => {
-              const picked = datesSet.has(t);
-              return !picked;
-            });
-            const key = new Date(hasNot).toJSON().split('T')[0];
-            setDisplayedDayDate(key);
-            // console.log(key, Array.from(availableDaysSet), Array.from(datesSet));
-            calendarRef.current.closeCalendar();
-            return false;
-          }}
+          />
+          <ul>
+            {
+              availableDays === 'undefined' ?
+              <div>Chargement</div>
+              :
+              availableDays
+                .filter(({ key }) => key === displayedDayDate)
+                .map(({ key, date, label }) => {
+                  const handleClick = () => {
+                    // setDisplayedDayDate(key);
+                    calendarRef.current.openCalendar();
 
-        />
-        <ul>
-          {
-            availableDays
-              .filter(({ key }) => key === displayedDayDate)
-              .map(({ key, date, label }) => {
-                const handleClick = () => {
-                  // setDisplayedDayDate(key);
-                  calendarRef.current.openCalendar();
-
-                }
-                return (
-                  <li key={key} >
-                    <h3> {label}</h3>
-                    <button
-                      // className={`available-day ${key === displayedDayDate ? 'active' : ''}`}
-                      onClick={handleClick}
-                    >
-                      Changer de jour
-                    </button>
-                  </li>
-                )
-              })
-          }
-        </ul>
-      </div>
+                  }
+                  return (
+                    <li key={key} >
+                      <h3> {label}</h3>
+                      <button
+                        // className={`available-day ${key === displayedDayDate ? 'active' : ''}`}
+                        onClick={handleClick}
+                      >
+                        Changer de jour
+                      </button>
+                    </li>
+                  )
+                })
+            }
+          </ul>
+        </div>
         <div>
           <span>Zoom</span>
           <button disabled={zoomLevel === MIN_ZOOM} onMouseDown={() => {
@@ -183,6 +223,8 @@ function Daily() {
           </button>
         </div>
       </div>
+      }
+      
 
       <div className="visualization-container">
         {
