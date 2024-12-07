@@ -49,6 +49,15 @@ $color-youtube: #ff0001;
     h1 {
       margin: 0;
     }
+    .ui {
+      display: flex;
+      flex-flow: row nowrap;
+      > div {
+        flex: 1;
+        display: flex;
+        align-items: center;
+      }
+    }
     .date-picker-container {
       display: flex;
       flex-flow: row nowrap;
@@ -74,15 +83,7 @@ $color-youtube: #ff0001;
   }
 
   .DayVisualization {
-    .ui {
-      display: flex;
-      flex-flow: row nowrap;
-      > div {
-        flex: 1;
-        display: flex;
-        align-items: center;
-      }
-    }
+    
   }
 
   .DailyVisualizationSession {

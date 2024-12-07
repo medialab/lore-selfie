@@ -3,7 +3,7 @@ import { useStorage } from "@plasmohq/storage/hook"
 import { Storage } from "@plasmohq/storage"
 import { FileDrop } from 'react-file-drop'
 import { CodeBlock, dracula } from "react-code-blocks";
-import {v4 as generateId} from 'uuid';
+import { v4 as generateId } from 'uuid';
 
 import { downloadJSONData } from "~helpers";
 
@@ -128,7 +128,7 @@ function DevDashboard() {
     });
     const injectionIds = Array.from(new Set(todayEvents.map(e => e.injectionId)));
     let newEvents = [...todayEvents];
-    for (let i = 1 ; i < numberOfDays ; i++) {
+    for (let i = 1; i < numberOfDays; i++) {
       const injectionIdMap = injectionIds.reduce((temp, id) => {
         return {
           ...temp,
@@ -180,12 +180,12 @@ function DevDashboard() {
         <div className="ui-section">
           <h2>Tests de charge</h2>
           <div>
-          <button
+            <button
               onClick={() => handleDuplicateTodayForPastDays(10)}
             >
               Dupliquer les données d'aujourd'hui sur les 10 derniers jours
             </button>
-          <button
+            <button
               onClick={() => handleDuplicateTodayForPastDays(100)}
             >
               Dupliquer les données d'aujourd'hui sur les 100 derniers jours
@@ -193,39 +193,45 @@ function DevDashboard() {
             <button
               onClick={() => handleDuplicateTodayForPastDays(1000)}
             >
-              Dupliquer les données d'aujourd'hui sur les 1000 derniers jours
+              Dupliquer les données d'aujourd'hui sur les 1000 derniers jours (2 ans et demi)
+            </button>
+            <button
+              onClick={() => handleDuplicateTodayForPastDays(10000)}
+            >
+              Dupliquer les données d'aujourd'hui sur les 10000 derniers jours (27 ans)
             </button>
           </div>
         </div>
         <div className="ui-section">
           <h2>Charger des données existantes</h2>
+          <div>
+            <ul>
+              <li>
+                <button className={`${uploadMode === 'prepend' ? 'active' : ''}`} onClick={() => setUploadMode('prepend')}>Ajouter au début de l'historique actuel</button>
+              </li>
+              {/* <li>
+                <button className={`${uploadMode === 'append' ? 'active' : ''}`} onClick={() => setUploadMode('append')}>Ajouter à la fin</button>
+              </li> */}
+              <li>
+                <button className={`${uploadMode === 'replace' ? 'active' : ''}`} onClick={() => setUploadMode('replace')}>Remplacer l'historique actuel</button>
+              </li>
+
+            </ul>
+          </div>
           <input
             onChange={onFileInputChange}
             ref={fileInputRef}
             type="file"
             className="hidden"
           />
+
           <FileDrop
             onTargetClick={onTargetClick}
             onDrop={onFileInputChange}
           >
             Charger des données existantes
           </FileDrop>
-          <div>
-            <p>Mode d'ajout des données : <code>{uploadMode}</code></p>
-            <ul>
-              <li>
-                <button onClick={() => setUploadMode('prepend')}>Ajouter au début</button>
-              </li>
-              <li>
-                <button onClick={() => setUploadMode('append')}>Ajouter à la fin</button>
-              </li>
-              <li>
-                <button onClick={() => setUploadMode('replace')}>Remplacer l'historique</button>
-              </li>
 
-            </ul>
-          </div>
         </div>
         <div className="ui-section">
           <h2>Montrer les types d'évènements</h2>
@@ -304,7 +310,7 @@ function DevDashboard() {
           theme={dracula}
         />
         <div>
-        {paginations.length > 1 ?
+          {paginations.length > 1 ?
             paginations.map(pageNumber => {
               return (
                 <button onClick={() => setCurrentDataPage(pageNumber)} key={pageNumber} className={`pagination ${currentDataPage === pageNumber ? 'active' : ''}`}>

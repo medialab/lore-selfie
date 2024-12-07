@@ -22,7 +22,7 @@ function IndexPopup() {
             url: "./tabs/dev-dashboard.html"
           })
         }}>
-        ouvrir le rapport de dev
+        ouvrir le dashboard de développement
       </button>    
     </div>
   )

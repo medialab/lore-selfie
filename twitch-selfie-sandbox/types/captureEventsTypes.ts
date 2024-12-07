@@ -1,10 +1,4 @@
 
-enum Platform {
-  youtube = "YOUTUBE",
-  twitch = "TWITCH",
-  tiktok = "TIKTOK"
-}
-
 export interface Browser {
   name: String,
   type: String,

@@ -1,11 +1,9 @@
 import { useMemo, useState } from "react";
 import { scaleLinear } from 'd3-scale';
 import { extent, max } from 'd3-array';
-import Slider from 'rc-slider';
 import { Tooltip } from 'react-tooltip';
 
 import 'react-tooltip/dist/react-tooltip.css'
-import 'rc-slider/assets/index.css';
 
 import Session from './DailyVisualizationSession'
 
@@ -42,9 +40,9 @@ function inferTickTimespan(timeSpan, zoomLevel) {
 function DayVisualization({
   sessions = new Map(),
   date,
+  zoomLevel,
+  roundDay
 }) {
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [roundDay, setRoundDay] = useState(false);
   const datesDomain = useMemo(() => {
     let min, max;
     if (roundDay) {
@@ -203,10 +201,13 @@ function DayVisualization({
             }
           }
         });
-      const chatSlices = events.filter(event => event.type === 'CHAT_ACTIVITY_RECORD')
-        .map(event => {
+      let chatSlices = events.filter(event => event.type === 'CHAT_ACTIVITY_RECORD')
+      chatSlices = chatSlices
+        .map((event, index) => {
+          const prev = index > 0 ? chatSlices[index - 1] : undefined;
           const end = new Date(event.date).getTime();
-          const start = end - event.timeSpan;
+          // const start = end - event.timeSpan;
+          const start = prev && prev.url === event.url ? new Date(prev.date).getTime() : end - event.timeSpan;
           return {
             start,
             end,
@@ -236,8 +237,6 @@ function DayVisualization({
     )
   }, [computedSessions]);
 
-
-
   const maxColumnIndex = useMemo(() => max(computedSessions.map(c => c.columnIndex)), [computedSessions]);
   const columnsRange = useMemo(() => [gutter * 2, visualizationWidth - gutter], [visualizationWidth, gutter]);
   const columnWidth = useMemo(() => (columnsRange[1] - columnsRange[0]) / (maxColumnIndex + 1), [columnsRange, maxColumnIndex]);
@@ -255,58 +254,8 @@ function DayVisualization({
   }, [maxChatMessagesNumber, columnWidth])
 
   return (
-    <div className="DayVisualization">
-      <div className="ui">
-        <div>
-          <span>Zoom</span>
-          <button disabled={zoomLevel === MIN_ZOOM} onMouseDown={() => {
-            let newZoomLevel = zoomLevel / 1.05;
-            if (newZoomLevel < MIN_ZOOM) {
-              newZoomLevel = MIN_ZOOM;
-            }
-            setZoomLevel(newZoomLevel)
-          }}>-</button>
-          <button onMouseDown={() => {
-            setZoomLevel(zoomLevel * 1.05)
-          }}>+</button>
-          <button onMouseDown={() => {
-            setZoomLevel(1)
-          }}>reset</button>
-          <div
-            style={{
-              position: 'relative',
-              width: '50%'
-            }}
-          >
-            <Slider
-              step={0.5}
-              min={0.5}
-              max={50}
-              onChange={(value: number) => {
-                setZoomLevel(value)
-              }}
-              value={zoomLevel}
-            />
-          </div>
-
-        </div>
-        <div>
-          <span>Visualiser</span>
-          <button
-            className={`${roundDay ? '' : 'active'}`}
-            onClick={() => setRoundDay(false)}
-          >
-            Sur les créneaux de la journée enregistrés uniquement
-          </button>
-          <button
-            className={`${roundDay ? 'active' : ''}`}
-            onClick={() => setRoundDay(true)}
-          >
-            Sur toute la journée
-          </button>
-        </div>
-      </div>
-      <svg width={visualizationWidth} height={visualizationHeight}>
+    <>
+      <svg className="DayVisualization" width={visualizationWidth} height={visualizationHeight}>
         {/* <rect x={0} y={0} width={visualizationWidth} height={visualizationHeight} fill="lightgrey" /> */}
         <g className="time-ticks">
           {
@@ -359,7 +308,7 @@ function DayVisualization({
 
       </svg>
       <Tooltip id="daily-vis-tooltip" />
-    </div>
+    </>
   )
 }
 
