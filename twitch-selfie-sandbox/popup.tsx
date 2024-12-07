@@ -2,7 +2,7 @@ import { useStorage } from "@plasmohq/storage/hook"
 
 
 function IndexPopup() {
-  const [activity] = useStorage("stream-selfie-activity");
+  const [activity] = useStorage("lore-selfie-activity");
   return (
     <div
       style={{
@@ -19,7 +19,7 @@ function IndexPopup() {
        <button
         onClick={() => {
           chrome.tabs.create({
-            url: "./tabs/dev-report.html"
+            url: "./tabs/dev-dashboard.html"
           })
         }}>
         ouvrir le rapport de dev

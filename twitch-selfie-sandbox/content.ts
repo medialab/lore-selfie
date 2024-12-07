@@ -33,15 +33,15 @@ const storage = new Storage({
  * @param evt event to add to local storage activity history
  */
 const addEvent = async (evt: EventGeneric) => {
-  const data: captureEventsList = await storage.get("stream-selfie-activity");
+  const data: captureEventsList = await storage.get("lore-selfie-activity");
   let updatedData;
   if (data) {
     updatedData = [...data, evt]
   } else {
     updatedData = [evt]
   }
-  console.debug('add event to stream-selfie-activity', evt);
-  await storage.set("stream-selfie-activity", updatedData);
+  console.debug('add event to lore-selfie-activity', evt);
+  await storage.set("lore-selfie-activity", updatedData);
 }
 
 
@@ -49,7 +49,7 @@ const MOUSE_TRACK_TIMESPAN = 5000;
 const LIVE_TRACK_TIMESPAN = 10000;
 
 const main = async () => {
-  // const data = await storage.get("stream-selfie-activity");
+  // const data = await storage.get("lore-selfie-activity");
   const browser = getBrowser();
   const injectionId = generateId();
   const platform = getPlatform(window.location.href);

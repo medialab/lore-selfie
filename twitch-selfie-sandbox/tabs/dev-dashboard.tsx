@@ -7,7 +7,7 @@ import {v4 as generateId} from 'uuid';
 
 import { downloadJSONData } from "~helpers";
 
-import '~styles/DevReport.scss';
+import '~styles/DevDashboard.scss';
 
 const PAGINATION_COUNT = 25;
 
@@ -23,17 +23,16 @@ const EVENT_TYPES = [
   'CHAT_ACTIVITY_RECORD'
 ]
 
-function DevReport() {
+function DevDashboard() {
   const fileInputRef = useRef(null);
-  // const [activity = []] = useStorage("stream-selfie-activity");
   const [activity = [], setActivity] = useStorage({
-    key: "stream-selfie-activity",
+    key: "lore-selfie-activity",
     instance: new Storage({
       area: "local"
     })
   });
-  const [hiddenTypes, setHiddenTypes] = useState(
-    EVENT_TYPES.filter(e => e !== 'BROWSE_VIEW')
+  const [visibleTypes, setVisibleTypes] = useState(
+    ['BROWSE_VIEW']
   );
   const [reverseOrder, setReverseOrder] = useState(false);
   const [uploadMode, setUploadMode] = useState('prepend');
@@ -77,7 +76,7 @@ function DevReport() {
                 area: "local",
               });
               console.info('set activity');
-              storage.set('stream-selfie-activity', newActivity);
+              storage.set('lore-selfie-activity', newActivity);
             }
           } else {
             console.error('Not a lore selfie record');
@@ -100,8 +99,8 @@ function DevReport() {
     fileInputRef.current.click()
   }
   const filteredActivity = useMemo(() => {
-    return (activity || []).filter((event) => !hiddenTypes.includes(event.type));
-  }, [activity, hiddenTypes]);
+    return (activity || []).filter((event) => visibleTypes.includes(event.type));
+  }, [activity, visibleTypes]);
 
   const visibleActivity = useMemo(() => {
     const ordered = reverseOrder ? (filteredActivity || []).reverse() : filteredActivity;
@@ -154,12 +153,12 @@ function DevReport() {
     console.debug('done');
   }
   return (
-    <div className="DevReport">
+    <div className="DevDashboard">
       {/* <h1>Dev report</h1> */}
       <div className="ui">
         <div className="ui-section">
           <button
-            onClick={() => downloadJSONData(activity, `stream-selfie-activity-${new Date().toUTCString()}`)}
+            onClick={() => downloadJSONData(activity, `lore-selfie-activity-${new Date().toUTCString()}`)}
           >
             Télécharger les données au format JSON
           </button>
@@ -229,19 +228,19 @@ function DevReport() {
           </div>
         </div>
         <div className="ui-section">
-          <h2>Cacher les types d'évènements</h2>
+          <h2>Montrer les types d'évènements</h2>
           <ul>
             {
               EVENT_TYPES.map(type => {
-                const checked = hiddenTypes.includes(type);
+                const checked = visibleTypes.includes(type);
                 const handleClick = () => {
                   if (checked) {
-                    setHiddenTypes(
-                      hiddenTypes.filter(t => t !== type)
+                    setVisibleTypes(
+                      visibleTypes.filter(t => t !== type)
                     )
                   } else {
-                    setHiddenTypes([
-                      ...hiddenTypes,
+                    setVisibleTypes([
+                      ...visibleTypes,
                       type
                     ])
                   }
@@ -262,11 +261,11 @@ function DevReport() {
             }
           </ul>
           <div>
-            <button onClick={() => setHiddenTypes([])}>
-              Montrer tout
-            </button>
-            <button onClick={() => setHiddenTypes([...EVENT_TYPES])}>
+            <button onClick={() => setVisibleTypes([])}>
               Cacher tout
+            </button>
+            <button onClick={() => setVisibleTypes([...EVENT_TYPES])}>
+              Montrer tout
             </button>
           </div>
         </div>
@@ -322,4 +321,4 @@ function DevReport() {
   )
 }
 
-export default DevReport
+export default DevDashboard

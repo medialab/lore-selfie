@@ -40,9 +40,9 @@ const trackers = {
 
       return setInterval(async () => {
         console.debug('track live data', new Date().toLocaleTimeString());
-        const messages = Array.from(document.querySelectorAll('.chat-line__message:not([data-stream-selfie-parsed])'))
+        const messages = Array.from(document.querySelectorAll('.chat-line__message:not([data-lore-selfie-parsed])'))
         .map(el => {
-          el.setAttribute('data-stream-selfie-parsed', '1');
+          el.setAttribute('data-lore-selfie-parsed', '1');
           return {
             message: el.querySelector('[data-a-target="chat-line-message-body"]')?.textContent,
             author: el.querySelector('.chat-author__display-name')?.textContent,

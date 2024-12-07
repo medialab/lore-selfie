@@ -8,7 +8,7 @@ function Daily() {
   const calendarRef = useRef(null);
   const [displayedDayDate, setDisplayedDayDate] = useState();
   const [activity = []] = useStorage({
-    key: "stream-selfie-activity",
+    key: "lore-selfie-activity",
     instance: new Storage({
       area: "local"
     })

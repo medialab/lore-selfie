@@ -116,7 +116,7 @@ const Session = ({
                   data-tooltip-content={`${messagesCount} messages sur le chat de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`}
                   x={gutter}
                   y={0}
-                  height={Math.abs(endY - startY)}
+                  height={Math.abs(endY - startY - 1)}
                   width={messageBarWidthScale(messagesCount)}
                   stroke={'none'}
                 />
