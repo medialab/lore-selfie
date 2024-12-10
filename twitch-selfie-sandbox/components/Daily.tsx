@@ -5,6 +5,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import DatePicker from "react-multi-date-picker"
 import Slider from 'rc-slider';
 import { useInterval } from 'usehooks-ts'
+import Measure from 'react-measure';
 
 import DayVisualization from "./DayVisualization"
 
@@ -19,6 +20,7 @@ function Daily() {
   const [roundDay, setRoundDay] = useState(false);
   const [availableDays, setAvailableDays] = useState([]);
   const [visibleEvents, setVisibleEvents] = useState([]);
+  const [dimensions, setDimensions] = useState({});
   const crudPort = usePort("activitycrud")
   crudPort.listen(response => {
     console.debug('received data : ', response.actionType, response?.result?.data);
@@ -120,15 +122,14 @@ function Daily() {
   return (
     <div className="Daily">
       <h1>Au jour le jour</h1>
-      {
-        availableDays === 'undefined' ?
-        <div>Chargement</div>
-        :
+      
+
         <div className="ui">
         <div className="date-picker-container">
           <DatePicker
             multiple
             format="DD MMMM YYYY"
+            numberOfMonths={3}
             sort
             ref={calendarRef}
             value={(availableDays || []).map(({ date }) => date.getTime())}
@@ -223,24 +224,35 @@ function Daily() {
           </button>
         </div>
       </div>
-      }
       
-
-      <div className="visualization-container">
-        {
-          currentDaySessions ?
-            <DayVisualization
-              sessions={currentDaySessions}
-              date={new Date(displayedDayDate)}
-              {...{
-                zoomLevel,
-                roundDay
-              }}
-            />
-            : null
-        }
-
-      </div>
+      
+      <Measure
+        bounds
+        onResize={contentRect => {
+          setDimensions(contentRect.bounds)
+        }}
+      >
+        {({ measureRef }) => (
+          <div ref={measureRef} className="visualization-container">
+          {
+            currentDaySessions ?
+              <DayVisualization
+                sessions={currentDaySessions}
+                date={new Date(displayedDayDate)}
+                {...{
+                  zoomLevel,
+                  roundDay,
+                  width: dimensions.width,
+                  height: dimensions.height,
+                }}
+              />
+              : null
+          }
+  
+        </div>
+        )}
+      </Measure>
+      
     </div>
   )
 }

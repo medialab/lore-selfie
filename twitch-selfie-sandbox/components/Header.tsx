@@ -13,6 +13,9 @@ function Header() {
             <NavLink to="/">Au jour le jour</NavLink>
           </li>
           <li>
+            <NavLink to="/lorectionary">Lorectionary</NavLink>
+          </li>
+          <li>
             <NavLink to="/studio">Studio</NavLink>
           </li>
           <li>

@@ -103,8 +103,13 @@ const Session = ({
             start,
             end,
             messagesCount,
-            platform
+            platform,
+            timeSpan
           }) => {
+            const span = (end - start);
+            const coeff = span / timeSpan;
+            const relativeCount = messagesCount / coeff;
+            // console.log({span, timeSpan, coeff, messagesCount, relativeCount})
             return (
               <g
                 key={startY}
@@ -117,7 +122,8 @@ const Session = ({
                   x={gutter}
                   y={0}
                   height={Math.abs(endY - startY - 1)}
-                  width={messageBarWidthScale(messagesCount)}
+                  // width={messageBarWidthScale(messagesCount)}
+                  width={messageBarWidthScale(relativeCount)}
                   stroke={'none'}
                 />
               </g>

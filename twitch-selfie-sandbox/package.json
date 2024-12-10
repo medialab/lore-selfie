@@ -19,6 +19,8 @@
   "dependencies": {
     "@plasmohq/messaging": "^0.6.2",
     "@plasmohq/storage": "^1.13.0",
+    "@vaadin/react-components": "^24.4.4",
+    "@vaadin/time-picker": "^24.5.5",
     "d3-array": "^3.2.4",
     "d3-scale": "^4.0.2",
     "plasmo": "0.89.4",
@@ -27,9 +29,11 @@
     "react-code-blocks": "^0.1.6",
     "react-dom": "18.2.0",
     "react-file-drop": "^3.1.6",
+    "react-measure": "^2.5.2",
     "react-multi-date-picker": "^4.5.2",
     "react-router-dom": "^7.0.2",
     "react-tooltip": "^5.28.0",
+    "reactjs-weekdays-picker": "^1.0.1",
     "usehooks-ts": "^3.1.0"
   },
   "devDependencies": {

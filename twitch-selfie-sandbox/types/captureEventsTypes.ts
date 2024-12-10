@@ -27,11 +27,6 @@ export interface BlurTabEvent extends GenericEvent {
 export interface FocusTabEvent extends GenericEvent {
   type: "FOCUS_TAB"
 }
-export interface PointerActivityRecordEvent extends GenericEvent {
-  type: "POINTER_ACTIVITY_RECORD",
-  timeSpan: Number, // timespan of measure provided, in ms
-  activityScore: Number // number between 0 and 1
-}
 
 export interface BrowseViewEvent extends GenericEvent {
   type: "BROWSE_VIEW",
@@ -64,6 +59,28 @@ export interface ChatActivityRecordEvent extends GenericEvent {
   messagesAverageCharLength: number,
   viewersCount?: number,
   timeSpan: Number, // timespan of measure provided, in ms
+}
+
+export interface PointerActivityRecordEvent extends GenericEvent {
+  type: "POINTER_ACTIVITY_RECORD",
+  timeSpan: Number, // timespan of measure provided, in ms
+  activityScore: Number // number between 0 and 1
+}
+export interface IsPlayingActivityRecord extends GenericEvent {
+  type: "IS_PLAYING_ACTIVITY_RECORD"
+  isPlaying: Boolean
+  timeSpan: Number, // timespan of measure provided, in ms
+  currentTime?: string,
+  duration?: string
+}
+
+export interface LiveUserActivityRecord extends GenericEvent {
+  type: "LIVE_USER_ACTIVITY_RECORD"
+  isPlaying: Boolean
+  timeSpan: Number, // timespan of measure provided, in ms
+  currentTime?: string,
+  pointerActivityScore: Number,
+  hasFocus: Boolean,
 }
 
 export type captureEventsList = Array<GenericEvent>

@@ -42,7 +42,9 @@ function DayVisualization({
   sessions = new Map(),
   date,
   zoomLevel,
-  roundDay
+  roundDay,
+  width,
+  height
 }) {
   const [nowLineY, setNowLineY] = useState();
   const datesDomain = useMemo(() => {
@@ -86,6 +88,7 @@ function DayVisualization({
     return [min, max]
   }, [date, sessions, roundDay, zoomLevel]);
   const tickTimeSpan = useMemo(() => inferTickTimespan(datesDomain[1] - datesDomain[0], zoomLevel), [datesDomain, zoomLevel]);
+  console.log('dimensions', width, height)
   const visualizationHeight = useMemo(() => {
     return window.innerHeight * zoomLevel;
   }, [zoomLevel, window.innerHeight]);
@@ -152,7 +155,7 @@ function DayVisualization({
         endY: yScale(end),
       }))
       // activity spans
-      const activityEvents = events.filter(event => event.type === 'POINTER_ACTIVITY_RECORD' && event.activityScore === 1);
+      const activityEvents = events.filter(event => event.type === 'LIVE_USER_ACTIVITY_RECORD' && event.pointerActivityScore === 1);
       const activitySpans = activityEvents.reduce((current, activityEvent) => {
         const end = new Date(activityEvent.date).getTime();
         const start = end - activityEvent.timeSpan;
@@ -216,7 +219,8 @@ function DayVisualization({
             startY: yScale(start),
             endY: yScale(end),
             messagesCount: event.messagesCount || event.messages?.length || 0,
-            platform: event.platform
+            platform: event.platform,
+            timeSpan: event.timeSpan
           }
         })
 

@@ -46,6 +46,15 @@ $color-youtube: #ff0001;
   }
 
   .Daily {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    position: absolute;
+    left: 0;
+    top: $gutter * 8;
+    height: calc(100vh - $gutter * 8);
+    width: 100%;
+    overflow: hidden;
     h1 {
       margin: 0;
     }
@@ -57,6 +66,10 @@ $color-youtube: #ff0001;
         display: flex;
         align-items: center;
       }
+    }
+    .visualization-container {
+      flex: 1;
+      overflow: auto;
     }
     .date-picker-container {
       display: flex;
@@ -82,12 +95,7 @@ $color-youtube: #ff0001;
     }
   }
 
-  .DayVisualization {
-    
-  }
-
   .DailyVisualizationSession {
-    
     .session-background {
       fill: rgba(0, 0, 0, 0.05);
     }
@@ -166,5 +174,44 @@ $color-youtube: #ff0001;
       margin-left: 1rem;
       max-width: 30rem;
     }
+  }
+}
+
+.Studio {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: stretch;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  .ui-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    max-width: 30vw;
+    padding: $gutter;
+    .header {
+
+    }
+    .body {
+      flex: 1;
+      overflow: auto;
+    }
+    .footer {
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-flow: row nowrap;
+        li {
+          display: flex;
+        }
+      }
+    }
+  }
+  .preview-container {
+    background: red;
+    flex: 1;
   }
 }

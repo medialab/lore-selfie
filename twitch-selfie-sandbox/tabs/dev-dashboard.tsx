@@ -9,7 +9,7 @@ import { v4 as generateId } from 'uuid';
 import { downloadTextfile } from "~helpers";
 
 import '~styles/DevDashboard.scss';
-import { useInterval } from "usehooks-ts";
+// import { useInterval } from "usehooks-ts";
 
 const PAGINATION_COUNT = 25;
 
@@ -20,9 +20,11 @@ const EVENT_TYPES = [
   'FOCUS_TAB',
   'FOCUS_ON_REACTION_INPUT',
   'BLUR_ON_REACTION_INPUT',
-  'POINTER_ACTIVITY_RECORD',
+  // 'POINTER_ACTIVITY_RECORD',
   'BROWSE_VIEW',
-  'CHAT_ACTIVITY_RECORD'
+  'CHAT_ACTIVITY_RECORD',
+  // 'IS_PLAYING_ACTIVITY_RECORD',
+  'LIVE_USER_ACTIVITY_RECORD',
 ]
 
 type DashboardRequestBody = {
@@ -80,7 +82,7 @@ function DevDashboard() {
     dashboardPort.send(payload)
   }
 
-  useInterval(() => requestPreviewUpdate(), 2000);
+  // useInterval(() => requestPreviewUpdate(), 2000);
 
   useEffect(() => {
     requestPreviewUpdate();
@@ -232,6 +234,7 @@ function DevDashboard() {
     })
     // console.debug('done');
   }
+  const previewedItemsStr = useMemo(() => JSON.stringify(previewedItems, null, 2), [previewedItems])
   return (
     <div className="DevDashboard">
       {/* <h1>Dev report</h1> */}
@@ -365,6 +368,11 @@ function DevDashboard() {
           <span>
             Visualisation de {filteredCount === undefined ? '?' : filteredCount} évènements sur {totalCount === undefined ? '?' : totalCount}
           </span>
+          <button
+          onClick={() => requestPreviewUpdate()}
+          >
+            Rafraîchir
+          </button>
           <button style={{ marginLeft: '1rem' }} onClick={() => setReverseOrder(!reverseOrder)}>
             {
               reverseOrder ?
@@ -390,7 +398,7 @@ function DevDashboard() {
         {
           isLoadingPreview ? <div>Chargement</div> :
             <CodeBlock
-              text={JSON.stringify(previewedItems, null, 2)}
+              text={previewedItemsStr}
               language={'json'}
               showLineNumbers
               theme={dracula}
@@ -411,7 +419,7 @@ function DevDashboard() {
         </div> */}
       </div>
       <div className={`worker-loading-container ${isWorking ? 'active' : ''}`}>
-        Opérations en cours {isWorkingShareStatus ? `${isWorkingShareStatus.current} / ${isWorkingShareStatus.total} (${Math.round(isWorkingShareStatus.current / isWorkingShareStatus.total * 100)}%)` : ''}
+        Opérations en cours {isWorkingShareStatus ? `${isWorkingShareStatus.current + 1} / ${isWorkingShareStatus.total} (${Math.round(isWorkingShareStatus.current / isWorkingShareStatus.total * 100)}%)` : ''}
       </div>
     </div>
   )

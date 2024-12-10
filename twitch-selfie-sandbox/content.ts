@@ -45,8 +45,8 @@ const addEvent = async (evt: EventGeneric) => {
 }
 
 
-const MOUSE_TRACK_TIMESPAN = 5000;
-const LIVE_TRACK_TIMESPAN = 10000;
+// const LIVE_ACTIVITY_TRACK_TIMESPAN = 5000;
+const LIVE_ACTIVITY_TRACK_TIMESPAN = 10000;
 
 const main = async () => {
   // const data = await storage.get("lore-selfie-activity");
@@ -104,41 +104,41 @@ const main = async () => {
     await addEvent(blurTabEvent);
   };
   // pointer activity monitoring
-  interface MousePosition {
-    posX: number,
-    posY: number
-  }
-  let mousePosition: MousePosition;
-  window.onmousemove = event => {
-    var posX = event.clientX;
-    var posY = event.clientY;
-    mousePosition = { posX, posY }
-  }
-  let prevMousePosition = mousePosition;
-  setInterval(async () => {
-    if (!document.hasFocus()) {
-      return;
-    }
-    let mouseHasMoved = false;
-    if (!prevMousePosition && mousePosition) {
-      mouseHasMoved = true;
-    }
-    if (prevMousePosition && mousePosition && (prevMousePosition.posX !== mousePosition.posX || prevMousePosition.posY !== mousePosition.posY)) {
-      mouseHasMoved = true;
-    }
-    const pointerActivityRecordEvent: PointerActivityRecordEvent = {
-      type: "POINTER_ACTIVITY_RECORD",
-      id: generateId(),
-      date: new Date(),
-      url: window.location.href,
-      injectionId,
-      platform,
-      timeSpan: MOUSE_TRACK_TIMESPAN,
-      activityScore: mouseHasMoved ? 1 : 0,
-    };
-    await addEvent(pointerActivityRecordEvent);
-    prevMousePosition = mousePosition;
-  }, MOUSE_TRACK_TIMESPAN);
+  // interface MousePosition {
+  //   posX: number,
+  //   posY: number
+  // }
+  // let mousePosition: MousePosition;
+  // window.onmousemove = event => {
+  //   var posX = event.clientX;
+  //   var posY = event.clientY;
+  //   mousePosition = { posX, posY }
+  // }
+  // let prevMousePosition = mousePosition;
+  // setInterval(async () => {
+  //   if (!document.hasFocus()) {
+  //     return;
+  //   }
+  //   // let mouseHasMoved = false;
+  //   // if (!prevMousePosition && mousePosition) {
+  //   //   mouseHasMoved = true;
+  //   // }
+  //   // if (prevMousePosition && mousePosition && (prevMousePosition.posX !== mousePosition.posX || prevMousePosition.posY !== mousePosition.posY)) {
+  //   //   mouseHasMoved = true;
+  //   // }
+  //   const pointerActivityRecordEvent: PointerActivityRecordEvent = {
+  //     type: "POINTER_ACTIVITY_RECORD",
+  //     id: generateId(),
+  //     date: new Date(),
+  //     url: window.location.href,
+  //     injectionId,
+  //     platform,
+  //     timeSpan: LIVE_ACTIVITY_TRACK_TIMESPAN,
+  //     activityScore: mouseHasMoved ? 1 : 0,
+  //   };
+  //   await addEvent(pointerActivityRecordEvent);
+  //   prevMousePosition = mousePosition;
+  // }, LIVE_ACTIVITY_TRACK_TIMESPAN);
 
   const bodyList = document.querySelector('body');
   let oldHref = window.location.href;
@@ -161,7 +161,8 @@ const main = async () => {
         platform,
         injectionId,
         addEvent,
-        liveTrackTimespan: LIVE_TRACK_TIMESPAN
+        liveTrackTimespan: LIVE_ACTIVITY_TRACK_TIMESPAN,
+        currentURL: document.location.href
       });
     }
   });
@@ -177,7 +178,8 @@ const main = async () => {
     platform,
     injectionId,
     addEvent,
-    liveTrackTimespan: LIVE_TRACK_TIMESPAN
+    liveTrackTimespan: LIVE_ACTIVITY_TRACK_TIMESPAN,
+    currentURL: document.location.href
   });
 }
 
