@@ -190,12 +190,11 @@ function Studio({
         }
       }
     })
-    console.log('newChannelsSettings', newChannelsSettings)
     setChannelsSettings(newChannelsSettings);
   }, [availableChannels])
 
   // console.log('availableChannels', availableChannels)
-  console.log('visible events', visibleEvents.length);
+  // console.log('visible events', visibleEvents.length, 'settings', settings);
   return (
     <div className="Studio">
       <div className="ui-container">

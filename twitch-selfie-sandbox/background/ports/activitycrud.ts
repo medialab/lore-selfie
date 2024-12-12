@@ -29,6 +29,36 @@ const checkDaysOfWeek = (date, days = []) => {
   return days.includes(dayOfWeek);
 }
 
+const applyExcludedTitlePatterns = (events: any[], inputPatterns: any[]) => {
+  const patterns = inputPatterns.filter(p => p && p.trim().length);
+  if (!patterns.length) {
+    return events;
+  }
+  const droppedURLs = new Set();
+  return events.filter((event) => {
+    const {url, metadata = {}} = event;
+    const {title} = metadata;
+    let passes = true;
+    if (title) {
+      let patternIndex = 0;
+      do {
+        const pattern = patterns[patternIndex];
+        const regexp = new RegExp(pattern, 'gi');
+        const match = title.match(regexp);
+        if (match !== null) {
+          passes = false;
+        }
+        patternIndex++;
+      } while (patternIndex < patterns.length && passes);
+    }
+    if (droppedURLs.has(url)) {
+      return false;
+    } else {
+      return passes;
+    }
+  })
+}
+
 const applyChannelSettings = (events, channelsSettings) => {
   const transformedEvents = [];
   let anonIndex = 1;
@@ -142,7 +172,7 @@ const filterEvents = (events, payload) => {
     const matchesTimespan = date > from && date < to;
     const matchesTimeOfDaySpan = timeOfDaySpan === undefined ? true : checkTimeOfDaySpan(date, timeOfDaySpan)
     const matchesDaysOfWeek = daysOfWeek === undefined ? true : checkDaysOfWeek(date, daysOfWeek)
-    // console.log('daysOfWeek', daysOfWeek, matchesDaysOfWeek, matchesTimespan, matchesTimeOfDaySpan && matchesDaysOfWeek);
+
     return matchesTimespan && matchesTimeOfDaySpan && matchesDaysOfWeek;
   });
   return filtered;
@@ -191,6 +221,9 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
 
       if (payload.channelsSettings && Object.keys(payload.channelsSettings).length) {
         filteredEvents = applyChannelSettings(filteredEvents, payload.channelsSettings)
+      }
+      if (payload.excludedTitlePatterns?.length) {
+        filteredEvents = applyExcludedTitlePatterns(filteredEvents, payload.excludedTitlePatterns)
       }
 
       res.send({
