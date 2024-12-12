@@ -51,7 +51,7 @@ const Witness = () => (
     className="lore-politics-witness-container"
   >
     <span className="witness-text">
-    Enregistrement de l'activité par le plugin lore selfie
+    Enregistrement de l'activité par le plugin lore selfie (ces données ne sont jamais partagées automatiquement)
     </span>
   </span>
 )

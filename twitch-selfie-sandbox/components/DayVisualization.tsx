@@ -88,7 +88,6 @@ function DayVisualization({
     return [min, max]
   }, [date, sessions, roundDay, zoomLevel]);
   const tickTimeSpan = useMemo(() => inferTickTimespan(datesDomain[1] - datesDomain[0], zoomLevel), [datesDomain, zoomLevel]);
-  console.log('dimensions', width, height)
   const visualizationHeight = useMemo(() => {
     return window.innerHeight * zoomLevel;
   }, [zoomLevel, window.innerHeight]);
