@@ -75,7 +75,7 @@ function Studio({
       ...settings,
       channelsSettings: undefined
     })
-  }, [settings]) // [settingsWithoutChannelsStringified, setSettingsWithoutChannels] = useState<Object>(settings);
+  }, [settings])
   useEffect(() => {
     storage.get('lore-selfie-studio-settings')
       .then((storedSettings) => {
@@ -190,9 +190,11 @@ function Studio({
         }
       }
     })
+    console.log('newChannelsSettings', newChannelsSettings)
     setChannelsSettings(newChannelsSettings);
   }, [availableChannels])
 
+  // console.log('availableChannels', availableChannels)
   console.log('visible events', visibleEvents.length);
   return (
     <div className="Studio">
@@ -327,7 +329,7 @@ function Studio({
       </div>
       <div className="preview-container">
         <CodeBlock
-          text={JSON.stringify(visibleEvents.filter(e => e.type === 'BROWSE_VIEW'), null, 2)}
+          text={visibleEvents.length + ` events\n\n`+ JSON.stringify(visibleEvents.filter(e => e.type === 'BROWSE_VIEW'), null, 2)}
           language={'json'}
           showLineNumbers
           theme={dracula}

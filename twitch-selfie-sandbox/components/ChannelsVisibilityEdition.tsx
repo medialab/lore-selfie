@@ -6,11 +6,13 @@ function ChannelsVisibilityEdition({
     <ul className={'ChannelsVisibilityEdition'}>
       {
         Object.entries(channels)
-          .map(([id, { label, status, platform }]) => {
+          .map(([id, { label, status, platform, ...rest }]) => {
             const handleChange = (newStatus) => {
               const newValue = {
                 label,
-                status: newStatus
+                status: newStatus,
+                platform,
+                ...rest
               }
               onChange({
                 ...channels,
