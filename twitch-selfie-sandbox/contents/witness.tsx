@@ -6,7 +6,6 @@ import "./witness.css"
 import type {
   PlasmoCSConfig,
   PlasmoGetOverlayAnchor,
-  // PlasmoWatchOverlayAnchor
 } from "plasmo"
 
 /**
@@ -31,17 +30,6 @@ export const getStyle = () => {
   style.textContent = cssText
   return style
 }
-
-
-// export const watchOverlayAnchor: PlasmoWatchOverlayAnchor = (
-//   updatePosition
-// ) => {
-//   const interval = setInterval(() => {
-//     updatePosition()
-//   }, 420)
-
-//   return () => clearInterval(interval)
-// }
 
 export const getOverlayAnchor: PlasmoGetOverlayAnchor = async () =>
   document.querySelector(`body`)
