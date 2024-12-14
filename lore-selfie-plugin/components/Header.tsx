@@ -10,7 +10,7 @@ function Header() {
       <nav>
         <ul>
           <li>
-            <NavLink to="/">Au jour le jour</NavLink>
+            <NavLink to="/">Selfie</NavLink>
           </li>
           {/* <li>
             <NavLink to="/lorectionary">Lorectionary</NavLink>
@@ -18,9 +18,9 @@ function Header() {
           <li>
             <NavLink to="/studio">Studio</NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink to="/participate">Participer à la recherche</NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink to="/about">À propos</NavLink>
           </li>

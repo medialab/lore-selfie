@@ -9,6 +9,7 @@ import { CodeBlock, dracula } from "react-code-blocks";
 import ChannelsVisibilityEdition from "~components/ChannelsVisibilityEdition";
 import FilterInputsList from "~components/FilterInputsList";
 import WeekdaysPicker from "~components/WeekdaysPicker";
+import Diary from "~components/Diary";
 
 
 interface Settings {
@@ -327,12 +328,34 @@ function Studio({
         </div>
       </div>
       <div className="preview-container">
-        <CodeBlock
-          text={visibleEvents.length + ` events\n\n`+ JSON.stringify(visibleEvents.filter(e => e.type === 'BROWSE_VIEW'), null, 2)}
-          language={'json'}
-          showLineNumbers
-          theme={dracula}
-        />
+        {
+          editionMode === 'diary' ?
+            <Diary 
+              {
+                ...{
+                  timeSpan,
+                  timeOfDaySpan,
+                  daysOfWeek,
+                  platforms,
+                  channelsSettings,
+                  excludedTitlePatterns,
+                  visibleEvents,
+                }
+              }
+            />
+            : null
+        }
+        {
+          editionMode === 'poster' ?
+            <CodeBlock
+              text={visibleEvents.length + ` events\n\n` + JSON.stringify(visibleEvents.filter(e => e.type === 'BROWSE_VIEW'), null, 2)}
+              language={'json'}
+              showLineNumbers
+              theme={dracula}
+            />
+            : null
+        }
+
       </div>
     </div>
   )

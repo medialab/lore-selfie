@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 
 
 const InputToValidate = ({
@@ -7,13 +7,17 @@ const InputToValidate = ({
   onRemove,
 }) => {
   const [currentValue, setCurrentValue] = useState(value);
-  const [isEdited, setIsEdited] = useState(true);
-
+  const [isEdited, setIsEdited] = useState(false);
+  const inputRef = useRef(null);
   useEffect(() => {
     setCurrentValue(value);
+    if (!value) {
+      setIsEdited(true);
+      setTimeout(() => inputRef.current.focus())
+    }
   }, [value]);
   return (
-    <div className="InputToValidate">
+    <div className={`InputToValidate ${!currentValue || !currentValue.length ? 'is-empty' : ''}`}>
       {
         !isEdited ?
           <span
@@ -36,6 +40,7 @@ const InputToValidate = ({
             <input
               value={currentValue}
               onChange={e => setCurrentValue(e.target.value)}
+              ref={inputRef}
             />
             <button role="submit">
               S
