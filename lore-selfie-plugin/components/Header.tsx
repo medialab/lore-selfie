@@ -12,9 +12,9 @@ function Header() {
           <li>
             <NavLink to="/">Au jour le jour</NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink to="/lorectionary">Lorectionary</NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink to="/studio">Studio</NavLink>
           </li>
