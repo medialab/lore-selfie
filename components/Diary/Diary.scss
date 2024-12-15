@@ -1,0 +1,160 @@
+.DiaryWrapper {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: stretch;
+  height: 100%;
+  overflow: hidden;
+  .header {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    .settings {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-end;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex: 1;
+    }
+  }
+  .document-space {
+    flex: 1;
+    overflow: auto;
+    background: rgba(230,230,230,1);
+    @media print {
+      background: none;
+      .page {
+        &.imposition-page {
+          display: flex;
+          flex-flow: row nowrap;
+          position: relative;
+          justify-content: stretch;
+          > .page {
+            display: inline-block;
+
+          }
+        }
+        &.A4 {
+          page: page-A4;
+          width: 210mm;
+          height: 297mm;
+
+          min-width: 210mm;
+          min-height: 297mm;
+        }
+        &.A4-landscape {
+          page: page-A4-landscape;
+          width: 297mm;
+          height: 110mm;
+
+          // min-width: 297mm;
+          // min-height: 110mm;
+          page-break-after: always;
+        }
+        &.A5 {
+          page: page-A5;
+          width: 148mm;
+          height: 210mm;
+          min-width: 148mm;
+          min-height: 210mm;
+        }
+      }
+    }
+    @media screen {
+      // background: blue;
+      // display: flex;
+      // flex-flow: column nowrap;
+      // align-items: center;
+      .page {
+        &:not(.is-imposed) {
+          background: white;
+          margin: 3rem;
+          box-shadow:  0 0px 50px grey;
+        }
+        &.imposition-page {
+          display: flex;
+          flex-flow: row nowrap;
+          position: relative;
+          > .page {
+            display: inline-block;
+          }
+        }
+       
+        &.A4 {
+          width: 210mm;
+          height: 297mm;
+
+          min-width: 210mm;
+          min-height: 297mm;
+        }
+        &.A4-landscape {
+          width: 297mm;
+          height: 210mm;
+
+          min-width: 297mm;
+          min-height: 210mm;
+        }
+        &.A5 {
+          width: 148mm;
+          height: 210mm;
+          min-width: 148mm;
+          min-height: 210mm;
+        }
+      }
+    }
+  }
+}
+
+@media print {
+  .App {
+    position: relative;
+    overflow: visible;
+    header {
+      display: none;
+    }
+
+    .Studio {
+      overflow: visible;
+      .ui-container {
+        display: none;
+      }
+      .preview-container {
+        overflow: visible;
+      }
+    }
+
+    .DiaryWrapper {
+      overflow: visible;
+      top: 0;
+      left: 0;
+      .header {
+        display: none;
+      }
+      .document-space {
+        overflow: visible;
+        // position: fixed;
+        // left: 0;
+        // top: 0;
+      }
+    }
+  }
+  
+}
+
+@page page-A4 {
+  format: A4;
+  margin: 0;
+}
+@page page-A4-landscape {
+  format: A4;
+  orientation: landscape;
+  margin: 0;
+}
+@page page-A5 {
+  format: A5;
+  margin: 0;
+}
