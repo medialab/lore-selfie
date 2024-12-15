@@ -306,16 +306,6 @@ function Studio({
           <ul>
             <li>
               <button>
-                Imprimer (A5 / non imposé)
-              </button>
-            </li>
-            <li>
-              <button>
-                Imprimer (A4 / A5 imposé)
-              </button>
-            </li>
-            <li>
-              <button>
                 Télécharger au format CSV
               </button>
             </li>

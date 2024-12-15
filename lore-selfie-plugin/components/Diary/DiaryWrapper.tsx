@@ -46,15 +46,19 @@ function DiaryWrapper({
     while (current <= toDay) {
       const date = new Date(current);
       let dayNumber = date.getDate() + '';
-      dayNumber = dayNumber === '1' ? '1<sup>er</sup>' : dayNumber;
-      days[current] = {
-        label: `${daysMap[date.getDay()]} ${dayNumber} ${monthsMap[date.getMonth()]} ${date.getFullYear()}`,
-        events: []
+      const dayOfWeek = date.getDay();
+      if (daysOfWeek.includes(dayOfWeek)) {
+        dayNumber = dayNumber === '1' ? '1<sup>er</sup>' : dayNumber;
+        days[current] = {
+          label: `${daysMap[dayOfWeek]} ${dayNumber} ${monthsMap[date.getMonth()]} ${date.getFullYear()}`,
+          events: []
+        }
       }
+      
       current += DAY;
     }
     return days;
-  }, [visibleEvents, timeSpan])
+  }, [visibleEvents, timeSpan, daysOfWeek])
   return (
     <div className="DiaryWrapper">
       <div className="header">

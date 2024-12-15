@@ -4,7 +4,7 @@ const parsers = {
       let match;
       if ((match = url.match(/https?:\/\/www.twitch.tv\/([^\/]+)/)) !== null) {
         console.log(match);
-        const channelId = match[1];
+        const channelId = match[1].split('?')[0];
         return {
           viewType: "live",
           parsedMetadata: {

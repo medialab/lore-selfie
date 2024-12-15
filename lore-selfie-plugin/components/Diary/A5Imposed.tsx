@@ -24,7 +24,6 @@ function A5Imposed({
       i++;
       j--;
     }
-    console.log('pairs', pairs);
     return pairs;
   }, [numberOfPages]);
   return (
