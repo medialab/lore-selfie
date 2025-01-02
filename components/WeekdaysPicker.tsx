@@ -23,7 +23,7 @@ const DAYS_OF_WEEK_MAP_REVERSE = {
 const WeekdaysPicker = ({state = [], setState}) => {
   // const withName = state.map(key => ({key, label: DAYS_OF_WEEK_MAP_REVERSE[key]}))
   return (
-    <ul className="WeekdaysPicker">
+    <ul className="WeekdaysPicker tags-list">
       {
         Object.entries(DAYS_OF_WEEK_MAP_REVERSE).map(([keyStr, label]) => {
           const key = +keyStr;

@@ -25,7 +25,7 @@ function ChannelsVisibilityEdition({
           onChange={e => setSearchString(e.target.value)}
         />
       </div>
-      <ul >
+      <ul className="small-cards-container capped">
         {
           Object.entries(visibleChannels)
             .map(([id, { label, status, platform, ...rest }]) => {
@@ -42,26 +42,33 @@ function ChannelsVisibilityEdition({
                 })
               }
               return (
-                <li key={id}>
+                <li key={id} className={`small-card ${status === 'hidden' ? 'disabled': ''}`}>
+                  <div className="small-card-body">
                   <span>{label} ({platform})</span>
+                  </div>
+                  <div className="small-card-actions">
                   <button
                     onClick={() => handleChange('visible')}
                     disabled={status === 'visible'}
+                    className={status === 'visible' ? 'active' : ''}
                   >
                     Visible
                   </button>
                   <button
                     onClick={() => handleChange('anon')}
                     disabled={status === 'anon'}
+                    className={status === 'anon' ? 'active' : ''}
                   >
                     Anonymisée
                   </button>
                   <button
                     onClick={() => handleChange('hidden')}
                     disabled={status === 'hidden'}
+                    className={status === 'hidden' ? 'active' : ''}
                   >
                     Invisible
                   </button>
+                  </div>
                 </li>
               )
             })

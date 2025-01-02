@@ -261,7 +261,7 @@ function Studio({
             <h3>
               Plateformes
             </h3>
-            <ul>
+            <ul className="tags-list">
               {
                 PLATFORMS.map(platform => {
                   const selected = platforms.includes(platform)
@@ -274,10 +274,13 @@ function Studio({
                   }
                   return (
                     <li key={platform} onClick={onChange}>
-                      <input type="radio" checked={selected} readOnly />
+                      <button onClick={onChange} className={selected ? 'active' : ''}>
+                        {platform}
+                      </button>
+                      {/* <input type="radio" checked={selected} readOnly />
                       <span>
                         {platform}
-                      </span>
+                      </span> */}
                     </li>
                   )
                 })
@@ -306,12 +309,12 @@ function Studio({
         <div className="footer">
           <ul>
             <li>
-              <button>
+              <button className="action-button">
                 Télécharger au format CSV
               </button>
             </li>
             <li>
-              <button>
+              <button className="action-button">
                 Télécharger au format JSON
               </button>
             </li>

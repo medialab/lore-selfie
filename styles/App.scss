@@ -39,6 +39,20 @@ $color-app-bg: #EDEDED;
     @include hammersmith-one-regular;
   }
 
+  /**
+    Small components
+  */
+  input, select {
+    border: .5px solid #333;
+    border-radius: 0;
+    background: inherit;
+  }
+  input::placeholder {
+    @include hammersmith-one-regular;
+    font-weight: 200;
+    color: black;
+  }
+
   button {
     background: inherit;
     box-shadow: none;
@@ -57,6 +71,43 @@ $color-app-bg: #EDEDED;
       &:hover {
         background: black;
       }
+    }
+
+    &.action-button {
+      background: $color-app-main;
+      padding: $gutter;
+    }
+  }
+
+  .tags-list {
+    padding: 0;
+    list-style : none;
+    display: flex;
+    flex-flow: row wrap;
+  }
+
+  .small-cards-container {
+    background: #848484;
+    list-style: none;
+    padding: 0;
+    box-sizing: border-box;
+    &.capped {
+      overflow: auto;
+      max-height: 60vh;
+    }
+  }
+  .small-card {
+    padding: $gutter;
+    background:$color-app-bg;
+    margin: $gutter;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row nowrap;
+    &.disabled {
+      opacity: .5;
+    }
+    .small-card-body {
+      flex: 1;
     }
   }
 
@@ -144,6 +195,7 @@ $color-app-bg: #EDEDED;
   }
   .contents.width-limited-contents {
     max-width: $max-content-width;
+    width: $max-content-width;
   }
 
   .Daily {
@@ -295,14 +347,20 @@ $color-app-bg: #EDEDED;
       overflow: auto;
     }
     .footer {
+      padding-top: $gutter;
       ul {
         list-style: none;
         padding: 0;
         margin: 0;
         display: flex;
         flex-flow: row nowrap;
+        align-content: stretch;
         li {
           display: flex;
+          flex: 1;
+          button {
+            width: 100%;
+          }
         }
       }
     }
