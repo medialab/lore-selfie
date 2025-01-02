@@ -1,4 +1,5 @@
 import { v4 as generateId } from 'uuid';
+import { BLUR_ON_REACTION_INPUT, CHAT_ACTIVITY_RECORD, FOCUS_ON_REACTION_INPUT, LIVE_USER_ACTIVITY_RECORD } from '~constants';
 import type { BlurOnReactionInputEvent, ChatActivityRecordEvent, FocusOnReactionInputEvent, IsPlayingActivityRecord, LiveUserActivityRecord } from "~types/captureEventsTypes";
 
 const trackers = {
@@ -15,7 +16,7 @@ const trackers = {
       if (chatInput) {
         const onFocus = async () => {
           const focusOnReactionInputEvent: FocusOnReactionInputEvent = {
-            type: "FOCUS_ON_REACTION_INPUT",
+            type: FOCUS_ON_REACTION_INPUT,
             id: generateId(),
             date: new Date(),
             url: window.location.href,
@@ -26,7 +27,7 @@ const trackers = {
         }
         const onBlur = async () => {
           const blurOnReactionInputEvent: BlurOnReactionInputEvent = {
-            type: "BLUR_ON_REACTION_INPUT",
+            type: BLUR_ON_REACTION_INPUT,
             id: generateId(),
             date: new Date(),
             url: window.location.href,
@@ -72,7 +73,7 @@ const trackers = {
           });
         const viewersCount = document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div')?.textContent?.replace(' ', '');
         const chatActivityRecordEvent: ChatActivityRecordEvent = {
-          type: "CHAT_ACTIVITY_RECORD",
+          type: CHAT_ACTIVITY_RECORD,
           id: generateId(),
           date: new Date(),
           url: window.location.href,
@@ -98,7 +99,7 @@ const trackers = {
           mouseHasMoved = true;
         }
         const liveUserActivityRecord:LiveUserActivityRecord = {
-          type: "LIVE_USER_ACTIVITY_RECORD",
+          type: LIVE_USER_ACTIVITY_RECORD,
           id: generateId(),
           date: new Date(),
           url: window.location.href,
@@ -160,7 +161,7 @@ const trackers = {
           mouseHasMoved = true;
         }
         const liveUserActivityRecord:LiveUserActivityRecord = {
-          type: "LIVE_USER_ACTIVITY_RECORD",
+          type: LIVE_USER_ACTIVITY_RECORD,
           id: generateId(),
           date: new Date(),
           url: window.location.href,

@@ -1,8 +1,48 @@
-
+@import "./fonts.scss";
 
 .DevDashboard {
-
+  padding: 0 10vw;
+  @media (max-width: 1200px) {
+    padding: 0 1rem;
+  }
+  @include abeezee-regular;
+  h1,
+  h2,
+  h3,
+  h4 {
+    @include hammersmith-one-regular;
+  }
+  button {
+    @include hammersmith-one-regular;
+    background: white;
+    box-shadow: none;
+    border: 1px solid white;
+    color: white;
+    background: #888888;
+    &:disabled {
+      cursor: not-allowed;
+      opacity: .5;
+    }
+    &.active {
+      background: #333;
+    }
+    box-sizing: border-box;
+    &.danger {
+      background: red;
+      border: none;
+    }
+    &.warning {
+      background: orange;
+      border: none;
+    }
+    &.ok {
+      background: lightgreen;
+      color: black;
+      border: none;
+    }
+  }
   .ui {
+    font-size: 1rem;
     ul {
       list-style: none;
       padding: 0;
@@ -12,14 +52,16 @@
 
     .ui-section {
       background: lightgrey;
-      padding: .5rem;
-      margin-bottom: .5rem;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+
+      .row {
+        margin-bottom: 0.5rem;
+      }
     }
   }
   .data-preview {
-
   }
-
 
   button {
     cursor: pointer;
@@ -27,7 +69,6 @@
       font-weight: 800;
     }
   }
-  
 
   .worker-loading-container {
     position: fixed;
@@ -41,12 +82,12 @@
     align-items: center;
     justify-content: center;
     font-size: 2rem;
-    background: rgba(0,0,0,0);
-    transition: .5s ease all;
+    background: rgba(0, 0, 0, 0);
+    transition: 0.5s ease all;
     pointer-events: none;
     opacity: 0;
     &.active {
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       opacity: 1;
       pointer-events: all;
     }

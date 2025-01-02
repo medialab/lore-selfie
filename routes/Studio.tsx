@@ -10,6 +10,7 @@ import ChannelsVisibilityEdition from "~components/ChannelsVisibilityEdition";
 import FilterInputsList from "~components/FilterInputsList";
 import WeekdaysPicker from "~components/WeekdaysPicker";
 import Diary from "~components/Diary";
+import { GET_ACTIVITY_EVENTS, GET_CHANNELS, PLATFORMS } from "~constants";
 
 
 interface Settings {
@@ -25,11 +26,6 @@ const EDITION_MODES = [
   'diary',
   'poster'
 ]
-const PLATFORMS = [
-  'youtube',
-  'twitch'
-]
-
 const storage = new Storage({
   area: "local",
   // copiedKeyList: ["shield-modulation"],
@@ -109,7 +105,7 @@ function Studio({
       const DAY = 3600 * 24 * 1000;
       const from = new Date(fromSpan).getTime();
       const to = new Date(new Date(toSpan).getTime() + DAY - 1).getTime();
-      requestFromActivityCrud('GET_ACTIVITY_EVENTS', {
+      requestFromActivityCrud(GET_ACTIVITY_EVENTS, {
         from,
         to,
         ...settings,
@@ -117,7 +113,7 @@ function Studio({
     }
   }, [settings])
   useEffect(() => {
-    requestFromActivityCrud('GET_CHANNELS', JSON.parse(settingsWithoutChannelsStringified));
+    requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
   }, [settingsWithoutChannelsStringified])
 
 
@@ -167,10 +163,10 @@ function Studio({
       const { result: { data = [] } } = response;
       // const today = new Date().toJSON().split('T')[0];
       switch (response.actionType) {
-        case 'GET_CHANNELS':
+        case GET_CHANNELS:
           setAvailableChannels(data);
           break;
-        case 'GET_ACTIVITY_EVENTS':
+        case GET_ACTIVITY_EVENTS:
           setVisibleEvents(data);
           break;
         default:

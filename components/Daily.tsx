@@ -11,6 +11,7 @@ import { v4 as generateId } from 'uuid';
 import DayVisualization from "./DayVisualization"
 
 import 'rc-slider/assets/index.css';
+import { GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE } from "~constants";
 
 const MIN_ZOOM = .8;
 
@@ -55,10 +56,10 @@ function Daily() {
     const { result: { data = [] } } = response;
     const today = new Date().toJSON().split('T')[0];
     switch (response.actionType) {
-      case 'GET_ACTIVITY_EVENTS':
+      case GET_ACTIVITY_EVENTS:
         setVisibleEvents(data);
         break;
-      case 'GET_BINNED_ACTIVITY_OUTLINE':
+      case GET_BINNED_ACTIVITY_OUTLINE:
         const formatted = data.map(({ date, eventsCount }) => {
           const key = new Date(date).toJSON().split('T')[0]
           return {
@@ -82,7 +83,7 @@ function Daily() {
 
   useEffect(() => {
     const DAY = 24 * 3600 * 1000;
-    requestFromActivityCrud('GET_BINNED_ACTIVITY_OUTLINE', {
+    requestFromActivityCrud(GET_BINNED_ACTIVITY_OUTLINE, {
       bin: DAY
     })
   }, []);
@@ -92,12 +93,12 @@ function Daily() {
       let from = new Date(displayedDayDate)
       const fromTime = from.getTime();
       const toTime = fromTime + 24 * 3600 * 1000;
-      requestFromActivityCrud('GET_ACTIVITY_EVENTS', {
+      requestFromActivityCrud(GET_ACTIVITY_EVENTS, {
         from: fromTime,
         to: toTime,
       })
       // crudPort.send({
-      //   actionType: 'GET_ACTIVITY_EVENTS',
+      //   actionType: GET_ACTIVITY_EVENTS,
       //   requestId: generateId(),
       //   payload: {
       //     from: fromTime,
@@ -118,12 +119,12 @@ function Daily() {
         let from = new Date(displayedDayDate)
         const fromTime = from.getTime();
         const toTime = fromTime + 24 * 3600 * 1000;
-        requestFromActivityCrud('GET_ACTIVITY_EVENTS', {
+        requestFromActivityCrud(GET_ACTIVITY_EVENTS, {
           from: fromTime,
           to: toTime,
         })
         // crudPort.send({
-        //   actionType: 'GET_ACTIVITY_EVENTS',
+        //   actionType: GET_ACTIVITY_EVENTS,
         //   payload: {
         //     from: fromTime,
         //     to: toTime,

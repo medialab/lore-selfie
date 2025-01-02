@@ -2,6 +2,7 @@ import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
 import { v4 as generateId } from 'uuid';
 import { type captureEventsList } from "~types/captureEventsTypes"
+import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
 
 const storage = new Storage({
   area: "local",
@@ -185,7 +186,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   const activity = baseActivity || [];
   let filteredEvents;
   switch (actionType) {
-    case 'GET_CHANNELS':
+    case GET_CHANNELS:
       filteredEvents = filterEvents(activity, payload)
         .filter(event => {
           if (event.type === 'BROWSE_VIEW') {
@@ -205,7 +206,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       })
       // console.log('channels list map values', Array.from(channelsList.values()))
       res.send({
-        responseType: 'ACTION_END',
+        responseType: ACTION_END,
         actionType,
         payload,
         requestId,
@@ -216,7 +217,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       })
       break;
 
-    case 'GET_ACTIVITY_EVENTS':
+    case GET_ACTIVITY_EVENTS:
       filteredEvents = filterEvents(activity, payload);
 
       if (payload.channelsSettings && Object.keys(payload.channelsSettings).length) {
@@ -227,7 +228,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       }
 
       res.send({
-        responseType: 'ACTION_END',
+        responseType: ACTION_END,
         actionType,
         payload,
         requestId,
@@ -238,7 +239,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       })
       break;
 
-    case 'GET_BINNED_ACTIVITY_OUTLINE':
+    case GET_BINNED_ACTIVITY_OUTLINE:
       const DAY = 24 * 3600 * 1000;
       const {
         bin = DAY // 'day'
@@ -261,7 +262,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       }
       res.send({
-        responseType: 'ACTION_END',
+        responseType: ACTION_END,
         requestId,
         actionType,
         payload,
@@ -271,11 +272,11 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         }
       })
       break;
-    case 'REPLACE_ACTIVITY_EVENTS':
+    case REPLACE_ACTIVITY_EVENTS:
       if (payload.data) {
         await storage.set('lore-selfie-activity', payload.data);
         res.send({
-          responseType: 'ACTION_END',
+          responseType: ACTION_END,
           requestId,
           actionType,
           payload,
@@ -285,7 +286,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       } else {
         res.send({
-          responseType: 'ACTION_END',
+          responseType: ACTION_END,
           requestId,
           actionType,
           payload,
@@ -296,11 +297,11 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       }
       break;
-    case 'PREPEND_ACTIVITY_EVENTS':
+    case PREPEND_ACTIVITY_EVENTS:
       if (payload.data) {
         await storage.set('lore-selfie-activity', [...payload.data, ...activity]);
         res.send({
-          responseType: 'ACTION_END',
+          responseType: ACTION_END,
           requestId,
           actionType,
           payload,
@@ -310,7 +311,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       } else {
         res.send({
-          responseType: 'ACTION_END',
+          responseType: ACTION_END,
           requestId,
           actionType,
           payload,
@@ -321,11 +322,11 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       }
       break;
-    case 'APPEND_ACTIVITY_EVENTS':
+    case APPEND_ACTIVITY_EVENTS:
       if (payload.data) {
         await storage.set('lore-selfie-activity', [...payload.data, ...activity]);
         res.send({
-          responseType: 'ACTION_END',
+          responseType: ACTION_END,
           requestId,
           actionType,
           payload,
@@ -335,7 +336,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       } else {
         res.send({
-          responseType: 'ACTION_END',
+          responseType: ACTION_END,
           actionType,
           payload,
           result: {
@@ -345,9 +346,9 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       }
       break;
-    case 'SERIALIZE_ALL_DATA':
+    case SERIALIZE_ALL_DATA:
       res.send({
-        responseType: 'ACTION_END',
+        responseType: ACTION_END,
         actionType,
         payload,
         result: {
@@ -356,10 +357,10 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         }
       })
       break;
-    case 'DELETE_ALL_DATA':
+    case DELETE_ALL_DATA:
       await storage.clear();
       res.send({
-        responseType: 'ACTION_END',
+        responseType: ACTION_END,
         requestId,
         actionType,
         payload,
@@ -368,7 +369,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         }
       })
       break;
-    case 'DUPLICATE_DAY_DATA':
+    case DUPLICATE_DAY_DATA:
       if (payload.daySlug && payload.numberOfDays) {
         const dayEvents = activity.filter(event => {
           const daySlug = new Date(event.date).toJSON().split('T')[0];
@@ -378,7 +379,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         let newEvents = [...dayEvents];
         for (let i = 1; i < payload.numberOfDays; i++) {
           res.send({
-            responseType: 'ACTION_PROGRESS',
+            responseType: ACTION_PROGRESS,
             requestId,
             actionType,
             payload,
@@ -402,7 +403,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         }
         await storage.set('lore-selfie-activity', newEvents);
         res.send({
-          responseType: 'ACTION_END',
+          responseType: ACTION_END,
           requestId,
           actionType,
           payload,
@@ -412,7 +413,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       } else {
         res.send({
-          responseType: 'ACTION_END',
+          responseType: ACTION_END,
           requestId,
           actionType,
           payload,

@@ -2,6 +2,7 @@ import { v4 as generateId } from 'uuid';
 import type { BrowseViewEvent } from "~types/captureEventsTypes";
 
 import parsers from './parsers';
+import { BROWSE_VIEW } from '~constants';
 
 function delay(t) {
   return new Promise(resolve => {
@@ -67,7 +68,7 @@ function delay(t) {
       ...scrapedMetadata
     }
     browseViewEvent = {
-      type: "BROWSE_VIEW",
+      type: BROWSE_VIEW,
       id: generateId(),
       date: new Date(),
       url: window.location.href,

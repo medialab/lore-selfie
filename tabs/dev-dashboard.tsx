@@ -6,27 +6,27 @@ import { FileDrop } from 'react-file-drop'
 import { CodeBlock, dracula } from "react-code-blocks";
 import { v4 as generateId } from 'uuid';
 
-import { downloadTextfile } from "~helpers";
+import { downloadTextfile, formatNumber } from "~helpers";
 
 import '~styles/DevDashboard.scss';
-import { formatNumber } from "~helpers/misc";
+import { EVENT_TYPES, ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
 // import { useInterval } from "usehooks-ts";
 
 const PAGINATION_COUNT = 25;
 
-const EVENT_TYPES = [
-  'OPEN_PLATFORM_IN_TAB',
-  'CLOSE_PLATFORM_IN_TAB',
-  'BLUR_TAB',
-  'FOCUS_TAB',
-  'FOCUS_ON_REACTION_INPUT',
-  'BLUR_ON_REACTION_INPUT',
-  // 'POINTER_ACTIVITY_RECORD',
-  'BROWSE_VIEW',
-  'CHAT_ACTIVITY_RECORD',
-  // 'IS_PLAYING_ACTIVITY_RECORD',
-  'LIVE_USER_ACTIVITY_RECORD',
-]
+// const EVENT_TYPES = [
+//   'OPEN_PLATFORM_IN_TAB',
+//   'CLOSE_PLATFORM_IN_TAB',
+//   'BLUR_TAB',
+//   'FOCUS_TAB',
+//   'FOCUS_ON_REACTION_INPUT',
+//   'BLUR_ON_REACTION_INPUT',
+//   // 'POINTER_ACTIVITY_RECORD',
+//   'BROWSE_VIEW',
+//   'CHAT_ACTIVITY_RECORD',
+//   // 'IS_PLAYING_ACTIVITY_RECORD',
+//   'LIVE_USER_ACTIVITY_RECORD',
+// ]
 
 type DashboardRequestBody = {
   types: Array<String>
@@ -91,16 +91,16 @@ function DevDashboard() {
 
   crudPort.listen(data => {
     // console.log('cudport response data', data);
-    if (data.actionType === 'SERIALIZE_ALL_DATA' && data.result.status === 'success' && pendingForDownload) {
+    if (data.actionType === SERIALIZE_ALL_DATA && data.result.status === 'success' && pendingForDownload) {
       downloadTextfile(data.result.data, `lore-selfie-activity-${new Date().toUTCString()}.json`, 'application/json')
       setPendingForDownload(false);
       // downloadJSONData(data.result.data, `lore-selfie-activity-${new Date().toUTCString()}`)
     }
-    else if (data.responseType === 'ACTION_END') {
+    else if (data.responseType === ACTION_END) {
       setIsWorking(false);
       setIsWorkingShareStatus(undefined);
       requestPreviewUpdate();
-    } else if (data.responseType === 'ACTION_PROGRESS') {
+    } else if (data.responseType === ACTION_PROGRESS) {
       setIsWorkingShareStatus({
         current: data.current,
         total: data.total
@@ -148,7 +148,7 @@ function DevDashboard() {
                 // console.log('send prepend request to cudport', data);
                 setIsWorking(true);
                 crudPort.send({
-                  actionType: 'PREPEND_ACTIVITY_EVENTS',
+                  actionType: PREPEND_ACTIVITY_EVENTS,
                   payload: {
                     data
                   }
@@ -159,7 +159,7 @@ function DevDashboard() {
                 // newActivity = [...activity, ...data]
                 setIsWorking(true);
                 crudPort.send({
-                  actionType: 'APPEND_ACTIVITY_EVENTS',
+                  actionType: APPEND_ACTIVITY_EVENTS,
                   payload: {
                     data
                   }
@@ -171,7 +171,7 @@ function DevDashboard() {
                   // newActivity = data;
                   setIsWorking(true);
                   crudPort.send({
-                    actionType: 'REPLACE_ACTIVITY_EVENTS',
+                    actionType: REPLACE_ACTIVITY_EVENTS,
                     payload: {
                       data
                     }
@@ -227,7 +227,7 @@ function DevDashboard() {
     const todaySlug = new Date().toJSON().split('T')[0];
     setIsWorking(true);
     crudPort.send({
-      actionType: 'DUPLICATE_DAY_DATA',
+      actionType: DUPLICATE_DAY_DATA,
       payload: {
         daySlug: todaySlug,
         numberOfDays
@@ -238,6 +238,7 @@ function DevDashboard() {
   const previewedItemsStr = useMemo(() => JSON.stringify(previewedItems, null, 2), [previewedItems])
   return (
     <div className="DevDashboard">
+      
       <h1>Lore selfie - dashboard de développement</h1>
       <div>
         <h3>Qu'est-ce que cette page ?</h3>
@@ -245,9 +246,9 @@ function DevDashboard() {
       </div>
       <div className="ui">
         <div className="ui-section">
-          <button
+          <button className="ok"
             onClick={() => {
-              crudPort.send({ actionType: 'SERIALIZE_ALL_DATA' })
+              crudPort.send({ actionType: SERIALIZE_ALL_DATA })
               setPendingForDownload(true);
               // downloadJSONData(activity, `lore-selfie-activity-${new Date().toUTCString()}`)
 
@@ -255,14 +256,14 @@ function DevDashboard() {
           >
             Télécharger les données au format JSON
           </button>
-          <button
+          <button className="danger"
             onClick={() => {
 
               const confirmed = confirm("Supprimer toutes les données enregistrées par lore selfie ?")
               if (confirmed) {
                 // console.log('send cud port action')
                 setIsWorking(true);
-                crudPort.send({ actionType: 'DELETE_ALL_DATA' })
+                crudPort.send({ actionType: DELETE_ALL_DATA })
               }
             }}
           >
@@ -272,22 +273,22 @@ function DevDashboard() {
         <div className="ui-section">
           <h2>Tests de charge</h2>
           <div>
-            <button
+            <button className="ok"
               onClick={() => handleDuplicateTodayForPastDays(10)}
             >
               Dupliquer les données d'aujourd'hui sur les 10 derniers jours
             </button>
-            <button
+            <button className="warning"
               onClick={() => handleDuplicateTodayForPastDays(100)}
             >
               Dupliquer les données d'aujourd'hui sur les 100 derniers jours
             </button>
-            <button
+            <button className="danger"
               onClick={() => handleDuplicateTodayForPastDays(1000)}
             >
               Dupliquer les données d'aujourd'hui sur les 1000 derniers jours (2 ans et demi)
             </button>
-            <button
+            <button className="danger"
               onClick={() => handleDuplicateTodayForPastDays(10000)}
             >
               Dupliquer les données d'aujourd'hui sur les 10000 derniers jours (27 ans)
@@ -344,15 +345,16 @@ function DevDashboard() {
                   }
                 }
                 return (
-                  <li key={type}>
+                  <li key={type}
+                    onClick={handleClick}
+                  >
                     <span
-                      onClick={handleClick}
                     >
                       <input type="checkbox" checked={checked} readOnly />
                     </span>
-                    <span>
+                    <code>
                       {type}
-                    </span>
+                    </code>
                   </li>
                 )
               })
@@ -370,33 +372,53 @@ function DevDashboard() {
         <div className="ui-section preview-control">
           <h2>
             <span>
-              Visualisation de {filteredCount === undefined ? '?' : filteredCount} évènements sur {totalCount === undefined ? '?' : formatNumber(totalCount)} tous types d'évènements confondus
+              Visualisation de {filteredCount === undefined ? '?' : filteredCount} évènements sur {totalCount === undefined ? '?' : formatNumber(totalCount)} tous types d'évènements confondus (page {reverseOrder ? paginations.length - currentPreviewPage : currentPreviewPage + 1} / {paginations.length})
             </span>
           </h2>
-          <div>
-            <button
-              onClick={() => requestPreviewUpdate()}
-            >
-              Rafraîchir
-            </button>
-            <button style={{ marginLeft: '1rem' }} onClick={() => setReverseOrder(!reverseOrder)}>
-              {
-                reverseOrder ?
-                  'Du plus récent au plus ancien'
-                  :
-                  'Du plus ancien au plus récent'
+          <div >
+            <div className="row">
+              <button
+                onClick={() => requestPreviewUpdate()}
+              >
+                Rafraîchir
+              </button>
+              <button style={{ marginLeft: '1rem' }} onClick={() => setReverseOrder(!reverseOrder)}>
+                {
+                  reverseOrder ?
+                    'Du plus récent au plus ancien'
+                    :
+                    'Du plus ancien au plus récent'
+                }
+              </button>
+              <button disabled={currentPreviewPage === 0} onClick={() => setCurrentPreviewPage(currentPreviewPage - 1)}>
+                {'<'}
+              </button>
+              <button disabled={currentPreviewPage >= paginations.length - 1} onClick={() => setCurrentPreviewPage(currentPreviewPage + 1)}>
+                {'>'}
+              </button>
+            </div>
+            <div className="row">
+              {paginations.length > 1 ?
+                (paginations < 10 ? paginations :
+                  [
+                    ...(currentPreviewPage > 6 ? [...paginations.slice(0, 5), '...'] : paginations.slice(0, currentPreviewPage > 0 ? currentPreviewPage - 1 : 1)),
+                    ...paginations.slice(currentPreviewPage > 0 ? currentPreviewPage - 1 : 1, currentPreviewPage < 4 ? 5 : currentPreviewPage + 2),
+                    ...(currentPreviewPage < paginations.length - 6 ? ['...'] : []),
+                    ...paginations.slice(currentPreviewPage < paginations.length - 6 ? paginations.length - 5 : currentPreviewPage + 2, paginations.length)
+                  ]).map((pageNumber, index) => {
+                    return (
+                      <button
+                        disabled={pageNumber === '...'} onClick={() => pageNumber !== '...' ? setCurrentPreviewPage(pageNumber) : undefined}
+                        key={index}
+                        className={`pagination ${currentPreviewPage === pageNumber ? 'active' : ''}`}>
+                        {pageNumber === '...' ? pageNumber : reverseOrder ? paginations.length - pageNumber : pageNumber + 1}
+                      </button>
+                    )
+                  })
+                : null
               }
-            </button>
-            {paginations.length > 1 ?
-              paginations.map((pageNumber) => {
-                return (
-                  <button onClick={() => setCurrentPreviewPage(pageNumber)} key={pageNumber} className={`pagination ${currentPreviewPage === pageNumber ? 'active' : ''}`}>
-                    {reverseOrder ? paginations.length - pageNumber : pageNumber + 1}
-                  </button>
-                )
-              })
-              : null
-            }
+            </div>
+
           </div>
         </div>
       </div>

@@ -7,9 +7,9 @@ import { csvFormat } from 'd3-dsv';
 import { Language } from 'voynich-ipsum';
 import { v4 as genId } from 'uuid';
 
-const lang = new Language({ seed: 1 });
+import { PLATFORMS } from '~constants';
 
-const PLATFORMS = ['twitch', 'youtube'];
+const lang = new Language({ seed: 1 });
 
 const MIN_NUMBER_OF_SESSIONS = 1;
 const MAX_NUMBER_OF_SESSIONS = 12;

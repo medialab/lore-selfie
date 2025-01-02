@@ -3,7 +3,7 @@ import './Diary.scss';
 import Cover from './Cover';
 import DayPage from './DayPage';
 import A5Imposed from './A5Imposed';
-import { formatNumber } from '~helpers/misc';
+import { formatNumber } from '~helpers';
 
 function DiaryWrapper({
   timeSpan,
