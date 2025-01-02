@@ -78,7 +78,7 @@ export interface LiveUserActivityRecord extends GenericEvent {
   type: "LIVE_USER_ACTIVITY_RECORD"
   isPlaying: Boolean
   timeSpan: Number, // timespan of measure provided, in ms
-  currentTime?: string,
+  currentMediaTime?: string,
   pointerActivityScore: Number,
   hasFocus: Boolean,
 }

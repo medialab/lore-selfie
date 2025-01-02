@@ -6,6 +6,7 @@ import { Browser, OpenPlatformInTabEvent, type captureEventsList, type ClosePlat
 import { recordNewViewContent } from "~analyzers/recordNewViewContent";
 import { getPlatform, getBrowser } from "~helpers";
 import { updateLiveTracking } from "~analyzers/livetrackers";
+import { BLUR_TAB, FOCUS_TAB, OPEN_PLATFORM_IN_TAB } from "~constants";
 
 /**
  * Content script config
@@ -27,6 +28,7 @@ const storage = new Storage({
   // copiedKeyList: ["shield-modulation"],
 })
 
+let routine; // interval used in live tracking
 
 /**
  * Adds to local storage a record about an activity from the user
@@ -54,7 +56,7 @@ const main = async () => {
   const injectionId = generateId();
   const platform = getPlatform(window.location.href);
   const openPlatformInTabEvent: OpenPlatformInTabEvent = {
-    type: "OPEN_PLATFORM_IN_TAB",
+    type: OPEN_PLATFORM_IN_TAB,
     id: generateId(),
     date: new Date(),
     url: window.location.href,
@@ -83,7 +85,7 @@ const main = async () => {
   // }
   window.onfocus = async function () {
     const focusTabEvent: FocusTabEvent = {
-      type: "FOCUS_TAB",
+      type: FOCUS_TAB,
       id: generateId(),
       date: new Date(),
       url: window.location.href,
@@ -94,7 +96,7 @@ const main = async () => {
   };
   window.onblur = async function () {
     const blurTabEvent: BlurTabEvent = {
-      type: "BLUR_TAB",
+      type: BLUR_TAB,
       id: generateId(),
       date: new Date(),
       url: window.location.href,
@@ -143,6 +145,13 @@ const main = async () => {
   const bodyList = document.querySelector('body');
   let oldHref = window.location.href;
 
+  const onCurrentURLChange = (URL) => {
+    if (oldHref !== URL) {
+      console.warn('untracked current url change from live tracking', URL);
+      alert('untracked current url change from live tracking : ' + URL);
+    }
+  }
+
   /**
    * Listen to location changes to trigger view change events
    */
@@ -156,13 +165,17 @@ const main = async () => {
         url: document.location.href,
         addEvent,
       });
-      updateLiveTracking({
+      if (routine) {
+        clearInterval(routine);
+      }
+      routine = updateLiveTracking({
         activeViewType,
         platform,
         injectionId,
         addEvent,
         liveTrackTimespan: LIVE_ACTIVITY_TRACK_TIMESPAN,
-        currentURL: document.location.href
+        currentURL: document.location.href,
+        onCurrentURLChange,
       });
     }
   });
@@ -173,7 +186,10 @@ const main = async () => {
   observer.observe(bodyList, config);
 
   console.log('active view type', activeViewType);
-  updateLiveTracking({
+  if (routine) {
+    clearInterval(routine);
+  }
+  routine = updateLiveTracking({
     activeViewType,
     platform,
     injectionId,

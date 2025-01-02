@@ -10,7 +10,12 @@ const trackers = {
       liveTrackTimespan,
       platform,
       currentURL,
+      onCurrentURLChange,
     }) => {
+      const URL = document.location.href;
+      if (URL !== currentURL) {
+        onCurrentURLChange(URL)
+      }
       const chatInput = document.querySelector('.chat-input__textarea textarea');
       // console.log('chat input', chatInput);
       if (chatInput) {
@@ -136,7 +141,13 @@ const trackers = {
       liveTrackTimespan,
       platform,
       currentURL,
+      onCurrentURLChange,
     }) => {
+
+      const URL = document.location.href;
+      if (URL !== currentURL) {
+        onCurrentURLChange(URL)
+      }
       interface MousePosition {
         posX: number,
         posY: number
@@ -152,7 +163,7 @@ const trackers = {
       return setInterval(async () => {
         console.debug('track live data', new Date().toLocaleTimeString());
         const isPlaying = document.querySelector('.ytd-player .playing-mode') !== null;
-        const currentTime = document.querySelector('.ytp-time-current')?.textContent;
+        const currentMediaTime = document.querySelector('.ytp-time-current')?.textContent;
         let mouseHasMoved = false;
         if (!prevMousePosition && mousePosition) {
           mouseHasMoved = true;
@@ -169,6 +180,7 @@ const trackers = {
           timeSpan: liveTrackTimespan,
           platform,
           pointerActivityScore: mouseHasMoved ? 1 : 0,
+          currentMediaTime,
           hasFocus: document.hasFocus(),
           isPlaying
         }
@@ -200,7 +212,8 @@ export const updateLiveTracking = ({
   injectionId,
   addEvent,
   liveTrackTimespan,
-  currentURL
+  currentURL,
+  onCurrentURLChange,
 }) => {
   let routine;
   console.info('update live tracking', platform, activeViewType);
@@ -214,9 +227,11 @@ export const updateLiveTracking = ({
       addEvent,
       liveTrackTimespan,
       platform,
-      currentURL
+      currentURL,
+      onCurrentURLChange
     })
   } else {
     clearInterval(routine);
   }
+  return updateLiveTracking;
 }
