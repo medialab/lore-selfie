@@ -86,7 +86,7 @@ const parsers = {
           channelImageSrc: document.querySelector('.yt-spec-avatar-shape img')?.getAttribute('src'),
           // following line is commented because lazy loaded
           commentsCount: document.querySelector('#actions #comments-button .yt-spec-button-shape-with-label')?.textContent.trim(),
-          likesCount: document.querySelector('#actions #like-button #like-button .yt-spec-button-shape-with-label')?.textContent.trim(),
+          likesCount: document.querySelector('#actions #like-button #like-button .yt-spec-button-shape-with-label, .ytLikeButtonViewModelHost')?.textContent.trim(),
         })
       },
       video: {
