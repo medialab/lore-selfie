@@ -5,17 +5,21 @@ const FilterInputsList = ({
   onChange
 }) => {
   return (
-    <ul className="FilterInputsList">
+    <ul className="FilterInputsList small-cards-container capped">
       {
         value.map((exp, index) => {
-          const handleChange = val => {
-            const newValue = [...value];
-            newValue[index] = val
-            onChange(newValue)
-          }
+         
           const handleRemove = () => {
             const newValue = [...value];
             newValue.splice(index, 1);
+            onChange(newValue)
+          }
+          const handleChange = val => {
+            if (!val.length) {
+              return handleRemove();
+            }
+            const newValue = [...value];
+            newValue[index] = val
             onChange(newValue)
           }
           return (
@@ -29,7 +33,7 @@ const FilterInputsList = ({
           )
         })
       }
-      <li>
+      <li className="small-card">
         <button onClick={() => {
           const newValue = [
             ...value,
@@ -38,7 +42,7 @@ const FilterInputsList = ({
           onChange(newValue);
 
         }}>
-          Ajouter
+          Ajouter un titre (ou morceau de titre) à exclure
         </button>
       </li>
     </ul>

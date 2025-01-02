@@ -37,6 +37,7 @@ $color-app-bg: #EDEDED;
   }
   button, select, option, input, textarea {
     @include hammersmith-one-regular;
+    box-sizing: border-box;
   }
 
   /**
@@ -76,6 +77,44 @@ $color-app-bg: #EDEDED;
     &.action-button {
       background: $color-app-main;
       padding: $gutter;
+      &:hover {
+        color: lightgrey;
+      }
+    }
+  }
+
+  .InputToValidate {
+    display: flex;
+    .small-card-body {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+    }
+    form {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: stretch;
+      flex: 1;
+      input {
+        flex: 1;
+      }
+      button {
+        margin: 0;
+      }
+    }
+
+    .value-placeholder {
+      cursor: pointer;
+      font-size: 1.1em;
+      @include hammersmith-one-regular;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      &:hover {
+        background: #333;
+        color: white;
+      }
     }
   }
 
@@ -327,12 +366,15 @@ $color-app-bg: #EDEDED;
 }
 
 .Studio {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: stretch;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
+  
+  .contents {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
   .ui-container {
     display: flex;
     flex-flow: column nowrap;

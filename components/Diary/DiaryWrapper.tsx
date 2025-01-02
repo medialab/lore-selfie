@@ -69,7 +69,7 @@ function DiaryWrapper({
           <li className="format-picker">
             <span>Format</span>
             <button className={format === 'A5-imposed' ? 'active' : ''} onClick={() => setFormat('A5-imposed')}>
-              A5 imposé sur A4 (livret à imprimer)
+              A5 imposé sur A4 (livret)
             </button>
             <button className={format === 'A4' ? 'active' : ''} onClick={() => setFormat('A4')}>
               A4
@@ -89,7 +89,7 @@ function DiaryWrapper({
           format === 'A5-imposed' ?
             <A5Imposed
               numberOfPages={Object.entries(dataByDay).length + 1}
-              renderPage={index => {
+              renderPage={(index) => {
                 // console.log('render page', index, Object.entries(dataByDay).length);
                 if (index === 0) {
                   return <Cover days={dataByDay} format={'A5'} imposed={true} />

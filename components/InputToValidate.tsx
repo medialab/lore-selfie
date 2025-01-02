@@ -17,10 +17,11 @@ const InputToValidate = ({
     }
   }, [value]);
   return (
-    <div className={`InputToValidate ${!currentValue || !currentValue.length ? 'is-empty' : ''}`}>
+    <div className={`InputToValidate small-card ${!currentValue || !currentValue.length ? 'is-empty' : ''}`}>
+      <div className="small-card-body">
       {
         !isEdited ?
-          <span
+          <span className="value-placeholder"
             onClick={() => {
               setCurrentValue(value);
               setIsEdited(true);
@@ -47,11 +48,14 @@ const InputToValidate = ({
             </button>
           </form>
       }
+      </div>
+      <div className="small-card-actions">
       <button
         onClick={() => onRemove()}
       >
-        X
+        ⛌
       </button>
+      </div>
     </div>
   )
 }

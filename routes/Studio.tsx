@@ -194,134 +194,134 @@ function Studio({
   // console.log('visible events', visibleEvents.length, 'settings', settings);
   return (
     <div className="Studio contents-wrapper">
-
-      <div className="ui-container">
-        <div className="header">
-          <h2>Choisir un type d'édition</h2>
-          <select value={editionMode} onChange={e => setEditionMode(e.target.value)}>
-            {
-              EDITION_MODES.map(mode => (
-                <option key={mode} value={mode}>
-                  {mode}
-                </option>
-              ))
-            }
-          </select>
-        </div>
-        <div className="body">
-          <div className="form-group">
-            <h3>
-              Dates de début et de fin
-            </h3>
-            <DatePicker
-              value={timeSpan}
-              onChange={dates => setTimespan(dates.map(formatDatepickerDate))}
-              range
-              // numberOfMonths={3}
-              rangeHover
-            />
-          </div>
-          <div className="form-group">
-            <h3>
-              Plages horaires de la journée
-            </h3>
-            <TimePicker
-              label="Début"
-              value={timeOfDaySpan[0]}
-              onValueChanged={(event) => {
-                const val = event.detail.value;
-                const newVal = [val, timeOfDaySpan[1]].sort();
-                setTimeOfDaySpan(newVal)
-              }}
-            />
-            <TimePicker
-              label="Fin"
-              value={timeOfDaySpan[1]}
-              onValueChanged={(event) => {
-                const val = event.detail.value;
-                const newVal = [timeOfDaySpan[0], val].sort();
-                setTimeOfDaySpan(newVal)
-              }}
-            />
-          </div>
-          <div className="form-group">
-            <h3>
-              Jours de la semaine
-            </h3>
-            <WeekdaysPicker
-              state={daysOfWeek}
-              setState={setDaysOfWeek}
-            />
-          </div>
-          <div className="form-group">
-            <h3>
-              Plateformes
-            </h3>
-            <ul className="tags-list">
+      <div className="contents width-limited-contents">
+        <div className="ui-container">
+          <div className="header">
+            <h2>Choisir un type d'édition</h2>
+            <select value={editionMode} onChange={e => setEditionMode(e.target.value)}>
               {
-                PLATFORMS.map(platform => {
-                  const selected = platforms.includes(platform)
-                  const onChange = () => {
-                    if (platforms.includes(platform)) {
-                      setPlatforms(platforms.filter(p => p !== platform))
-                    } else {
-                      setPlatforms([...platforms, platform])
+                EDITION_MODES.map(mode => (
+                  <option key={mode} value={mode}>
+                    {mode}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+          <div className="body">
+            <div className="form-group">
+              <h3>
+                Dates de début et de fin
+              </h3>
+              <DatePicker
+                value={timeSpan}
+                onChange={dates => setTimespan(dates.map(formatDatepickerDate))}
+                range
+                // numberOfMonths={3}
+                rangeHover
+              />
+            </div>
+            <div className="form-group">
+              <h3>
+                Plages horaires de la journée
+              </h3>
+              <TimePicker
+                label="Début"
+                value={timeOfDaySpan[0]}
+                onValueChanged={(event) => {
+                  const val = event.detail.value;
+                  const newVal = [val, timeOfDaySpan[1]].sort();
+                  setTimeOfDaySpan(newVal)
+                }}
+              />
+              <TimePicker
+                label="Fin"
+                value={timeOfDaySpan[1]}
+                onValueChanged={(event) => {
+                  const val = event.detail.value;
+                  const newVal = [timeOfDaySpan[0], val].sort();
+                  setTimeOfDaySpan(newVal)
+                }}
+              />
+            </div>
+            <div className="form-group">
+              <h3>
+                Jours de la semaine
+              </h3>
+              <WeekdaysPicker
+                state={daysOfWeek}
+                setState={setDaysOfWeek}
+              />
+            </div>
+            <div className="form-group">
+              <h3>
+                Plateformes
+              </h3>
+              <ul className="tags-list">
+                {
+                  PLATFORMS.map(platform => {
+                    const selected = platforms.includes(platform)
+                    const onChange = () => {
+                      if (platforms.includes(platform)) {
+                        setPlatforms(platforms.filter(p => p !== platform))
+                      } else {
+                        setPlatforms([...platforms, platform])
+                      }
                     }
-                  }
-                  return (
-                    <li key={platform} onClick={onChange}>
-                      <button onClick={onChange} className={selected ? 'active' : ''}>
-                        {platform}
-                      </button>
-                      {/* <input type="radio" checked={selected} readOnly />
+                    return (
+                      <li key={platform} onClick={onChange}>
+                        <button onClick={onChange} className={selected ? 'active' : ''}>
+                          {platform}
+                        </button>
+                        {/* <input type="radio" checked={selected} readOnly />
                       <span>
                         {platform}
                       </span> */}
-                    </li>
-                  )
-                })
-              }
+                      </li>
+                    )
+                  })
+                }
+              </ul>
+            </div>
+            <div className="form-group">
+              <h3>
+                Visibilité des chaînes
+              </h3>
+              <ChannelsVisibilityEdition
+                channels={channelsSettings}
+                onChange={setChannelsSettings}
+              />
+            </div>
+            <div className="form-group">
+              <h3>
+                Exclure l'activité associée à certaines vidéos (par leurs titres)
+              </h3>
+              <FilterInputsList
+                value={excludedTitlePatterns}
+                onChange={setExcludedTitlePatterns}
+              />
+            </div>
+          </div>
+          <div className="footer">
+            <ul>
+              <li>
+                <button className="action-button">
+                  Télécharger au format CSV
+                </button>
+              </li>
+              <li>
+                <button className="action-button">
+                  Télécharger au format JSON
+                </button>
+              </li>
             </ul>
           </div>
-          <div className="form-group">
-            <h3>
-              Visibilité des chaînes
-            </h3>
-            <ChannelsVisibilityEdition
-              channels={channelsSettings}
-              onChange={setChannelsSettings}
-            />
-          </div>
-          <div className="form-group">
-            <h3>
-              Exclure l'activité associée à certaines vidéos (par leurs titres)
-            </h3>
-            <FilterInputsList
-              value={excludedTitlePatterns}
-              onChange={setExcludedTitlePatterns}
-            />
-          </div>
         </div>
-        <div className="footer">
-          <ul>
-            <li>
-              <button className="action-button">
-                Télécharger au format CSV
-              </button>
-            </li>
-            <li>
-              <button className="action-button">
-                Télécharger au format JSON
-              </button>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className="preview-container">
-        {
-          editionMode === 'diary' ?
-            <Diary 
-              {
+        <div className="preview-container">
+          {
+            editionMode === 'diary' ?
+              <Diary
+                {
                 ...{
                   timeSpan,
                   timeOfDaySpan,
@@ -331,21 +331,22 @@ function Studio({
                   excludedTitlePatterns,
                   visibleEvents,
                 }
-              }
-            />
-            : null
-        }
-        {
-          editionMode === 'poster' ?
-            <CodeBlock
-              text={visibleEvents.length + ` events\n\n` + JSON.stringify(visibleEvents.filter(e => e.type === 'BROWSE_VIEW'), null, 2)}
-              language={'json'}
-              showLineNumbers
-              theme={dracula}
-            />
-            : null
-        }
+                }
+              />
+              : null
+          }
+          {
+            editionMode === 'poster' ?
+              <CodeBlock
+                text={visibleEvents.length + ` events\n\n` + JSON.stringify(visibleEvents.filter(e => e.type === 'BROWSE_VIEW'), null, 2)}
+                language={'json'}
+                showLineNumbers
+                theme={dracula}
+              />
+              : null
+          }
 
+        </div>
       </div>
     </div>
   )

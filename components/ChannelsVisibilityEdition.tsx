@@ -15,7 +15,21 @@ function ChannelsVisibilityEdition({
       .reduce((res, [id, obj]) => ({...res, [id]: obj}), {})
     }
     return channels;
-  }, [searchString, channels])
+  }, [searchString, channels]);
+
+  const handleChangeAll = (status) => {
+      const newChannels = Object.entries(channels).reduce((cur, [id, obj]: [string, object]) => ({
+        ...cur, 
+        [id]: {
+          ...obj, 
+          status: status
+        }
+      }), {});
+      onChange(newChannels);
+  }
+  const handleShowAll = () => handleChangeAll('visible');
+  const handleAnonAll = () => handleChangeAll('anon');
+  const handleHideAll = () => handleChangeAll('hidden');
   return (
     <div className={'ChannelsVisibilityEdition'}>
       <div>
@@ -24,6 +38,15 @@ function ChannelsVisibilityEdition({
           value={searchString}
           onChange={e => setSearchString(e.target.value)}
         />
+        <button onClick={() => handleShowAll()}>
+          tout montrer
+        </button>
+        <button onClick={() => handleAnonAll()}>
+          tout anon.
+        </button>
+        <button onClick={() => handleHideAll()}>
+          tout cacher
+        </button>
       </div>
       <ul className="small-cards-container capped">
         {

@@ -29,8 +29,8 @@ function A5Imposed({
   return (
     <>
       {
-        doublePagesIndexes.map(([i1, i2]) => (
-          <section className={`page A4-landscape imposition-page`}>
+        doublePagesIndexes.map(([i1, i2], index) => (
+          <section key={index} className={`page A4-landscape imposition-page`}>
             {renderPage(i1)}
             {renderPage(i2)}
           </section>
