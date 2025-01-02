@@ -197,7 +197,8 @@ function Studio({
   // console.log('availableChannels', availableChannels)
   // console.log('visible events', visibleEvents.length, 'settings', settings);
   return (
-    <div className="Studio">
+    <div className="Studio contents-wrapper">
+
       <div className="ui-container">
         <div className="header">
           <h2>Choisir un type d'édition</h2>

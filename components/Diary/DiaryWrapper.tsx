@@ -3,6 +3,7 @@ import './Diary.scss';
 import Cover from './Cover';
 import DayPage from './DayPage';
 import A5Imposed from './A5Imposed';
+import { formatNumber } from '~helpers/misc';
 
 function DiaryWrapper({
   timeSpan,
@@ -62,11 +63,11 @@ function DiaryWrapper({
   return (
     <div className="DiaryWrapper">
       <div className="header">
-        <div>{visibleEvents.length} évènements</div>
-        <div>, {Object.keys(dataByDay).length} jours</div>
+      <div>{Object.keys(dataByDay).length} jours, </div>
+      <div>{formatNumber(visibleEvents.length)} actions capturées.</div>
         <ul className="settings">
           <li className="format-picker">
-            <span>Format :</span>
+            <span>Format</span>
             <button className={format === 'A5-imposed' ? 'active' : ''} onClick={() => setFormat('A5-imposed')}>
               A5 imposé sur A4 (livret à imprimer)
             </button>

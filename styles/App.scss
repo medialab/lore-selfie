@@ -1,6 +1,13 @@
+@import './fonts';
+
 $gutter: 0.5rem;
+$gutter-small: 0.25rem;
+$max-content-width: 1200px;
 $color-twitch: #aa43ff;
 $color-youtube: #ff0001;
+
+$color-app-main : #9147FF;
+$color-app-bg: #EDEDED;
 
 .App {
   position: fixed;
@@ -8,23 +15,89 @@ $color-youtube: #ff0001;
   top: 0;
   width: 100%;
   height: 100%;
-  padding: $gutter;
-  padding-top: $gutter * 8;
+  padding: 0;
+  // padding: $gutter;
+  // padding-top: $gutter * 8;
   box-sizing: border-box;
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: stretch;
+  background: $color-app-bg;
+
+  /*
+    default fonts
+  */
+  @include abeezee-regular;
+  h1,h2,h3 {
+    @include kanit-medium;
+  }
+  h4,h5,h6 {
+    @include hammersmith-one-regular;
+  }
+  button, select, option, input, textarea {
+    @include hammersmith-one-regular;
+  }
+
+  button {
+    background: inherit;
+    box-shadow: none;
+    border: none;
+    cursor: pointer;
+    background: #867f7f;
+    color: white;
+    border: 1px solid $color-app-bg;
+    box-sizing: border-box;
+    cursor: pointer;
+    &:hover {
+      background: #333;
+    }
+    &.active {
+      background: #333;
+      &:hover {
+        background: black;
+      }
+    }
+  }
+
+  /**
+   Main structure
+   */
   header {
-    position: absolute;
+    // position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    padding: 0;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
-    box-sizing: border-box;
-    padding: $gutter;
-    align-items: flex-end;
+    justify-content: center;
+    // padding: $gutter;
+    align-items: center;
+    @include kanit-bold;
+    background: $color-app-main;
+    color :white;
+    .header-contents {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      box-sizing: border-box;
+      padding: $gutter 0;
+      width: $max-content-width;
+      max-width: $max-content-width;
+    }
     h1 {
       margin: 0;
+      @include kanit-bold;
+      a, a.active {
+        text-decoration: none;
+      }
+      .alpha-mark {
+        padding-left: $gutter-small;
+        opacity: .5;
+        @include kanit-light;
+      }
+      font-size : 2rem;
     }
     ul {
       list-style: none;
@@ -33,6 +106,17 @@ $color-youtube: #ff0001;
       margin: 0;
       li {
         margin-left: $gutter;
+        @include kanit-light;
+        font-size: 2rem;
+        a,a.active {
+          text-decoration: none;
+        }
+        a.active {
+          @include kanit-semibold;
+        }
+        a:not(.active):hover {
+          @include kanit-regular;
+        }
       }
     }
 
@@ -45,16 +129,29 @@ $color-youtube: #ff0001;
     }
   }
 
+  .contents-wrapper {
+    display: flex;
+    flex-flow : row nowrap;
+    justify-content: center;
+    // align-items: center;
+    width: 100%;
+    height: 100%;
+    flex: 1;    
+    overflow: hidden;
+  }
+  .contents {
+    position: relative;
+  }
+  .contents.width-limited-contents {
+    max-width: $max-content-width;
+  }
+
   .Daily {
     display: flex;
     flex-flow: column nowrap;
     justify-content: stretch;
-    position: absolute;
-    left: 0;
-    top: $gutter * 8;
-    height: calc(100vh - $gutter * 8);
     width: 100%;
-    overflow: hidden;
+    overflow: auto;
     h1 {
       margin: 0;
     }

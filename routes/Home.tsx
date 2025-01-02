@@ -3,7 +3,7 @@ import Daily from "~components/Daily";
 
 function Home() {
   return (
-    <div className="Home">
+    <div className="Home contents-wrapper">
       <Daily />
     </div>
   )

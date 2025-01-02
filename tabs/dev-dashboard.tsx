@@ -9,6 +9,7 @@ import { v4 as generateId } from 'uuid';
 import { downloadTextfile } from "~helpers";
 
 import '~styles/DevDashboard.scss';
+import { formatNumber } from "~helpers/misc";
 // import { useInterval } from "usehooks-ts";
 
 const PAGINATION_COUNT = 25;
@@ -105,7 +106,7 @@ function DevDashboard() {
         total: data.total
       });
     }
-    
+
   })
 
   dashboardPort.listen(data => {
@@ -237,7 +238,11 @@ function DevDashboard() {
   const previewedItemsStr = useMemo(() => JSON.stringify(previewedItems, null, 2), [previewedItems])
   return (
     <div className="DevDashboard">
-      {/* <h1>Dev report</h1> */}
+      <h1>Lore selfie - dashboard de développement</h1>
+      <div>
+        <h3>Qu'est-ce que cette page ?</h3>
+        <p>Cette page est dédiée aux développeur·euses qui désirent visualiser et télécharger les données brutes collectées par l'extension lore selfie.</p>
+      </div>
       <div className="ui">
         <div className="ui-section">
           <button
@@ -362,36 +367,42 @@ function DevDashboard() {
             </button>
           </div>
         </div>
-      </div>
-      <div className="data-preview">
-        <h2>
-          <span>
-            Visualisation de {filteredCount === undefined ? '?' : filteredCount} évènements sur {totalCount === undefined ? '?' : totalCount}
-          </span>
-          <button
-          onClick={() => requestPreviewUpdate()}
-          >
-            Rafraîchir
-          </button>
-          <button style={{ marginLeft: '1rem' }} onClick={() => setReverseOrder(!reverseOrder)}>
-            {
-              reverseOrder ?
-                'Du plus récent au plus ancien'
-                :
-                'Du plus ancien au plus récent'
+        <div className="ui-section preview-control">
+          <h2>
+            <span>
+              Visualisation de {filteredCount === undefined ? '?' : filteredCount} évènements sur {totalCount === undefined ? '?' : formatNumber(totalCount)} tous types d'évènements confondus
+            </span>
+          </h2>
+          <div>
+            <button
+              onClick={() => requestPreviewUpdate()}
+            >
+              Rafraîchir
+            </button>
+            <button style={{ marginLeft: '1rem' }} onClick={() => setReverseOrder(!reverseOrder)}>
+              {
+                reverseOrder ?
+                  'Du plus récent au plus ancien'
+                  :
+                  'Du plus ancien au plus récent'
+              }
+            </button>
+            {paginations.length > 1 ?
+              paginations.map((pageNumber) => {
+                return (
+                  <button onClick={() => setCurrentPreviewPage(pageNumber)} key={pageNumber} className={`pagination ${currentPreviewPage === pageNumber ? 'active' : ''}`}>
+                    {reverseOrder ? paginations.length - pageNumber : pageNumber + 1}
+                  </button>
+                )
+              })
+              : null
             }
-          </button>
-          {paginations.length > 1 ?
-            paginations.map(pageNumber => {
-              return (
-                <button onClick={() => setCurrentPreviewPage(pageNumber)} key={pageNumber} className={`pagination ${currentPreviewPage === pageNumber ? 'active' : ''}`}>
-                  {pageNumber + 1}
-                </button>
-              )
-            })
-            : null
-          }
-        </h2>
+          </div>
+        </div>
+      </div>
+
+      <div className="data-preview">
+
         <div>
 
         </div>

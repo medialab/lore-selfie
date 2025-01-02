@@ -150,10 +150,8 @@ function Daily() {
   }, [visibleEvents]);
 
   return (
-    <div className="Daily">
+    <div className="Daily contents width-limited-contents">
       <h1>Au jour le jour</h1>
-
-
       <div className="ui">
         <div className="date-picker-container">
           <DatePicker
