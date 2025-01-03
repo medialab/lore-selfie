@@ -5,13 +5,19 @@ import type { BlurOnReactionInputEvent, ChatActivityRecordEvent, FocusOnReaction
 const trackers = {
   twitch: {
     live: async ({
+      settings,
       injectionId,
       addEvent,
-      liveTrackTimespan,
       platform,
       currentURL,
       onCurrentURLChange,
     }) => {
+      const {
+        liveRecordingInterval, 
+        recordTabs,
+        recordMouse,
+        recordChat
+      } = settings;
       const URL = document.location.href;
       if (URL !== currentURL) {
         onCurrentURLChange(URL)
@@ -83,15 +89,16 @@ const trackers = {
           date: new Date(),
           url: window.location.href,
           injectionId,
-          timeSpan: liveTrackTimespan,
+          timeSpan: +liveRecordingInterval,
           platform,
           messages,
           messagesCount: messages.length,
           viewersCount: +(viewersCount || 0),
           messagesAverageCharLength: messages.reduce((sum, m) => sum + (m.message ? m.message.length : 0), 0) / messages.length
         }
-        // console.debug('new messages', messages);
-        await addEvent(chatActivityRecordEvent);
+        if (recordChat) {
+          await addEvent(chatActivityRecordEvent);
+        }
 
         // record pause events
         const isPlaying = document.querySelector('.ytd-player .playing-mode') !== null;
@@ -109,10 +116,10 @@ const trackers = {
           date: new Date(),
           url: window.location.href,
           injectionId,
-          timeSpan: liveTrackTimespan,
+          timeSpan: +liveRecordingInterval,
           platform,
-          pointerActivityScore: mouseHasMoved ? 1 : 0,
-          hasFocus: document.hasFocus(),
+          pointerActivityScore: recordMouse ? mouseHasMoved ? 1 : 0 : undefined,
+          hasFocus: recordTabs ? document.hasFocus() : undefined,
           isPlaying
         }
         prevMousePosition = mousePosition;
@@ -124,26 +131,31 @@ const trackers = {
         //   date: new Date(),
         //   url: window.location.href,
         //   injectionId,
-        //   timeSpan: liveTrackTimespan,
+        //   timeSpan: liveRecordingInterval,
         //   platform,
         //   isPlaying,
         // }
         // await addEvent(IsPlayingActivityRecord);
         // prevIsPlaying = isPlaying
         // }
-      }, liveTrackTimespan)
+      }, +liveRecordingInterval)
     }
   },
   youtube: {
     video: async ({
+      settings,
       injectionId,
       addEvent,
-      liveTrackTimespan,
       platform,
       currentURL,
       onCurrentURLChange,
     }) => {
-
+      const {
+        liveRecordingInterval, 
+        recordTabs,
+        recordMouse,
+        recordChat
+      } = settings;
       const URL = document.location.href;
       if (URL !== currentURL) {
         onCurrentURLChange(URL)
@@ -159,6 +171,7 @@ const trackers = {
         mousePosition = { posX, posY }
       }
       let prevMousePosition = mousePosition;
+      console.log('in video youtube, interval', liveRecordingInterval)
       // let prevIsPlaying = document.querySelector('.ytd-player .playing-mode') !== null;
       return setInterval(async () => {
         console.debug('track live data', new Date().toLocaleTimeString());
@@ -177,11 +190,11 @@ const trackers = {
           date: new Date(),
           url: window.location.href,
           injectionId,
-          timeSpan: liveTrackTimespan,
+          timeSpan: +liveRecordingInterval,
           platform,
-          pointerActivityScore: mouseHasMoved ? 1 : 0,
+          pointerActivityScore: recordMouse ? mouseHasMoved ? 1 : 0 : undefined,
           currentMediaTime,
-          hasFocus: document.hasFocus(),
+          hasFocus: recordTabs ? document.hasFocus() : undefined,
           isPlaying
         }
         prevMousePosition = mousePosition;
@@ -193,7 +206,7 @@ const trackers = {
         //   date: new Date(),
         //   url: window.location.href,
         //   injectionId,
-        //   timeSpan: liveTrackTimespan,
+        //   timeSpan: liveRecordingInterval,
         //   platform,
         //   isPlaying,
         //   currentTime,
@@ -202,30 +215,26 @@ const trackers = {
         // await addEvent(IsPlayingActivityRecord);
         // }
 
-      }, liveTrackTimespan)
+      }, +liveRecordingInterval)
     }
   }
 }
 export const updateLiveTracking = ({
+  settings,
   activeViewType,
   platform,
   injectionId,
   addEvent,
-  liveTrackTimespan,
   currentURL,
   onCurrentURLChange,
 }) => {
   let routine;
   console.info('update live tracking', platform, activeViewType);
   if (trackers[platform] && trackers[platform][activeViewType]) {
-    // routine = setInterval(() => {
-    //   console.info('track live data');
-
-    // }, liveTrackTimespan)
     routine = trackers[platform][activeViewType]({
+      settings,
       injectionId,
       addEvent,
-      liveTrackTimespan,
       platform,
       currentURL,
       onCurrentURLChange

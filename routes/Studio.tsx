@@ -7,7 +7,7 @@ import { v4 as generateId } from 'uuid';
 import { CodeBlock, dracula } from "react-code-blocks";
 
 import ChannelsVisibilityEdition from "~components/ChannelsVisibilityEdition";
-import FilterInputsList from "~components/FilterInputsList";
+import FilterInputsList from "~components/FormComponents/FilterInputsList";
 import WeekdaysPicker from "~components/WeekdaysPicker";
 import Diary from "~components/Diary";
 import { GET_ACTIVITY_EVENTS, GET_CHANNELS, PLATFORMS } from "~constants";

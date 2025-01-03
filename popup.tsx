@@ -16,6 +16,14 @@ function IndexPopup() {
         }}>
         ouvrir l'application
       </button>
+      <button
+        onClick={() => {
+          chrome.tabs.create({
+            url: "./tabs/app.html#/settings"
+          })
+        }}>
+        ouvrir les options
+      </button>
        <button
         onClick={() => {
           chrome.tabs.create({

@@ -14,13 +14,22 @@ function Header() {
       <nav>
         <ul>
           <li>
-            <NavLink to="/">selfie</NavLink>
+            <NavLink to="/">explorer</NavLink>
+          </li>
+          <li>
+            <NavLink to="/channels">organiser</NavLink>
+          </li>
+          <li>
+            <NavLink to="/lore">annoter</NavLink>
           </li>
           {/* <li>
             <NavLink to="/lorectionary">Lorectionary</NavLink>
           </li> */}
           <li>
-            <NavLink to="/studio">studio</NavLink>
+            <NavLink to="/studio">imprimer</NavLink>
+          </li>
+          <li>
+            <NavLink to="/settings">paramètres</NavLink>
           </li>
           {/* <li>
             <NavLink to="/participate">Participer à la recherche</NavLink>

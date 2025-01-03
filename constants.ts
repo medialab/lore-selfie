@@ -25,6 +25,12 @@ export const EVENT_TYPES = [
 ]
 
 /**
+ * SETTINGS ACTIONS
+ */
+export const GET_SETTINGS = 'GET_SETTINGS';
+export const SET_SETTING = 'SET_SETTING';
+
+/**
  * Generic processes control actions
  */
 export const ACTION_END = 'ACTION_END';
@@ -45,3 +51,12 @@ export const GET_ACTIVITY_EVENTS = 'GET_ACTIVITY_EVENTS';
 export const GET_CHANNELS = 'GET_CHANNELS';
 
 export const PLATFORMS = ['twitch', 'youtube']
+
+export const DEFAULT_SETTINGS = {
+  handles: [],
+  recordOnPlatforms: PLATFORMS,
+  liveRecordingInterval: 10000,
+  recordTabs: true,
+  recordMouse: true,
+  recordChat: true
+}

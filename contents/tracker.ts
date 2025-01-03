@@ -6,7 +6,8 @@ import { Browser, OpenPlatformInTabEvent, type captureEventsList, type ClosePlat
 import { recordNewViewContent } from "~analyzers/recordNewViewContent";
 import { getPlatform, getBrowser } from "~helpers";
 import { updateLiveTracking } from "~analyzers/livetrackers";
-import { BLUR_TAB, FOCUS_TAB, OPEN_PLATFORM_IN_TAB } from "~constants";
+import { BLUR_TAB, DEFAULT_SETTINGS, FOCUS_TAB, OPEN_PLATFORM_IN_TAB } from "~constants";
+import type { Settings } from "~types/settings";
 
 /**
  * Content script config
@@ -51,10 +52,15 @@ const addEvent = async (evt: EventGeneric) => {
 const LIVE_ACTIVITY_TRACK_TIMESPAN = 10000;
 
 const main = async () => {
-  // const data = await storage.get("lore-selfie-activity");
+  console.log('init tracker');
+  const settings: Settings = await storage.get("lore-selfie-settings") || DEFAULT_SETTINGS;
   const browser = getBrowser();
   const injectionId = generateId();
   const platform = getPlatform(window.location.href);
+
+  if (!settings.recordOnPlatforms.includes(platform)){
+    return;
+  } 
   const openPlatformInTabEvent: OpenPlatformInTabEvent = {
     type: OPEN_PLATFORM_IN_TAB,
     id: generateId(),
@@ -169,6 +175,7 @@ const main = async () => {
         clearInterval(routine);
       }
       routine = updateLiveTracking({
+        settings,
         activeViewType,
         platform,
         injectionId,
@@ -190,12 +197,14 @@ const main = async () => {
     clearInterval(routine);
   }
   routine = updateLiveTracking({
+    settings,
     activeViewType,
     platform,
     injectionId,
     addEvent,
     liveTrackTimespan: LIVE_ACTIVITY_TRACK_TIMESPAN,
-    currentURL: document.location.href
+    currentURL: document.location.href,
+    onCurrentURLChange: onCurrentURLChange
   });
 }
 

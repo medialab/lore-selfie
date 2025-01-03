@@ -116,11 +116,12 @@ export const formatNumber = (n: Number, style: String  = 'fr'): String => {
   if (+n === 0) {
     return '0';
   }
-  return ('' + n)
+  const [intPart, floatPart] = ('' + n).split('.')
+  return intPart
     .split('')
     .reverse()
     .reduce(({ count, result }, digit, index) => {
-      const endOfLine = count === 3 || (count === 0 && index === ('' + n).length - 1);
+      const endOfLine = count === 3 || (count === 0 && index === intPart.length - 1);
       if (endOfLine) {
         return {
           count: 1,
@@ -138,4 +139,11 @@ export const formatNumber = (n: Number, style: String  = 'fr'): String => {
     .result
     .reverse()
     .join('')
+    + (floatPart === undefined ? '' : style === 'fr' ? ',' : '.' + floatPart)
+}
+
+export function lengthInUtf8Bytes(str) {
+  // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
+  const m = encodeURIComponent(str).match(/%[89ABab]/g);
+  return str.length + (m ? m.length : 0);
 }
