@@ -46,7 +46,8 @@ type DashboardResponseBody = {
 
 function DevDashboard() {
   const dashboardPort = usePort<DashboardRequestBody, DashboardResponseBody>("devdashboard")
-  const crudPort = usePort("activitycrud")
+  const activitiesPort = usePort("activitycrud")
+  const annotationsPort = usePort("annotationscrud")
 
   const fileInputRef = useRef(null);
   // const [activity = [], setActivity] = useStorage({
@@ -89,7 +90,7 @@ function DevDashboard() {
     requestPreviewUpdate();
   }, [reverseOrder, currentPreviewPage, visibleTypes])
 
-  crudPort.listen(data => {
+  activitiesPort.listen(data => {
     // console.log('cudport response data', data);
     if (data.actionType === SERIALIZE_ALL_DATA && data.result.status === 'success' && pendingForDownload) {
       downloadTextfile(data.result.data, `lore-selfie-activity-${new Date().toUTCString()}.json`, 'application/json')
@@ -147,7 +148,7 @@ function DevDashboard() {
               case 'prepend':
                 // console.log('send prepend request to cudport', data);
                 setIsWorking(true);
-                crudPort.send({
+                activitiesPort.send({
                   actionType: PREPEND_ACTIVITY_EVENTS,
                   payload: {
                     data
@@ -158,7 +159,7 @@ function DevDashboard() {
               case 'append':
                 // newActivity = [...activity, ...data]
                 setIsWorking(true);
-                crudPort.send({
+                activitiesPort.send({
                   actionType: APPEND_ACTIVITY_EVENTS,
                   payload: {
                     data
@@ -170,7 +171,7 @@ function DevDashboard() {
                 if (confirmed) {
                   // newActivity = data;
                   setIsWorking(true);
-                  crudPort.send({
+                  activitiesPort.send({
                     actionType: REPLACE_ACTIVITY_EVENTS,
                     payload: {
                       data
@@ -226,7 +227,7 @@ function DevDashboard() {
     }
     const todaySlug = new Date().toJSON().split('T')[0];
     setIsWorking(true);
-    crudPort.send({
+    activitiesPort.send({
       actionType: DUPLICATE_DAY_DATA,
       payload: {
         daySlug: todaySlug,
@@ -248,13 +249,16 @@ function DevDashboard() {
         <div className="ui-section">
           <button className="ok"
             onClick={() => {
-              crudPort.send({ actionType: SERIALIZE_ALL_DATA })
+              activitiesPort.send({ actionType: SERIALIZE_ALL_DATA })
               setPendingForDownload(true);
               // downloadJSONData(activity, `lore-selfie-activity-${new Date().toUTCString()}`)
 
             }}
           >
-            Télécharger les données au format JSON
+            Télécharger les données d'activité au format JSON
+          </button>
+          <button disabled className="ok">
+            Télécharger les données d'annotation au format JSON
           </button>
           <button className="danger"
             onClick={() => {
@@ -263,7 +267,8 @@ function DevDashboard() {
               if (confirmed) {
                 // console.log('send cud port action')
                 setIsWorking(true);
-                crudPort.send({ actionType: DELETE_ALL_DATA })
+                activitiesPort.send({ actionType: DELETE_ALL_DATA })
+                annotationsPort.send({ actionType: DELETE_ALL_DATA })
               }
             }}
           >

@@ -1,4 +1,4 @@
-@import './fonts';
+@use "fonts";
 
 $gutter: 0.5rem;
 $gutter-small: 0.25rem;
@@ -6,8 +6,8 @@ $max-content-width: 1200px;
 $color-twitch: #aa43ff;
 $color-youtube: #ff0001;
 
-$color-app-main : #9147FF;
-$color-app-bg: #EDEDED;
+$color-app-main: #9147ff;
+$color-app-bg: #ededed;
 
 .App {
   position: fixed;
@@ -28,30 +28,45 @@ $color-app-bg: #EDEDED;
   /*
     default fonts
   */
-  @include abeezee-regular;
-  h1,h2,h3 {
-    @include kanit-medium;
+  @include fonts.abeezee-regular;
+  h1,
+  h2,
+  h3 {
+    @include fonts.kanit-medium;
   }
-  h4,h5,h6 {
-    @include hammersmith-one-regular;
+  h4,
+  h5,
+  h6 {
+    @include fonts.hammersmith-one-regular;
   }
-  button, select, option, input, textarea {
-    @include hammersmith-one-regular;
+  button,
+  select,
+  option,
+  input,
+  textarea {
+    @include fonts.hammersmith-one-regular;
     box-sizing: border-box;
   }
 
   /**
     Small components
   */
-  input, select {
-    border: .5px solid #333;
+  input,
+  select,
+  textarea {
+    border: 0.5px solid #333;
     border-radius: 0;
     background: inherit;
+    outline: none;
+    box-sizing: border-box;
+  }
+  input:focus {
+    border-color: black;
   }
   input::placeholder {
-    @include hammersmith-one-regular;
-    font-weight: 200;
+    @include fonts.kanit-extralight;
     color: black;
+    font-size: 0.8em;
   }
 
   button {
@@ -64,8 +79,12 @@ $color-app-bg: #EDEDED;
     border: 1px solid $color-app-bg;
     box-sizing: border-box;
     cursor: pointer;
-    &:hover {
+    &:hover:not(:disabled) {
       background: #333;
+    }
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.8;
     }
     &.active {
       background: #333;
@@ -82,6 +101,10 @@ $color-app-bg: #EDEDED;
       }
     }
   }
+
+  /** 
+    Bigger reusable components
+  */
 
   .InputToValidate {
     display: flex;
@@ -106,7 +129,7 @@ $color-app-bg: #EDEDED;
     .value-placeholder {
       cursor: pointer;
       font-size: 1.1em;
-      @include hammersmith-one-regular;
+      @include fonts.hammersmith-one-regular;
       width: 100%;
       height: 100%;
       display: flex;
@@ -118,11 +141,70 @@ $color-app-bg: #EDEDED;
     }
   }
 
+  .CollapsibleSection {
+    .header {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: stretch;
+      .title {
+        flex: 1;
+      }
+    }
+    .body {
+      overflow: visible;
+      max-height: 5000px;
+    }
+    &.is-collapsed {
+      .body {
+        max-height: 0;
+        overflow: hidden;
+      }
+    }
+  }
+
   .tags-list {
     padding: 0;
-    list-style : none;
+    list-style: none;
     display: flex;
     flex-flow: row wrap;
+  }
+
+  .input-group {
+    display: flex;
+    flex-flow: column nowrap;
+    margin-bottom: $gutter;
+  }
+
+  .cards-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    .card {
+      margin: $gutter 0;
+      border: 1px solid #333;
+      padding: $gutter;
+      &:first-of-type {
+        margin-top: 0;
+      }
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+      .card-content {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: stretch;
+
+        .card-body {
+          flex: 1;
+          box-sizing: border-box;
+          padding-right: $gutter;
+        }
+        .card-actions {
+          display: flex;
+          flex-flow: column nowrap;
+        }
+      }
+    }
   }
 
   .small-cards-container {
@@ -137,13 +219,13 @@ $color-app-bg: #EDEDED;
   }
   .small-card {
     padding: $gutter;
-    background:$color-app-bg;
+    background: $color-app-bg;
     margin: $gutter;
     box-sizing: border-box;
     display: flex;
     flex-flow: row nowrap;
     &.disabled {
-      opacity: .5;
+      opacity: 0.5;
     }
     .small-card-body {
       flex: 1;
@@ -164,9 +246,9 @@ $color-app-bg: #EDEDED;
     justify-content: center;
     // padding: $gutter;
     align-items: center;
-    @include kanit-bold;
+    @include fonts.kanit-bold;
     background: $color-app-main;
-    color :white;
+    color: white;
     .header-contents {
       display: flex;
       flex-flow: row nowrap;
@@ -178,16 +260,17 @@ $color-app-bg: #EDEDED;
     }
     h1 {
       margin: 0;
-      @include kanit-bold;
-      a, a.active {
+      @include fonts.kanit-bold;
+      a,
+      a.active {
         text-decoration: none;
       }
       .alpha-mark {
         padding-left: $gutter-small;
-        opacity: .5;
-        @include kanit-light;
+        opacity: 0.5;
+        @include fonts.kanit-light;
       }
-      font-size : 2rem;
+      font-size: 2rem;
     }
     ul {
       list-style: none;
@@ -196,16 +279,17 @@ $color-app-bg: #EDEDED;
       margin: 0;
       li {
         margin-left: $gutter;
-        @include kanit-light;
+        @include fonts.kanit-light;
         font-size: 2rem;
-        a,a.active {
+        a,
+        a.active {
           text-decoration: none;
         }
         a.active {
-          @include kanit-semibold;
+          @include fonts.kanit-semibold;
         }
         a:not(.active):hover {
-          @include kanit-regular;
+          @include fonts.kanit-regular;
         }
       }
     }
@@ -221,12 +305,12 @@ $color-app-bg: #EDEDED;
 
   .contents-wrapper {
     display: flex;
-    flex-flow : row nowrap;
+    flex-flow: row nowrap;
     justify-content: center;
     // align-items: center;
     width: 100%;
     height: 100%;
-    flex: 1;    
+    flex: 1;
     overflow: hidden;
   }
   .contents {
@@ -235,6 +319,89 @@ $color-app-bg: #EDEDED;
   .contents.width-limited-contents {
     max-width: $max-content-width;
     width: $max-content-width;
+  }
+
+  .Annotations {
+    .contents {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: stretch;
+      overflow: hidden;
+      .column {
+        flex: 1;
+        width: 50%;
+      }
+      .form-column {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: stretch;
+        .tabs-container {
+          padding: 0;
+          padding-top: $gutter;
+          box-sizing: border-box;
+          ul {
+            margin: 0;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: stretch;
+            list-style: none;
+            padding: 0;
+
+            .tab {
+              cursor: pointer;
+              flex: 1;
+              box-sizing: border-box;
+              a {
+                text-decoration: none;
+                color: inherit;
+                padding: $gutter;
+                display: inline-block;
+                width: 100%;
+                height: 100%;
+                box-sizing: border-box;
+              }
+              &.active {
+                background: #333;
+                color: white;
+              }
+            }
+          }
+        }
+        .tab-content {
+          flex: 1;
+          overflow: hidden;
+        }
+
+        .annotation-form {
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: stretch;
+          height: 100%;
+          overflow: hidden;
+          > div {
+            padding: $gutter;
+          }
+          .form-header {
+          }
+          .form-actions {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: stretch;
+          }
+          .form-list {
+            flex: 1;
+            overflow: auto;
+          }
+          .form-footer {
+            button {
+              width: 100%;
+            }
+          }
+        }
+      }
+      .viz-column {
+      }
+    }
   }
 
   .Daily {
@@ -351,12 +518,12 @@ $color-app-bg: #EDEDED;
   li {
     display: flex;
     flex-flow: row nowrap;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
     em {
       min-width: 10rem;
       max-width: 10rem;
       text-align: right;
-      padding-right: .25rem;
+      padding-right: 0.25rem;
     }
     code {
       margin-left: 1rem;
@@ -366,7 +533,6 @@ $color-app-bg: #EDEDED;
 }
 
 .Studio {
-  
   .contents {
     display: flex;
     flex-flow: row nowrap;
@@ -382,7 +548,6 @@ $color-app-bg: #EDEDED;
     max-width: 30vw;
     padding: $gutter;
     .header {
-
     }
     .body {
       flex: 1;
@@ -412,5 +577,4 @@ $color-app-bg: #EDEDED;
     overflow: auto;
     height: 100%;
   }
-
 }

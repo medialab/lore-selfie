@@ -31,6 +31,16 @@ export const GET_SETTINGS = 'GET_SETTINGS';
 export const SET_SETTING = 'SET_SETTING';
 
 /**
+ * ANNOTATIONS ACTIONS
+ */
+export const GET_ANNOTATIONS = 'GET_ANNOTATIONS';
+export const GET_ANNOTATIONS_COLLECTION = 'GET_ANNOTATIONS_COLLECTION';
+export const UPDATE_ANNOTATION_COLLECTION = 'UPDATE_ANNOTATION_COLLECTION';
+export const CREATE_ANNOTATION = 'CREATE_ANNOTATION';
+export const UPDATE_ANNOTATION = 'UPDATE_ANNOTATION';
+export const DELETE_ANNOTATION = 'DELETE_ANNOTATION';
+
+/**
  * Generic processes control actions
  */
 export const ACTION_END = 'ACTION_END';
@@ -59,4 +69,15 @@ export const DEFAULT_SETTINGS = {
   recordTabs: true,
   recordMouse: true,
   recordChat: true
+}
+
+export const DEFAULT_ANNOTATIONS = {
+  creators: {},
+  tags: {},
+  expressions: {}
+} 
+
+export const PLATFORMS_COLORS = {
+  twitch: '#aa43ff',
+  youtube: '#ff0001'
 }

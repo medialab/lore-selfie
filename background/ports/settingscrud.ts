@@ -14,7 +14,6 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   // console.log('req body in settingscrud', req.body);
   const baseSettings : Object = await storage.get('lore-selfie-settings');
   let settings = baseSettings || DEFAULT_SETTINGS;
-  let filteredEvents;
   switch (actionType) {
     case GET_SETTINGS:
       res.send({

@@ -81,7 +81,6 @@ function Studio({
         } else {
           setSettings(defaultSettings)
         }
-
       })
   }, []);
 

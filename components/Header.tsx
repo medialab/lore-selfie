@@ -16,17 +16,17 @@ function Header() {
           <li>
             <NavLink to="/">explorer</NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink to="/channels">organiser</NavLink>
-          </li>
+          </li> */}
           <li>
-            <NavLink to="/lore">annoter</NavLink>
+            <NavLink to="/annotations">organiser</NavLink>
           </li>
           {/* <li>
             <NavLink to="/lorectionary">Lorectionary</NavLink>
           </li> */}
           <li>
-            <NavLink to="/studio">imprimer</NavLink>
+            <NavLink to="/studio">exporter</NavLink>
           </li>
           <li>
             <NavLink to="/settings">paramètres</NavLink>

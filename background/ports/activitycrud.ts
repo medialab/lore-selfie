@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
 import { v4 as generateId } from 'uuid';
 import { type captureEventsList } from "~types/captureEventsTypes"
-import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
+import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
 
 const storage = new Storage({
   area: "local",
@@ -162,6 +162,9 @@ const filterEvents = (events, payload) => {
   if (!initialFrom && !initialTo && timeSpan) {
     from = new Date(timeSpan[0]).getTime();
     to = new Date(timeSpan[1]).getTime();
+  } else if (!initialFrom && !initialTo && !timeSpan) {
+    from = -Infinity;
+    to = Infinity;
   } else {
     from = initialFrom;
     to = initialTo;
@@ -189,7 +192,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     case GET_CHANNELS:
       filteredEvents = filterEvents(activity, payload)
         .filter(event => {
-          if (event.type === 'BROWSE_VIEW') {
+          if (event.type === BROWSE_VIEW) {
             return event.metadata && event.metadata.channelId
           }
         });

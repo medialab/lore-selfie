@@ -6,6 +6,7 @@ const InputToValidate = ({
   onChange,
   onRemove,
   type = "text",
+  placeholderFn
 }) => {
   const [currentValue, setCurrentValue] = useState(value);
   const [isEdited, setIsEdited] = useState(false);
@@ -28,7 +29,7 @@ const InputToValidate = ({
                 setIsEdited(true);
               }}
             >
-              {value}
+              {typeof placeholderFn === 'function' ? placeholderFn(value) : value}
             </span>
             :
             <form

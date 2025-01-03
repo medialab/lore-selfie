@@ -1,19 +1,19 @@
-@import "./fonts.scss";
+@use "fonts.scss";
 
 .DevDashboard {
   padding: 0 10vw;
   @media (max-width: 1200px) {
     padding: 0 1rem;
   }
-  @include abeezee-regular;
+  @include fonts.abeezee-regular;
   h1,
   h2,
   h3,
   h4 {
-    @include hammersmith-one-regular;
+    @include fonts.hammersmith-one-regular;
   }
   button {
-    @include hammersmith-one-regular;
+    @include fonts.hammersmith-one-regular;
     background: white;
     box-shadow: none;
     border: 1px solid white;

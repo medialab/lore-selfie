@@ -67,7 +67,7 @@ function ChannelsVisibilityEdition({
               return (
                 <li key={id} className={`small-card ${status === 'hidden' ? 'disabled': ''}`}>
                   <div className="small-card-body">
-                  <span>{label} ({platform})</span>
+                  <span>{status === 'anon' ? <s>{label} ({platform})</s> : `${label} (${platform})`}</span>
                   </div>
                   <div className="small-card-actions">
                   <button

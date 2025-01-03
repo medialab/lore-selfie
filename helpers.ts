@@ -116,7 +116,7 @@ export const formatNumber = (n: Number, style: String  = 'fr'): String => {
   if (+n === 0) {
     return '0';
   }
-  const [intPart, floatPart] = ('' + n).split('.')
+  const [intPart, floatPart] = ('' + n).split('.');
   return intPart
     .split('')
     .reverse()
@@ -139,7 +139,7 @@ export const formatNumber = (n: Number, style: String  = 'fr'): String => {
     .result
     .reverse()
     .join('')
-    + (floatPart === undefined ? '' : style === 'fr' ? ',' : '.' + floatPart)
+    + (floatPart === undefined ? '' : style === 'fr' ? ',' + floatPart : '.' + floatPart)
 }
 
 export function lengthInUtf8Bytes(str) {

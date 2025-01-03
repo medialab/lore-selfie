@@ -24,14 +24,14 @@ function HandleEditor({
     alias
   } = handle;
   return (
-    <li className="Handle">
-      <form onSubmit={(e) => {
+    <li className="Handle card">
+      <form className="card-content" onSubmit={(e) => {
         e.preventDefault();
         onChange(handle)
       }}>
-        <div className="fields">
+        <div className="card-body fields">
           <div className="input-group">
-            <label>Identifiant sur la plateforme (utiliser pour repérer vos commentaires et messages de chat)</label>
+            <label>Identifiant sur la plateforme (utilisé pour repérer vos commentaires et messages de chat)</label>
             <input placeholder="identifiant" type="text" id="id" value={handle.id} onChange={e => setHandle({ ...handle, id: e.target.value })} />
           </div>
           <div className="input-group">
@@ -40,7 +40,7 @@ function HandleEditor({
           </div>
           <div className="input-group">
             <label>Plateforme</label>
-            <select value={platform} onChange={p => setHandle({ ...handle, platform: p })}>
+            <select value={platform} onChange={p => setHandle({ ...handle, platform: p.target.value })}>
 
               {
                 PLATFORMS.map(p => {
@@ -52,7 +52,7 @@ function HandleEditor({
             </select>
           </div>
         </div>
-        <div className="actions">
+        <div className="card-actions">
           <button onClick={e => {
             e.stopPropagation();
             e.preventDefault();
@@ -85,7 +85,7 @@ function HandlesManager({
     onChange(newHandles);
   }
   return (
-    <ul className="HandlesManager">
+    <ul className="HandlesManager cards-list">
       {
         handles.map((handle) => {
           const handleChange = (newHandle) => {
@@ -199,7 +199,7 @@ function Settings() {
                           } else {
                             newPlatforms = [...settings.recordOnPlatforms, platform]
                           }
-                          settingsPort.send({actionType: SET_SETTING, payload: {key: 'recordOnPlatforms', value: newPlatforms}})
+                          settingsPort.send({ actionType: SET_SETTING, payload: { key: 'recordOnPlatforms', value: newPlatforms } })
                         }
                         return (
                           <li onClick={handleChange} key={platform}>
@@ -215,31 +215,31 @@ function Settings() {
                   <p>Portée de l'enregistrement</p>
                   <ul>
                     {
-                      [{key: 'recordTabs', label: 'enregistrer les changements de tabulation'},
-                        {key: 'recordMouse', label: 'enregistrer le taux d\'activité de la souris'},
-                        {key: 'recordChat', label: 'enregistrer le chat et/ou les commentaires'}
+                      [{ key: 'recordTabs', label: 'enregistrer les changements de tabulation' },
+                      { key: 'recordMouse', label: 'enregistrer le taux d\'activité de la souris' },
+                      { key: 'recordChat', label: 'enregistrer le chat et/ou les commentaires' }
                       ]
-                      .map(({key, label}) => {
-                        const isChecked = !!settings[key];
-                        const handleClick = (e) => {
-                          e.stopPropagation();
-                          settingsPort.send({actionType: SET_SETTING, payload: {key, value: !isChecked}})
-                        }
-                        return (
-                          <li onClick={handleClick} key={key}>
-                            <input type="radio" checked={!!settings[key]} readOnly />
-                            <label>{label}</label>
-                          </li>
-                        )
-                      })
+                        .map(({ key, label }) => {
+                          const isChecked = !!settings[key];
+                          const handleClick = (e) => {
+                            e.stopPropagation();
+                            settingsPort.send({ actionType: SET_SETTING, payload: { key, value: !isChecked } })
+                          }
+                          return (
+                            <li onClick={handleClick} key={key}>
+                              <input type="radio" checked={!!settings[key]} readOnly />
+                              <label>{label}</label>
+                            </li>
+                          )
+                        })
                     }
                   </ul>
                 </div>
                 <div className="settings-subgroup">
                   <p>Fréquence de l'enregistrement de l'activité (en milisecondes)</p>
-                  <InputToValidate onRemove={undefined} value={+settings.liveRecordingInterval} type="number" onChange={val => {
+                  <InputToValidate placeholderFn={val => val + ' milisecondes'} onRemove={undefined} value={+settings.liveRecordingInterval} type="number" onChange={val => {
                     if (!isNaN(+val) && val >= 1000) {
-                      settingsPort.send({actionType: SET_SETTING, payload: {key: 'liveRecordingInterval', value: val}})
+                      settingsPort.send({ actionType: SET_SETTING, payload: { key: 'liveRecordingInterval', value: val } })
                     } else {
                       alert('Valeur incorrecte : elle doit être d\'au moins 1000 ms (1 seconde)')
                     }
@@ -252,7 +252,17 @@ function Settings() {
                   Informations
                 </h2>
                 <ul>
-                  <li>Taille des données de capture sur le disque : {sizeInMb === undefined ? 'chargement ...' : formatNumber(sizeInMb.toFixed(1)) + ' Mo'}</li>
+                  <li>Taille des données d'enregistrement de l'activité sur le disque : {sizeInMb === undefined ? 'chargement ...' : formatNumber(sizeInMb.toFixed(1)) + ' Mo'}</li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        chrome.tabs.create({
+                          url: "./tabs/dev-dashboard.html"
+                        })
+                      }}>
+                      Ouvrir le dashboard de développement
+                    </button>
+                  </li>
                 </ul>
               </div>
             </div>
