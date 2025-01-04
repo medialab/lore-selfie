@@ -296,14 +296,17 @@ function DevDashboard() {
   return (
     <div className="DevDashboard">
 
-      <h1>Lore selfie - dashboard de développement</h1>
-      <div>
+      <h1><strong>lore selfie</strong> | dashboard de développement</h1>
+      <div className="about">
         <h3>Qu'est-ce que cette page ?</h3>
-        <p>Cette page est dédiée aux développeur·euses qui désirent visualiser et télécharger les données brutes collectées et construites avec l'extension lore selfie installée sur ce navigateur.</p>
+        <p>Cette page est dédiée aux développeur·euses qui désirent visualiser, télécharger et manipuler les données créées avec l'extension lore selfie installée sur ce navigateur à des fins de test technique et d'expérimenation.</p>
+        <p>Ne l'utilisez que si vous savez ce que vous faites, au risque de compromettre vos données patiemment constituées !</p>
       </div>
       <div className="ui">
         <div className="ui-section">
-          <button className="ok"
+          <h2>Grandes manœuvres sur les données</h2>
+          <button
+            className="important-button"
             onClick={() => {
               ioPort.send({ actionType: SERIALIZE_ALL_DATA })
               setPendingForDownload(true);
@@ -311,7 +314,7 @@ function DevDashboard() {
           >
             Télécharger toutes les données de l'extension
           </button>
-          <button className="danger"
+          <button className="important-button danger"
             onClick={() => {
 
               const confirmed = confirm("Supprimer toutes les données enregistrées par lore selfie ?")
@@ -326,42 +329,8 @@ function DevDashboard() {
           </button>
         </div>
         <div className="ui-section">
-          <h2>Tests de charge</h2>
+          <h2>Charger des données précédemment téléchargées</h2>
           <div>
-            <button className="ok"
-              onClick={() => handleDuplicateTodayForPastDays(10)}
-            >
-              Dupliquer les données d'aujourd'hui sur les 10 derniers jours
-            </button>
-            <button className="warning"
-              onClick={() => handleDuplicateTodayForPastDays(100)}
-            >
-              Dupliquer les données d'aujourd'hui sur les 100 derniers jours
-            </button>
-            <button className="danger"
-              onClick={() => handleDuplicateTodayForPastDays(1000)}
-            >
-              Dupliquer les données d'aujourd'hui sur les 1000 derniers jours (2 ans et demi)
-            </button>
-            <button className="danger"
-              onClick={() => handleDuplicateTodayForPastDays(10000)}
-            >
-              Dupliquer les données d'aujourd'hui sur les 10000 derniers jours (27 ans)
-            </button>
-          </div>
-        </div>
-        <div className="ui-section">
-          <h2>Charger des données existantes</h2>
-          <div>
-            {/* <ul>
-              <li>
-                <button className={`${uploadMode === 'prepend' ? 'active' : ''}`} onClick={() => setUploadMode('prepend')}>Ajouter au début de l'historique actuel</button>
-              </li>
-              <li>
-                <button className={`${uploadMode === 'replace' ? 'active' : ''}`} onClick={() => setUploadMode('replace')}>Remplacer l'historique actuel</button>
-              </li>
-
-            </ul> */}
           </div>
           <input
             onChange={onFileInputChange}
@@ -379,7 +348,38 @@ function DevDashboard() {
 
         </div>
         <div className="ui-section">
-          <h2>Montrer les types d'évènements</h2>
+          <h2>Tests de charge (pour évaluer la robustesse de l'extension à de grands volumes)</h2>
+          <ul>
+            <li><button className="important-button ok full-width"
+              onClick={() => handleDuplicateTodayForPastDays(10)}
+            >
+              Dupliquer les données d'aujourd'hui sur les 10 derniers jours
+            </button>
+            </li>
+            <li><button className="important-button warning full-width"
+              onClick={() => handleDuplicateTodayForPastDays(100)}
+            >
+              Dupliquer les données d'aujourd'hui sur les 100 derniers jours
+            </button>
+            </li>
+            <li><button className="important-button danger full-width"
+              onClick={() => handleDuplicateTodayForPastDays(1000)}
+            >
+              Dupliquer les données d'aujourd'hui sur les 1000 derniers jours (2 ans et demi)
+            </button>
+            </li>
+            <li><button className="important-button danger full-width"
+              onClick={() => handleDuplicateTodayForPastDays(10000)}
+            >
+              Dupliquer les données d'aujourd'hui sur les 10000 derniers jours (27 ans)
+            </button>
+            </li>
+          </ul>
+        </div>
+        
+        <div className="ui-section">
+          <h2>Visualisation des données brutes</h2>
+          <h3>Montrer les types d'évènements</h3>
           <ul>
             {
               EVENT_TYPES.map(type => {
@@ -399,6 +399,7 @@ function DevDashboard() {
                 return (
                   <li key={type}
                     onClick={handleClick}
+                    style={{cursor: 'pointer'}}
                   >
                     <span
                     >
@@ -420,8 +421,7 @@ function DevDashboard() {
               Montrer tout
             </button>
           </div>
-        </div>
-        <div className="ui-section preview-control">
+
           <h2>
             <span>
               Visualisation de {filteredCount === undefined ? '?' : filteredCount} évènements sur {totalCount === undefined ? '?' : formatNumber(totalCount)} tous types d'évènements confondus (page {reverseOrder ? paginations.length - currentPreviewPage : currentPreviewPage + 1} / {paginations.length})
@@ -429,46 +429,49 @@ function DevDashboard() {
           </h2>
           <div >
             <div className="row">
-              <button
-                onClick={() => requestPreviewUpdate()}
-              >
-                Rafraîchir
-              </button>
-              <button style={{ marginLeft: '1rem' }} onClick={() => setReverseOrder(!reverseOrder)}>
-                {
-                  reverseOrder ?
-                    'Du plus récent au plus ancien'
-                    :
-                    'Du plus ancien au plus récent'
+              <div>
+                <button className="important-button"
+                  onClick={() => requestPreviewUpdate()}
+                >
+                  Rafraîchir
+                </button>
+
+                <button className="important-button" onClick={() => setReverseOrder(!reverseOrder)}>
+                  {
+                    reverseOrder ?
+                      'Du plus récent au plus ancien'
+                      :
+                      'Du plus ancien au plus récent'
+                  }
+                </button>
+                <button className="important-button" disabled={isLoadingPreview || currentPreviewPage === 0} onClick={() => setCurrentPreviewPage(currentPreviewPage - 1)}>
+                  {'< page précédente'}
+                </button>
+                <button className="important-button" disabled={isLoadingPreview || currentPreviewPage >= paginations.length - 1} onClick={() => setCurrentPreviewPage(currentPreviewPage + 1)}>
+                  {'page suivante >'}
+                </button>
+              </div>
+              <div >
+                {paginations.length > 1 ?
+                  (paginations < 10 ? paginations :
+                    [
+                      ...(currentPreviewPage > 6 ? [...paginations.slice(0, 5), '...'] : paginations.slice(0, currentPreviewPage > 0 ? currentPreviewPage - 1 : 1)),
+                      ...paginations.slice(currentPreviewPage > 0 ? currentPreviewPage - 1 : 1, currentPreviewPage < 4 ? 5 : currentPreviewPage + 2),
+                      ...(currentPreviewPage < paginations.length - 6 ? ['...'] : []),
+                      ...paginations.slice(currentPreviewPage < paginations.length - 6 ? paginations.length - 5 : currentPreviewPage + 2, paginations.length)
+                    ]).map((pageNumber, index) => {
+                      return (
+                        <button
+                          disabled={pageNumber === '...'} onClick={() => pageNumber !== '...' ? setCurrentPreviewPage(pageNumber) : undefined}
+                          key={index}
+                          className={`important-button pagination ${currentPreviewPage === pageNumber ? 'active' : ''}`}>
+                          {pageNumber === '...' ? pageNumber : reverseOrder ? paginations.length - pageNumber : pageNumber + 1}
+                        </button>
+                      )
+                    })
+                  : null
                 }
-              </button>
-              <button disabled={currentPreviewPage === 0} onClick={() => setCurrentPreviewPage(currentPreviewPage - 1)}>
-                {'<'}
-              </button>
-              <button disabled={currentPreviewPage >= paginations.length - 1} onClick={() => setCurrentPreviewPage(currentPreviewPage + 1)}>
-                {'>'}
-              </button>
-            </div>
-            <div className="row">
-              {paginations.length > 1 ?
-                (paginations < 10 ? paginations :
-                  [
-                    ...(currentPreviewPage > 6 ? [...paginations.slice(0, 5), '...'] : paginations.slice(0, currentPreviewPage > 0 ? currentPreviewPage - 1 : 1)),
-                    ...paginations.slice(currentPreviewPage > 0 ? currentPreviewPage - 1 : 1, currentPreviewPage < 4 ? 5 : currentPreviewPage + 2),
-                    ...(currentPreviewPage < paginations.length - 6 ? ['...'] : []),
-                    ...paginations.slice(currentPreviewPage < paginations.length - 6 ? paginations.length - 5 : currentPreviewPage + 2, paginations.length)
-                  ]).map((pageNumber, index) => {
-                    return (
-                      <button
-                        disabled={pageNumber === '...'} onClick={() => pageNumber !== '...' ? setCurrentPreviewPage(pageNumber) : undefined}
-                        key={index}
-                        className={`pagination ${currentPreviewPage === pageNumber ? 'active' : ''}`}>
-                        {pageNumber === '...' ? pageNumber : reverseOrder ? paginations.length - pageNumber : pageNumber + 1}
-                      </button>
-                    )
-                  })
-                : null
-              }
+              </div>
             </div>
 
           </div>
@@ -477,9 +480,6 @@ function DevDashboard() {
 
       <div className="data-preview">
 
-        <div>
-
-        </div>
         {
           isLoadingPreview ? <div>Chargement</div> :
             <CodeBlock
@@ -491,27 +491,27 @@ function DevDashboard() {
         }
         {
           !appSettings ? <div>Chargement</div> :
-          <div>
-            <h3>Paramètres (<code>settings</code>)</h3>
-            <CodeBlock
-              text={JSON.stringify(appSettings, null, 2)}
-              language={'json'}
-              showLineNumbers
-              theme={dracula}
-            />
-          </div>
+            <div>
+              <h3>Paramètres (<code>settings</code>)</h3>
+              <CodeBlock
+                text={JSON.stringify(appSettings, null, 2)}
+                language={'json'}
+                showLineNumbers
+                theme={dracula}
+              />
+            </div>
         }
         {
           !appAnnotations ? <div>Chargement</div> :
-          <div>
-            <h3>Annotations (<code>annotations</code>)</h3>
-            <CodeBlock
-              text={JSON.stringify(appAnnotations, null, 2)}
-              language={'json'}
-              showLineNumbers
-              theme={dracula}
-            />
-          </div>
+            <div>
+              <h3>Annotations (<code>annotations</code>)</h3>
+              <CodeBlock
+                text={JSON.stringify(appAnnotations, null, 2)}
+                language={'json'}
+                showLineNumbers
+                theme={dracula}
+              />
+            </div>
         }
 
         {/* <div>
