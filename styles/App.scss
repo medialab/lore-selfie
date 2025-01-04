@@ -344,6 +344,9 @@ $color-app-bg: #ededed;
     height: 100%;
     flex: 1;
     overflow: hidden;
+    &.scrollable {
+      overflow: auto;
+    }
   }
   .contents {
     position: relative;
@@ -351,9 +354,7 @@ $color-app-bg: #ededed;
   .contents.width-limited-contents {
     max-width: $max-content-width;
     width: $max-content-width;
-    &.scrollable {
-      overflow: auto;
-    }
+    
   }
 
   .Annotations {

@@ -159,8 +159,8 @@ function Settings() {
   })
   console.log('settings', settings);
   return (
-    <div className="contents-wrapper Settings">
-      <div className="contents width-limited-contents scrollable">
+    <div className="contents-wrapper Settings scrollable">
+      <div className="contents width-limited-contents">
         <h1>Paramètres</h1>
         {
           isLoadingSettings ?
@@ -189,6 +189,33 @@ function Settings() {
               </div>
               <div className="settings-group">
                 <h2>Paramètres d'enregistrement de votre activité</h2>
+                
+                <div className="settings-subgroup">
+                  <p>Portée de l'enregistrement</p>
+                  <ul>
+                    {
+                      [
+                      { key: 'recordActivity', label: 'enregistrer votre activité avec l\'extension' },
+                      { key: 'recordTabs', label: 'enregistrer les changements de tabulation', disabled: !settings.recordActivity },
+                      { key: 'recordMouse', label: 'enregistrer le taux d\'activité de la souris', disabled: !settings.recordActivity },
+                      { key: 'recordChat', label: 'enregistrer le chat et/ou les commentaires', disabled: !settings.recordActivity }
+                      ]
+                        .map(({ key, label, disabled }) => {
+                          const isChecked = !!settings[key];
+                          const handleClick = (e) => {
+                            e.stopPropagation();
+                            settingsPort.send({ actionType: SET_SETTING, payload: { key, value: !isChecked } })
+                          }
+                          return (
+                            <li style={{opacity: disabled ? .5 : 1, pointerEvents: disabled ? 'none' : 'all'}} onClick={handleClick} key={key}>
+                              <input type="radio" checked={!!settings[key] && !disabled} readOnly />
+                              <label>{label}</label>
+                            </li>
+                          )
+                        })
+                    }
+                  </ul>
+                </div>
                 <div className="settings-subgroup">
                   <p>Enregistrer l'activité sur les plateformes</p>
                   <ul>
@@ -205,38 +232,12 @@ function Settings() {
                           settingsPort.send({ actionType: SET_SETTING, payload: { key: 'recordOnPlatforms', value: newPlatforms } })
                         }
                         return (
-                          <li onClick={handleChange} key={platform}>
-                            <input type="radio" checked={isIncluded} readOnly />
+                          <li style={{opacity: !settings.recordActivity ? .5 : 1, pointerEvents: !settings.recordActivity ? 'none' : 'all'}} onClick={handleChange} key={platform}>
+                            <input type="radio" checked={isIncluded && settings.recordActivity} readOnly />
                             <label>{platform}</label>
                           </li>
                         )
                       })
-                    }
-                  </ul>
-                </div>
-                <div className="settings-subgroup">
-                  <p>Portée de l'enregistrement</p>
-                  <ul>
-                    {
-                      [
-                      { key: 'recordActivity', label: 'enregistrer votre activité avec l\'extension' },
-                      { key: 'recordTabs', label: 'enregistrer les changements de tabulation' },
-                      { key: 'recordMouse', label: 'enregistrer le taux d\'activité de la souris' },
-                      { key: 'recordChat', label: 'enregistrer le chat et/ou les commentaires' }
-                      ]
-                        .map(({ key, label }) => {
-                          const isChecked = !!settings[key];
-                          const handleClick = (e) => {
-                            e.stopPropagation();
-                            settingsPort.send({ actionType: SET_SETTING, payload: { key, value: !isChecked } })
-                          }
-                          return (
-                            <li onClick={handleClick} key={key}>
-                              <input type="radio" checked={!!settings[key]} readOnly />
-                              <label>{label}</label>
-                            </li>
-                          )
-                        })
                     }
                   </ul>
                 </div>

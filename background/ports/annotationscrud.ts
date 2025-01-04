@@ -12,6 +12,7 @@ import {
   DEFAULT_ANNOTATIONS,
   UPDATE_ANNOTATION_COLLECTION,
   DELETE_ALL_DATA,
+  SET_ANNOTATIONS,
 } from "~constants";
 
 const storage = new Storage({
@@ -51,6 +52,20 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         }
       })
       break;
+    case SET_ANNOTATIONS:
+      // @todo add proper schema validation
+      await storage.set('lore-selfie-annotations', payload.value);
+      res.send({
+        responseType: ACTION_END,
+        actionType,
+        payload,
+        requestId,
+        result: {
+          status: 'success',
+          data: payload.value
+        }
+      })
+      break;
     case GET_ANNOTATIONS_COLLECTION:
       res.send({
         responseType: ACTION_END,
@@ -64,7 +79,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       })
       break;
     case UPDATE_ANNOTATION_COLLECTION:
-      console.log('payload', payload, ['data', 'id'].every(k => k in payload))
+      // console.log('payload', payload, ['data', 'id'].every(k => k in payload))
       if (['data', 'id'].every(k => k in payload)) {
         const newAnnotations = {
           ...annotations,

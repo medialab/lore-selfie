@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "description": "A lore selfie",
   "author": "Robin de Mourat <robin.demourat@gmail.com>",
+  "homepage": "https://github.com/medialab/lore-selfie",
   "scripts": {
     "dev": "plasmo dev",
     "dev:firefox": "plasmo dev --target=firefox-mv2",

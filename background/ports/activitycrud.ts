@@ -361,29 +361,29 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       }
       break;
-    case SERIALIZE_ALL_DATA:
-      res.send({
-        responseType: ACTION_END,
-        actionType,
-        payload,
-        result: {
-          status: 'success',
-          data: JSON.stringify(activity)
-        }
-      })
-      break;
-    case DELETE_ALL_DATA:
-      await storage.clear();
-      res.send({
-        responseType: ACTION_END,
-        requestId,
-        actionType,
-        payload,
-        result: {
-          status: 'success'
-        }
-      })
-      break;
+    // case SERIALIZE_ALL_DATA:
+    //   res.send({
+    //     responseType: ACTION_END,
+    //     actionType,
+    //     payload,
+    //     result: {
+    //       status: 'success',
+    //       data: JSON.stringify(activity)
+    //     }
+    //   })
+    //   break;
+    // case DELETE_ALL_DATA:
+    //   await storage.clear();
+    //   res.send({
+    //     responseType: ACTION_END,
+    //     requestId,
+    //     actionType,
+    //     payload,
+    //     result: {
+    //       status: 'success'
+    //     }
+    //   })
+    //   break;
     case DUPLICATE_DAY_DATA:
       if (payload.daySlug && payload.numberOfDays) {
         const dayEvents = activity.filter(event => {

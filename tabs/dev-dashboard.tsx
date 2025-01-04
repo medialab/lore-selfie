@@ -9,7 +9,7 @@ import { v4 as generateId } from 'uuid';
 import { downloadTextfile, formatNumber } from "~helpers";
 
 import '~styles/DevDashboard.scss';
-import { EVENT_TYPES, ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
+import { EVENT_TYPES, ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA, SET_SETTINGS, SET_ANNOTATIONS, GET_SETTINGS, GET_ANNOTATIONS } from "~constants";
 // import { useInterval } from "usehooks-ts";
 
 const PAGINATION_COUNT = 25;
@@ -46,8 +46,10 @@ type DashboardResponseBody = {
 
 function DevDashboard() {
   const dashboardPort = usePort<DashboardRequestBody, DashboardResponseBody>("devdashboard")
+  const ioPort = usePort('io');
   const activitiesPort = usePort("activitycrud")
   const annotationsPort = usePort("annotationscrud")
+  const settingsPort = usePort("settingscrud")
 
   const fileInputRef = useRef(null);
   // const [activity = [], setActivity] = useStorage({
@@ -60,13 +62,15 @@ function DevDashboard() {
     ['BROWSE_VIEW']
   );
   const [reverseOrder, setReverseOrder] = useState(false);
-  const [uploadMode, setUploadMode] = useState('prepend');
+  // const [uploadMode, setUploadMode] = useState('prepend');
   const [currentPreviewPage, setCurrentPreviewPage] = useState(0);
   const [isLoadingPreview, setIsLoadingPreview] = useState();
   const [numberOfPages, setNumberOfPages] = useState();
   const [totalCount, setTotalCount] = useState();
   const [filteredCount, setFilteredCount] = useState();
   const [previewedItems, setPreviewedItems] = useState();
+  const [appSettings, setAppSettings] = useState();
+  const [appAnnotations, setAppAnnotations] = useState();
 
   const [isWorking, setIsWorking] = useState(false);
   const [isWorkingShareStatus, setIsWorkingShareStatus] = useState(0);
@@ -84,20 +88,39 @@ function DevDashboard() {
     dashboardPort.send(payload)
   }
 
+  useEffect(() => {
+    settingsPort.send({ actionType: GET_SETTINGS })
+    annotationsPort.send({ actionType: GET_ANNOTATIONS })
+  }, [])
+
   // useInterval(() => requestPreviewUpdate(), 2000);
 
   useEffect(() => {
     requestPreviewUpdate();
   }, [reverseOrder, currentPreviewPage, visibleTypes])
 
-  activitiesPort.listen(data => {
-    // console.log('cudport response data', data);
+  settingsPort.listen(data => {
+    if (data.actionType === GET_SETTINGS && data.result.status === 'success') {
+      setAppSettings(data.result.data);
+    }
+  })
+  annotationsPort.listen(data => {
+    if (data.actionType === GET_ANNOTATIONS && data.result.status === 'success') {
+      setAppAnnotations(data.result.data);
+    }
+  })
+
+  ioPort.listen(data => {
     if (data.actionType === SERIALIZE_ALL_DATA && data.result.status === 'success' && pendingForDownload) {
       downloadTextfile(data.result.data, `lore-selfie-activity-${new Date().toUTCString()}.json`, 'application/json')
       setPendingForDownload(false);
-      // downloadJSONData(data.result.data, `lore-selfie-activity-${new Date().toUTCString()}`)
     }
-    else if (data.responseType === ACTION_END) {
+    if (data.actionType === DELETE_ALL_DATA && data.result.status === 'success') {
+      setIsWorking(false)
+    }
+  })
+  activitiesPort.listen(data => {
+    if (data.responseType === ACTION_END) {
       setIsWorking(false);
       setIsWorkingShareStatus(undefined);
       requestPreviewUpdate();
@@ -107,7 +130,6 @@ function DevDashboard() {
         total: data.total
       });
     }
-
   })
 
   dashboardPort.listen(data => {
@@ -141,47 +163,80 @@ function DevDashboard() {
         const str = reader.result.toString();
         try {
           const data = JSON.parse(str);
-          console.log('uploaded data', data);
-          if (Array.isArray(data)) {
-            let newActivity;
-            switch (uploadMode) {
-              case 'prepend':
-                // console.log('send prepend request to cudport', data);
-                setIsWorking(true);
-                activitiesPort.send({
-                  actionType: PREPEND_ACTIVITY_EVENTS,
-                  payload: {
-                    data
-                  }
-                })
-                // newActivity = [...data, ...activity];
-                break;
-              case 'append':
-                // newActivity = [...activity, ...data]
-                setIsWorking(true);
-                activitiesPort.send({
-                  actionType: APPEND_ACTIVITY_EVENTS,
-                  payload: {
-                    data
-                  }
-                })
-                break;
-              case 'replace':
-                const confirmed = confirm('L\'entièreté de l\'historique d\'activité actuel va être écrasé et remplacé par celui du fichier versé. Confirmer ?');
-                if (confirmed) {
-                  // newActivity = data;
-                  setIsWorking(true);
-                  activitiesPort.send({
-                    actionType: REPLACE_ACTIVITY_EVENTS,
-                    payload: {
-                      data
-                    }
-                  })
+          // @todo improve that with proper schema-like validation
+          const recordKeys = [
+            "type",
+            "title",
+            "date",
+            "pluginVersion",
+            "learnMoreURL",
+            "activities",
+            "settings",
+            "annotations"
+          ];
+
+          if (recordKeys.every(k => k in data)) {
+            const confirmed = confirm('L\'entièreté de l\'historique d\'activité, des paramètres et des annotations actuelles va être écrasée et remplacée par les données du fichier versé. Confirmer ?');
+            if (confirmed) {
+              // newActivity = data;
+              setIsWorking(true);
+              activitiesPort.send({
+                actionType: REPLACE_ACTIVITY_EVENTS,
+                payload: {
+                  data: data.activities
                 }
-                break;
-              default:
-                break;
+              })
+              settingsPort.send({
+                actionType: SET_SETTINGS,
+                payload: {
+                  data: data.settings
+                }
+              })
+              annotationsPort.send({
+                actionType: SET_ANNOTATIONS,
+                payload: {
+                  value: data.annotations
+                }
+              })
             }
+
+            // let newActivity;
+            // switch (uploadMode) {
+            // case 'prepend':
+            //   // console.log('send prepend request to cudport', data);
+            //   setIsWorking(true);
+            //   activitiesPort.send({
+            //     actionType: PREPEND_ACTIVITY_EVENTS,
+            //     payload: {
+            //       data
+            //     }
+            //   })
+            //   break;
+            // case 'append':
+            //   setIsWorking(true);
+            //   activitiesPort.send({
+            //     actionType: APPEND_ACTIVITY_EVENTS,
+            //     payload: {
+            //       data
+            //     }
+            //   })
+            //   break;
+            //   case 'replace':
+            //     const confirmed = confirm('L\'entièreté de l\'historique d\'activité actuel va être écrasé et remplacé par celui du fichier versé. Confirmer ?');
+            //     if (confirmed) {
+            //       // newActivity = data;
+            //       setIsWorking(true);
+            //       activitiesPort.send({
+            //         actionType: REPLACE_ACTIVITY_EVENTS,
+            //         payload: {
+            //           data
+            //         }
+            //       })
+            //     }
+            //     break;
+            //   default:
+            //     break;
+            // }
             // if (newActivity) {
             //   const storage = new Storage({
             //     area: "local",
@@ -239,7 +294,7 @@ function DevDashboard() {
   const previewedItemsStr = useMemo(() => JSON.stringify(previewedItems, null, 2), [previewedItems])
   return (
     <div className="DevDashboard">
-      
+
       <h1>Lore selfie - dashboard de développement</h1>
       <div>
         <h3>Qu'est-ce que cette page ?</h3>
@@ -249,16 +304,11 @@ function DevDashboard() {
         <div className="ui-section">
           <button className="ok"
             onClick={() => {
-              activitiesPort.send({ actionType: SERIALIZE_ALL_DATA })
+              ioPort.send({ actionType: SERIALIZE_ALL_DATA })
               setPendingForDownload(true);
-              // downloadJSONData(activity, `lore-selfie-activity-${new Date().toUTCString()}`)
-
             }}
           >
-            Télécharger les données d'activité au format JSON
-          </button>
-          <button disabled className="ok">
-            Télécharger les données d'annotation au format JSON
+            Télécharger toutes les données de l'extension
           </button>
           <button className="danger"
             onClick={() => {
@@ -303,18 +353,15 @@ function DevDashboard() {
         <div className="ui-section">
           <h2>Charger des données existantes</h2>
           <div>
-            <ul>
+            {/* <ul>
               <li>
                 <button className={`${uploadMode === 'prepend' ? 'active' : ''}`} onClick={() => setUploadMode('prepend')}>Ajouter au début de l'historique actuel</button>
               </li>
-              {/* <li>
-                <button className={`${uploadMode === 'append' ? 'active' : ''}`} onClick={() => setUploadMode('append')}>Ajouter à la fin</button>
-              </li> */}
               <li>
                 <button className={`${uploadMode === 'replace' ? 'active' : ''}`} onClick={() => setUploadMode('replace')}>Remplacer l'historique actuel</button>
               </li>
 
-            </ul>
+            </ul> */}
           </div>
           <input
             onChange={onFileInputChange}
@@ -441,6 +488,30 @@ function DevDashboard() {
               showLineNumbers
               theme={dracula}
             />
+        }
+        {
+          !appSettings ? <div>Chargement</div> :
+          <div>
+            <h3>Paramètres (<code>settings</code>)</h3>
+            <CodeBlock
+              text={JSON.stringify(appSettings, null, 2)}
+              language={'json'}
+              showLineNumbers
+              theme={dracula}
+            />
+          </div>
+        }
+        {
+          !appAnnotations ? <div>Chargement</div> :
+          <div>
+            <h3>Annotations (<code>annotations</code>)</h3>
+            <CodeBlock
+              text={JSON.stringify(appAnnotations, null, 2)}
+              language={'json'}
+              showLineNumbers
+              theme={dracula}
+            />
+          </div>
         }
 
         {/* <div>
