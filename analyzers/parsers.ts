@@ -84,7 +84,6 @@ const parsers = {
           channelName: document.querySelector('.YtReelChannelBarViewModelChannelName a')?.textContent.trim(),
           channelId: decodeURI(document.querySelector('.YtReelChannelBarViewModelChannelName a')?.getAttribute('href'))?.split('@').pop(),
           channelImageSrc: document.querySelector('.yt-spec-avatar-shape img')?.getAttribute('src'),
-          // following line is commented because lazy loaded
           commentsCount: document.querySelector('#actions #comments-button .yt-spec-button-shape-with-label')?.textContent.trim(),
           likesCount: document.querySelector('#actions #like-button #like-button .yt-spec-button-shape-with-label, .ytLikeButtonViewModelHost')?.textContent.trim(),
         })
@@ -114,6 +113,16 @@ const parsers = {
           ownerSubcount: document.querySelector('#owner-sub-count')?.textContent,
           channelImageSrc: document.querySelector('.ytd-watch-metadata .yt-img-shadow')?.getAttribute('src'),
           duration: document.querySelector('.ytp-time-duration')?.textContent,
+
+          recommendedVideos: Array.from(document.querySelectorAll('#related #dismissible'))
+          .map(el => {
+            return {
+              title: el.querySelector('#video-title').innerText.trim(),
+              channelName: el.querySelector('.ytd-channel-name').innerText.trim(),
+              url: 'https:/youtube.com' + el.querySelector('#thumbnail').getAttribute('href'),
+              thumbnailImageSrc: el.querySelector('.ytd-thumbnail img').getAttribute('src')
+            }
+          }),
           
           // following line is commented because lazy loaded
           // commentsCount: document.querySelector('.count-text.ytd-comments-header-renderer span')?.textContent,

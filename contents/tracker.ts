@@ -47,10 +47,6 @@ const addEvent = async (evt: EventGeneric) => {
   await storage.set("lore-selfie-activity", updatedData);
 }
 
-
-// const LIVE_ACTIVITY_TRACK_TIMESPAN = 5000;
-const LIVE_ACTIVITY_TRACK_TIMESPAN = 10000;
-
 const main = async () => {
   console.log('init tracker');
   const settings: Settings = await storage.get("lore-selfie-settings") || DEFAULT_SETTINGS;
@@ -58,7 +54,7 @@ const main = async () => {
   const injectionId = generateId();
   const platform = getPlatform(window.location.href);
 
-  if (!settings.recordOnPlatforms.includes(platform)){
+  if (!settings.recordActivity || !settings.recordOnPlatforms.includes(platform)){
     return;
   } 
   const openPlatformInTabEvent: OpenPlatformInTabEvent = {
@@ -180,7 +176,6 @@ const main = async () => {
         platform,
         injectionId,
         addEvent,
-        liveTrackTimespan: LIVE_ACTIVITY_TRACK_TIMESPAN,
         currentURL: document.location.href,
         onCurrentURLChange,
       });
@@ -202,7 +197,6 @@ const main = async () => {
     platform,
     injectionId,
     addEvent,
-    liveTrackTimespan: LIVE_ACTIVITY_TRACK_TIMESPAN,
     currentURL: document.location.href,
     onCurrentURLChange: onCurrentURLChange
   });

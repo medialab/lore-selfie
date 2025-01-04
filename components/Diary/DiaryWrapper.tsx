@@ -64,7 +64,7 @@ function DiaryWrapper({
     <div className="DiaryWrapper">
       <div className="header">
       <div>{Object.keys(dataByDay).length} jours, </div>
-      <div>{formatNumber(visibleEvents.length)} actions capturées.</div>
+      <div>{formatNumber(visibleEvents.length)} évènements enregistrés.</div>
         <ul className="settings">
           <li className="format-picker">
             <span>Format</span>

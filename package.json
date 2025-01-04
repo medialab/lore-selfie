@@ -1,8 +1,8 @@
 {
-  "name": "lore-selfie-sandbox",
-  "displayName": "Lore selfie sandbox",
+  "name": "lore-selfie",
+  "displayName": "lore selfie",
   "version": "0.0.1",
-  "description": "A lore selfie sandbox",
+  "description": "A lore selfie",
   "author": "Robin de Mourat <robin.demourat@gmail.com>",
   "scripts": {
     "dev": "plasmo dev",

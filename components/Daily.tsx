@@ -238,18 +238,17 @@ function Daily() {
           </div>
         </div>
         <div>
-          <span>Visualiser</span>
           <button
             className={`${roundDay ? '' : 'active'}`}
             onClick={() => setRoundDay(false)}
           >
-            Sur les créneaux de la journée enregistrés uniquement
+            visualiser uniquement les créneaux de la journée actifs
           </button>
           <button
             className={`${roundDay ? 'active' : ''}`}
             onClick={() => setRoundDay(true)}
           >
-            Sur toute la journée
+            visualiser toute la journée
           </button>
         </div>
       </div>

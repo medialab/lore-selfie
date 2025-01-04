@@ -66,6 +66,7 @@ export const DEFAULT_SETTINGS = {
   handles: [],
   recordOnPlatforms: PLATFORMS,
   liveRecordingInterval: 10000,
+  recordActivity: true,
   recordTabs: true,
   recordMouse: true,
   recordChat: true

@@ -351,6 +351,9 @@ $color-app-bg: #ededed;
   .contents.width-limited-contents {
     max-width: $max-content-width;
     width: $max-content-width;
+    &.scrollable {
+      overflow: auto;
+    }
   }
 
   .Annotations {

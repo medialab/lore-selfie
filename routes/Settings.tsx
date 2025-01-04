@@ -160,7 +160,7 @@ function Settings() {
   console.log('settings', settings);
   return (
     <div className="contents-wrapper Settings">
-      <div className="contents width-limited-contents">
+      <div className="contents width-limited-contents scrollable">
         <h1>Paramètres</h1>
         {
           isLoadingSettings ?
@@ -218,7 +218,9 @@ function Settings() {
                   <p>Portée de l'enregistrement</p>
                   <ul>
                     {
-                      [{ key: 'recordTabs', label: 'enregistrer les changements de tabulation' },
+                      [
+                      { key: 'recordActivity', label: 'enregistrer votre activité avec l\'extension' },
+                      { key: 'recordTabs', label: 'enregistrer les changements de tabulation' },
                       { key: 'recordMouse', label: 'enregistrer le taux d\'activité de la souris' },
                       { key: 'recordChat', label: 'enregistrer le chat et/ou les commentaires' }
                       ]

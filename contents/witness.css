@@ -23,7 +23,7 @@
   min-width: 15px;
   min-height: 5px;
   cursor: pointer;
-  animation: flicker 5s infinite;
+  animation: flicker 10s infinite;
 }
 
 .witness-text {
@@ -48,8 +48,8 @@
 
 .lore-politics-witness-container:hover .witness-text {
   opacity: 1;
-  max-width: 100%;
-  max-height: 15px;
+  max-width: calc(100vw - 20px);
+  max-height: 50px;
   font-size: 15px;
   padding: 5px;
 }
