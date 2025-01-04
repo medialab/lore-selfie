@@ -200,11 +200,20 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       const channelsList = new Map();
       filteredEvents.forEach(event => {
         const { channelId, channelName } = event.metadata;
-        const { platform } = event;
+        const { platform, url } = event;
         const id = `${channelId}-${platform}`
-        // console.log({ channelId, channelName, id })
+        // console.log('channel', { channelId, channelName, id, platform })
         if (!channelsList.has(id)) {
-          channelsList.set(id, { id, channelId, channelName, platform });
+          channelsList.set(id, { id, channelId, channelName, platform, urls: new Set([url]) });
+        } else {
+          const existing = channelsList.get(id);
+          const newUrls = new Set(Array.from(existing.urls));
+          newUrls.add(url);
+          const updated = {
+            ...existing,
+            urls: newUrls
+          }
+          channelsList.set(id, updated)
         }
       })
       // console.log('channels list map values', Array.from(channelsList.values()))
@@ -215,7 +224,10 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         requestId,
         result: {
           status: 'success',
-          data: Array.from(channelsList.values())
+          data: Array.from(channelsList.values().map(channel => ({
+            ...channel,
+            urlsCount: Array.from(channel.urls).length
+          })))
         }
       })
       break;

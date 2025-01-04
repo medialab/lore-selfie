@@ -56,8 +56,10 @@ export default function TagCard({
             </form>
             :
             <div className="card-readonly-content" onClick={() => setIsEdited(true)}>
-              <div className="color-marker" style={{ color }} />
-              <h4>{name}</h4>
+              <h4>
+                <span className="color-marker" style={{ background: color }} />
+                <span>{name}</span>
+                </h4>
               <div className="description">
                 {description.split('\n').map((t, index) => <p key={index}>{t}</p>)}
               </div>

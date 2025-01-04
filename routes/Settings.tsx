@@ -171,6 +171,9 @@ function Settings() {
                 <h2>
                   Mes pseudos
                 </h2>
+                <p>
+                  L'enregistrement de vos pseudos permet de rajouter des emphases sur vos interventions dans les chats et commentaires dans les visualisations de l'extension.
+                </p>
                 <HandlesManager
                   handles={settings.handles}
                   onChange={

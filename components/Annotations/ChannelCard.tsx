@@ -20,7 +20,7 @@ export default function ChannelCard({
     <li className="TagCard card">
       <div className="card-content">
         <div className="card-body">
-          <h3>{channel.channelName} ({channel.platform}) </h3>
+          <h3>{channel.channelName || channel.channelId} ({channel.platform}) </h3>
         </div>
         <div className="card-actions">
           <p>Attribuer à la chaîne</p>

@@ -1,10 +1,11 @@
 import CollapsibleSection from "~components/CollapsibleSection";
 import { v4 as generateId } from 'uuid';
 import type { Creator } from "~types/annotations";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import CreatorCard from "./CreatorCard";
 import ChannelCard from "./ChannelCard";
-
+import levenshtein from 'talisman/metrics/levenshtein'
+import SuggestionCard from "./SuggestionCard";
 
 export default function ChannelsEdition({
   availableChannels,
@@ -13,6 +14,9 @@ export default function ChannelsEdition({
   onChange,
   onDeleteItem,
 }) {
+  const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set());
+  const [creatorSearchTerm, setCreatorSearchTerm] = useState('');
+  const [channelSearchTerm, setChannelSearchTerm] = useState('');
   const soloChannels = useMemo(() => {
     const attributedChannelsIds = new Set();
     Object.values(creators).forEach(({ channels }) => {
@@ -24,7 +28,57 @@ export default function ChannelsEdition({
       }
       return true;
     })
-  }, [creators, availableChannels])
+  }, [creators, availableChannels]);
+  const tokenize = useMemo(() => (term) => term.replace(/\W+/g, '').toLowerCase(), []);
+
+  const suggestions = useMemo(() => {
+    const isAcceptableMatch = (term1, term2) => {
+      const lev = levenshtein(term1, term2);
+      return lev <= 1 || term1.includes(term2) || term2.includes(term1);
+    }
+    const tokenizedChannels = soloChannels.map(channel => {
+      const title = channel.channelName || channel.channelId;
+      const token = tokenize(title);
+      return {...channel, title, token}
+    })
+    const sugg = [];
+    // 1. check for channels to add to existing creators
+    Object.values(creators).forEach((creator: Creator) => {
+      const tokenizedName = tokenize(creator.name);
+      tokenizedChannels.forEach(chan => {
+        if (isAcceptableMatch(tokenizedName, chan.token)) {
+          sugg.push({
+            type: 'addition',
+            id: `add-${tokenizedName}-${chan.token}`,
+            items: [creator, chan]
+          })
+        }
+      })
+    })
+    for (let i = 0 ; i < tokenizedChannels.length ; i++) {
+      const channel1 = tokenizedChannels[i];
+      const matches = [];
+      for (let j = i + 1 ; j < tokenizedChannels.length ; j++) {
+        const channel2 = tokenizedChannels[j];
+        if (isAcceptableMatch(channel1.token, channel2.token)) {
+          matches.push(channel2)
+        }
+      }
+      if (matches.length) {
+        sugg.push({
+          type: 'creation',
+          id: `bind-${[channel1, ...matches].map(c => c.token).join('-')}`,
+          title: channel1.title,
+          items: [channel1, ...matches]
+        })
+      }
+    }
+    return sugg;
+  }, [soloChannels, tokenize, creators]);
+  const visibleSuggestions = useMemo(() => {
+    return suggestions
+    .filter(s => !dismissedSuggestions.has(s.id))
+  }, [suggestions, dismissedSuggestions])
   return (
     <section className="ChannelsEdition annotation-form">
       <div className="form-header">
@@ -38,16 +92,126 @@ export default function ChannelsEdition({
       </div>
       <div className="form-list">
         <CollapsibleSection
-          title={'Suggestions de groupement à partir des noms des chaînes'}
+          title={`Suggestions de groupement à partir des noms des chaînes et d'entrées (${visibleSuggestions.length})`}
+          disabled={!visibleSuggestions.length}
         >
-          <ul className="cards-list"></ul>
-        </CollapsibleSection>
-        <CollapsibleSection
-          title={`Vos créatrices et créateurs de contenus (${Object.keys(creators).length})`}
-        >
+          <>
+          {visibleSuggestions.length ? <div>
+            <button
+              onClick={() => {
+                const newCreators = visibleSuggestions.reduce((tempCreators, suggestion) => {
+                  const {type, items, title} = suggestion;
+                  if (type === 'addition') {
+                    const [{id: creatorId}, {id: newChannelId}] = items;
+                    const newCreators = {
+                      ...tempCreators,
+                      [creatorId]: {
+                        ...tempCreators[creatorId],
+                        channels: [...tempCreators[creatorId].channels, newChannelId]
+                      }
+                    }
+                    return newCreators;
+                  } else if (type === 'creation') {
+                    const newCreator: Creator = {
+                      id: generateId(),
+                      name: title,
+                      channels: items.map(item => item.id),
+                      description: '',
+                      links: {
+                        tags: []
+                      }
+                    }
+                    const newCreators = {
+                      ...tempCreators,
+                      [newCreator.id]: newCreator
+                    }
+                    return newCreators;
+                  }
+                }, creators);
+                onChange(newCreators);
+              }}
+            >Accepter toutes les suggestions</button>
+            <button
+              onClick={() => {
+                const newDismissed = new Set(Array.from(dismissedSuggestions));
+                visibleSuggestions.forEach(suggestion => newDismissed.add(suggestion.id));
+                setDismissedSuggestions(newDismissed);
+              }}
+            >Refuser toutes les suggestions</button>
+          </div>
+          : null}
           <ul className="cards-list">
             {
-              Object.values(creators).map(creator => {
+              visibleSuggestions
+              .map(suggestion => {
+                const handleAccept = () => {
+                  const {type, items, title} = suggestion;
+                  if (type === 'addition') {
+                    const [{id: creatorId}, {id: newChannelId}] = items;
+                    const newCreators = {
+                      ...creators,
+                      [creatorId]: {
+                        ...creators[creatorId],
+                        channels: [...creators[creatorId].channels, newChannelId]
+                      }
+                    }
+                    onChange(newCreators);
+                  } else if (type === 'creation') {
+                    const newCreator: Creator = {
+                      id: generateId(),
+                      name: title,
+                      channels: items.map(item => item.id),
+                      description: '',
+                      links: {
+                        tags: []
+                      }
+                    }
+                    const newCreators = {
+                      ...creators,
+                      [newCreator.id]: newCreator
+                    }
+                    onChange(newCreators);
+                  }
+                }
+                const handleDismiss = () => {
+                  const newDismissed = new Set(Array.from(dismissedSuggestions));
+                  newDismissed.add(suggestion.id);
+                  setDismissedSuggestions(newDismissed);
+                }
+                return (
+                  <SuggestionCard
+                    suggestion={suggestion}
+                    onAccept={handleAccept}
+                    onDismiss={handleDismiss}
+                    key={suggestion.id}
+                  />
+                )
+              })
+            }
+          </ul>
+          </>
+        </CollapsibleSection>
+        <CollapsibleSection
+          title={`Vos créatrices et créateurs de contenus existants (${Object.keys(creators).length})`}
+          disabled={!Object.values(creators).length}
+        >
+          <>
+          <input
+            placeholder="Rechercher une entrée existante"
+            value={creatorSearchTerm}
+            onChange={e => setCreatorSearchTerm(e.target.value)}
+          />
+          <ul className="cards-list">
+            {
+              Object.values(creators)
+              .filter(c => creatorSearchTerm.length > 2 ? c.name.toLowerCase().includes(creatorSearchTerm.toLowerCase()) : true)
+              .sort((c1, c2) => {
+                if (c1.name.toLowerCase() > c2.name.toLowerCase()) {
+                  return 1;
+                }
+                return -1;
+              })
+              .map(creator => {
                 return (
                   <CreatorCard
                     key={creator.id}
@@ -68,13 +232,48 @@ export default function ChannelsEdition({
               })
             }
           </ul>
+          </>
         </CollapsibleSection>
         <CollapsibleSection
           title={`Chaînes non associées (${Object.values(soloChannels).length})`}
+          disabled={!Object.values(soloChannels).length}
         >
+          <>
+          <input
+            placeholder="Rechercher une chaîne"
+            value={channelSearchTerm}
+            onChange={e => setChannelSearchTerm(e.target.value)}
+          />
+          {Object.values(soloChannels).length ? <div>
+            <button
+              onClick={() => {
+                const newCreators = Object.values(soloChannels)
+                .reduce((tempCreators, channel) => {
+                  const newCreator: Creator = {
+                    id: generateId(),
+                    name: channel.channelName || channel.channelId,
+                    channels: [channel.id],
+                    description: '',
+                    links: {
+                      tags: []
+                    }
+                  }
+                  const newCreators = {
+                    ...tempCreators,
+                    [newCreator.id]: newCreator
+                  }
+                  return newCreators;
+                }, creators)
+                onChange(newCreators);
+              }}
+            >Créer automatiquement des entrées de créateurs/créatrices pour toutes ces chaînes</button>
+          </div>
+          : null}
           <ul className="cards-list">
           {
-              Object.values(soloChannels).map(channel => {
+              Object.values(soloChannels)
+              .filter(c => channelSearchTerm.length > 2 ? (c.channelName || c.channelId).toLowerCase().includes(creatorSearchTerm.toLowerCase()) : true)
+              .map(channel => {
                 return (
                   <ChannelCard
                     key={channel.id}
@@ -93,7 +292,7 @@ export default function ChannelsEdition({
                     onCreateEponym={() => {
                       const newCreator: Creator = {
                         id: generateId(),
-                        name: channel.channelName,
+                        name: channel.channelName || channel.channelId,
                         channels: [channel.id],
                         description: '',
                         links: {
@@ -111,6 +310,7 @@ export default function ChannelsEdition({
               })
             }
           </ul>
+          </>
         </CollapsibleSection>
       </div>
       <div className="form-footer">

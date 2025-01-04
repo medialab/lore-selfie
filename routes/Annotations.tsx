@@ -8,6 +8,7 @@ import { CREATE_ANNOTATION, DELETE_ANNOTATION, GET_ANNOTATIONS, GET_CHANNELS, UP
 import ExpressionsEdition from "~components/Annotations/ExpressionsEdition";
 import ChannelsEdition from "~components/Annotations/ChannelsEdition";
 import TagsEdition from "~components/Annotations/TagsEdition";
+import AnnotationsNetwork from "~components/Annotations/AnnotationsNetwork";
 
 
 function Annotations() {
@@ -68,7 +69,6 @@ function Annotations() {
         case UPDATE_ANNOTATION:
         case DELETE_ANNOTATION:
         case UPDATE_ANNOTATION_COLLECTION:
-          console.log('new data', data);
           setAnnotations(data);
           break;
 
@@ -115,9 +115,11 @@ function Annotations() {
                     tabs.map(({ id, label }) => {
                       return (
                         <li className={`tab ${tab === id ? 'active' : ''}`} key={id}>
+                          <h2>
                           <Link to={`/annotations/${id}`}>
                             {label}
                           </Link>
+                          </h2>
                         </li>
                       )
                     })
@@ -185,7 +187,16 @@ function Annotations() {
               </div>
             </div>
             <div className="column viz-column">
-              Viz
+
+              {
+                isLoading ? <div>Chargement ...</div>
+                :
+                <AnnotationsNetwork
+                  annotations={annotations}
+                  channels={availableChannels}
+                />
+              }
+             
             </div>
           </div>
         )}

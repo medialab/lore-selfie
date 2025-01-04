@@ -31,8 +31,8 @@ export default function CreatorCard({
   }, [tags]);
 
   const channelsOptions = useMemo(() => {
-    return Object.values(soloChannels).map(({ id, channelName, platform }) => ({
-      label: `${channelName} (${platform})`,
+    return Object.values(soloChannels).map(({ id, channelName, channelId, platform }) => ({
+      label: `${channelName  || channelId} (${platform})`,
       value: id,
     }))
   }, [soloChannels]);
