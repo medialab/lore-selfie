@@ -121,16 +121,17 @@ function Settings() {
   const [sizeInMb, setSizeInMb]: [number | undefined, Function] = useState(undefined);
   const [isLoadingSettings, setIsLoadingSettings] = useState(true);
   const [settings, setSettings] = useState(undefined);
-  const crudPort = usePort("activitycrud")
+  // const crudPort = usePort("activitycrud")
   const settingsPort = usePort("settingscrud")
+  const ioPort = usePort("io")
 
 
   useEffect(() => {
-    crudPort.send({ actionType: SERIALIZE_ALL_DATA })
+    ioPort.send({ actionType: SERIALIZE_ALL_DATA })
     settingsPort.send({ actionType: GET_SETTINGS })
   }, []);
 
-  crudPort.listen(data => {
+  ioPort.listen(data => {
     if (data.actionType === SERIALIZE_ALL_DATA && data.result.status === 'success') {
       const str = data.result.data;
       const size = lengthInUtf8Bytes(str);
@@ -258,7 +259,7 @@ function Settings() {
                   Informations
                 </h2>
                 <ul>
-                  <li>Taille des données d'enregistrement de l'activité sur le disque : {sizeInMb === undefined ? 'chargement ...' : formatNumber(sizeInMb.toFixed(1)) + ' Mo'}</li>
+                  <li>Taille des données stockées par l'extension sur le disque dur : {sizeInMb === undefined ? 'chargement ...' : formatNumber(sizeInMb.toFixed(1)) + ' Mo'}</li>
                   <li>
                     <button
                       onClick={() => {

@@ -12,6 +12,8 @@ import WeekdaysPicker from "~components/WeekdaysPicker";
 import Diary from "~components/Diary";
 import { GET_ACTIVITY_EVENTS, GET_CHANNELS, PLATFORMS } from "~constants";
 
+import '../styles/Studio.scss';
+
 
 interface Settings {
   editionMode: string

@@ -11,6 +11,9 @@ import TagsEdition from "~components/Annotations/TagsEdition";
 import AnnotationsNetwork from "~components/Annotations/AnnotationsNetwork";
 
 
+import "../styles/Annotations.scss";
+
+
 function Annotations() {
   const annotationsPort = usePort('annotationscrud')
   const activityPort = usePort("activitycrud");

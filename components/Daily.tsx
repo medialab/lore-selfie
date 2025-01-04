@@ -10,8 +10,10 @@ import { v4 as generateId } from 'uuid';
 
 import DayVisualization from "./DayVisualization"
 
-import 'rc-slider/assets/index.css';
 import { GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE } from "~constants";
+
+import "../styles/Daily.scss";
+import 'rc-slider/assets/index.css';
 
 const MIN_ZOOM = .8;
 

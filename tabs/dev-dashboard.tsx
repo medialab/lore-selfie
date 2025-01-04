@@ -298,7 +298,7 @@ function DevDashboard() {
       <h1>Lore selfie - dashboard de développement</h1>
       <div>
         <h3>Qu'est-ce que cette page ?</h3>
-        <p>Cette page est dédiée aux développeur·euses qui désirent visualiser et télécharger les données brutes collectées par l'extension lore selfie.</p>
+        <p>Cette page est dédiée aux développeur·euses qui désirent visualiser et télécharger les données brutes collectées et construites avec l'extension lore selfie installée sur ce navigateur.</p>
       </div>
       <div className="ui">
         <div className="ui-section">
