@@ -1,0 +1,49 @@
+@use "fonts";
+@use "constants";
+
+.Studio {
+  .contents {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+  .ui-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    max-width: 30vw;
+    padding: constants.$gutter;
+    .header {
+    }
+    .body {
+      flex: 1;
+      overflow: auto;
+    }
+    .footer {
+      padding-top: constants.$gutter;
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-flow: row nowrap;
+        align-content: stretch;
+        li {
+          display: flex;
+          flex: 1;
+          button {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+  .preview-container {
+    flex: 1;
+    overflow: auto;
+    height: 100%;
+  }
+}

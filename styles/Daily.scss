@@ -1,0 +1,124 @@
+@use "constants";
+@use "fonts";
+
+.Daily {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: stretch;
+  width: 100%;
+  overflow: auto;
+  h1 {
+    margin: 0;
+  }
+  .ui {
+    display: flex;
+    flex-flow: row nowrap;
+    > div {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+  }
+  .visualization-container {
+    flex: 1;
+    overflow: auto;
+  }
+  .date-picker-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      margin: 0;
+      li {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        margin-left: 1rem;
+        button {
+          margin-left: 1rem;
+        }
+      }
+    }
+  }
+
+  .DailyVisualizationSession {
+    .session-background {
+      fill: rgba(0, 0, 0, 0.05);
+    }
+    .activity-span {
+      rect {
+        fill: rgba(255, 0, 0, 0.3);
+      }
+    }
+    .blur-span {
+      rect {
+        fill: rgba(255, 255, 255, 0.3);
+      }
+    }
+    .chat-slice {
+      &.twitch {
+        rect {
+          fill: constants.$color-twitch;
+        }
+      }
+      &.youtube {
+        rect {
+          fill: constants.$color-youtube;
+        }
+      }
+    }
+    .browsing-event {
+      text,
+      .event-label {
+        font-size: 0.8rem;
+      }
+      .event-label {
+        text-align: right;
+      }
+      &.twitch {
+        .browsing-event-circle {
+          fill: constants.$color-twitch;
+          stroke: white;
+        }
+        .browsing-event-duration-line {
+          stroke: constants.$color-twitch;
+        }
+      }
+      &.youtube {
+        .browsing-event-circle {
+          fill: constants.$color-youtube;
+          stroke: white;
+        }
+        .browsing-event-duration-line {
+          stroke: constants.$color-youtube;
+        }
+      }
+    }
+  }
+
+
+.event-tooltip-content {
+  list-style: none;
+  padding: 0;
+  li {
+    display: flex;
+    flex-flow: row nowrap;
+    margin-bottom: 0.5rem;
+    em {
+      min-width: 10rem;
+      max-width: 10rem;
+      text-align: right;
+      padding-right: 0.25rem;
+    }
+    code {
+      margin-left: 1rem;
+      max-width: 30rem;
+    }
+  }
+}
+}
