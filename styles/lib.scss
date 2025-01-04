@@ -75,7 +75,7 @@
       }
     }
 
-    &.action-button {
+    &.important-button {
       background: constants.$color-app-main;
       padding: constants.$gutter;
       &:hover {
@@ -87,6 +87,16 @@
   /** 
     Bigger reusable components
   */
+
+  .ui-row {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    button, input {
+      flex: 1;
+    }
+    margin-bottom: constants.$gutter;
+  }
 
   .InputToValidate {
     display: flex;

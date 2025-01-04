@@ -51,6 +51,7 @@ export default function TagsEdition({
       </div>
       <div className="form-footer">
         <button
+          className="important-button"
           onClick={() => {
             const name = prompt('Quel nom donner à l\'étiquette ?');
             if (name.length) {

@@ -148,7 +148,6 @@ function Settings() {
           setSettings(data.result.data);
           break;
         case SET_SETTING:
-          console.log('set setting result', data)
           setSettings(data.result.data);
           break;
         default:

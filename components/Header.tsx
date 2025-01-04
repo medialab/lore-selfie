@@ -16,15 +16,9 @@ function Header() {
           <li>
             <NavLink to="/">explorer</NavLink>
           </li>
-          {/* <li>
-            <NavLink to="/channels">organiser</NavLink>
-          </li> */}
           <li>
             <NavLink to="/annotations">organiser</NavLink>
           </li>
-          {/* <li>
-            <NavLink to="/lorectionary">Lorectionary</NavLink>
-          </li> */}
           <li>
             <NavLink to="/studio">exporter</NavLink>
           </li>

@@ -306,12 +306,12 @@ function Studio({
           <div className="footer">
             <ul>
               <li>
-                <button className="action-button">
+                <button className="important-button">
                   Télécharger au format CSV
                 </button>
               </li>
               <li>
-                <button className="action-button">
+                <button className="important-button">
                   Télécharger au format JSON
                 </button>
               </li>

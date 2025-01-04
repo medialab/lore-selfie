@@ -74,6 +74,7 @@ export const LoadGraph = ({ annotations, channels, legend }) => {
       //   gravity: 10
       // }
     });
+    console.log('spatialized', sensibleSettings)
 
     loadGraph(graph);
   }, [loadGraph, annotations, channels, legend]);

@@ -39,7 +39,7 @@ export default function ChannelsEdition({
     const tokenizedChannels = soloChannels.map(channel => {
       const title = channel.channelName || channel.channelId;
       const token = tokenize(title);
-      return {...channel, title, token}
+      return { ...channel, title, token }
     })
     const sugg = [];
     // 1. check for channels to add to existing creators
@@ -55,10 +55,10 @@ export default function ChannelsEdition({
         }
       })
     })
-    for (let i = 0 ; i < tokenizedChannels.length ; i++) {
+    for (let i = 0; i < tokenizedChannels.length; i++) {
       const channel1 = tokenizedChannels[i];
       const matches = [];
-      for (let j = i + 1 ; j < tokenizedChannels.length ; j++) {
+      for (let j = i + 1; j < tokenizedChannels.length; j++) {
         const channel2 = tokenizedChannels[j];
         if (isAcceptableMatch(channel1.token, channel2.token)) {
           matches.push(channel2)
@@ -77,7 +77,7 @@ export default function ChannelsEdition({
   }, [soloChannels, tokenize, creators]);
   const visibleSuggestions = useMemo(() => {
     return suggestions
-    .filter(s => !dismissedSuggestions.has(s.id))
+      .filter(s => !dismissedSuggestions.has(s.id))
   }, [suggestions, dismissedSuggestions])
   return (
     <section className="ChannelsEdition annotation-form">
@@ -96,99 +96,101 @@ export default function ChannelsEdition({
           disabled={!visibleSuggestions.length}
         >
           <>
-          {visibleSuggestions.length ? <div>
-            <button
-              onClick={() => {
-                const newCreators = visibleSuggestions.reduce((tempCreators, suggestion) => {
-                  const {type, items, title} = suggestion;
-                  if (type === 'addition') {
-                    const [{id: creatorId}, {id: newChannelId}] = items;
-                    const newCreators = {
-                      ...tempCreators,
-                      [creatorId]: {
-                        ...tempCreators[creatorId],
-                        channels: [...tempCreators[creatorId].channels, newChannelId]
+            {visibleSuggestions.length ? <div className="ui-row">
+              <button
+                className="important-button"
+                onClick={() => {
+                  const newCreators = visibleSuggestions.reduce((tempCreators, suggestion) => {
+                    const { type, items, title } = suggestion;
+                    if (type === 'addition') {
+                      const [{ id: creatorId }, { id: newChannelId }] = items;
+                      const newCreators = {
+                        ...tempCreators,
+                        [creatorId]: {
+                          ...tempCreators[creatorId],
+                          channels: [...tempCreators[creatorId].channels, newChannelId]
+                        }
                       }
-                    }
-                    return newCreators;
-                  } else if (type === 'creation') {
-                    const newCreator: Creator = {
-                      id: generateId(),
-                      name: title,
-                      channels: items.map(item => item.id),
-                      description: '',
-                      links: {
-                        tags: []
+                      return newCreators;
+                    } else if (type === 'creation') {
+                      const newCreator: Creator = {
+                        id: generateId(),
+                        name: title,
+                        channels: items.map(item => item.id),
+                        description: '',
+                        links: {
+                          tags: []
+                        }
                       }
-                    }
-                    const newCreators = {
-                      ...tempCreators,
-                      [newCreator.id]: newCreator
-                    }
-                    return newCreators;
-                  }
-                }, creators);
-                onChange(newCreators);
-              }}
-            >Accepter toutes les suggestions</button>
-            <button
-              onClick={() => {
-                const newDismissed = new Set(Array.from(dismissedSuggestions));
-                visibleSuggestions.forEach(suggestion => newDismissed.add(suggestion.id));
-                setDismissedSuggestions(newDismissed);
-              }}
-            >Refuser toutes les suggestions</button>
-          </div>
-          : null}
-          <ul className="cards-list">
-            {
-              visibleSuggestions
-              .map(suggestion => {
-                const handleAccept = () => {
-                  const {type, items, title} = suggestion;
-                  if (type === 'addition') {
-                    const [{id: creatorId}, {id: newChannelId}] = items;
-                    const newCreators = {
-                      ...creators,
-                      [creatorId]: {
-                        ...creators[creatorId],
-                        channels: [...creators[creatorId].channels, newChannelId]
+                      const newCreators = {
+                        ...tempCreators,
+                        [newCreator.id]: newCreator
                       }
+                      return newCreators;
                     }
-                    onChange(newCreators);
-                  } else if (type === 'creation') {
-                    const newCreator: Creator = {
-                      id: generateId(),
-                      name: title,
-                      channels: items.map(item => item.id),
-                      description: '',
-                      links: {
-                        tags: []
-                      }
-                    }
-                    const newCreators = {
-                      ...creators,
-                      [newCreator.id]: newCreator
-                    }
-                    onChange(newCreators);
-                  }
-                }
-                const handleDismiss = () => {
+                  }, creators);
+                  onChange(newCreators);
+                }}
+              >Accepter toutes les suggestions</button>
+              <button
+                className="important-button"
+                onClick={() => {
                   const newDismissed = new Set(Array.from(dismissedSuggestions));
-                  newDismissed.add(suggestion.id);
+                  visibleSuggestions.forEach(suggestion => newDismissed.add(suggestion.id));
                   setDismissedSuggestions(newDismissed);
-                }
-                return (
-                  <SuggestionCard
-                    suggestion={suggestion}
-                    onAccept={handleAccept}
-                    onDismiss={handleDismiss}
-                    key={suggestion.id}
-                  />
-                )
-              })
-            }
-          </ul>
+                }}
+              >Refuser toutes les suggestions</button>
+            </div>
+              : null}
+            <ul className="cards-list">
+              {
+                visibleSuggestions
+                  .map(suggestion => {
+                    const handleAccept = () => {
+                      const { type, items, title } = suggestion;
+                      if (type === 'addition') {
+                        const [{ id: creatorId }, { id: newChannelId }] = items;
+                        const newCreators = {
+                          ...creators,
+                          [creatorId]: {
+                            ...creators[creatorId],
+                            channels: [...creators[creatorId].channels, newChannelId]
+                          }
+                        }
+                        onChange(newCreators);
+                      } else if (type === 'creation') {
+                        const newCreator: Creator = {
+                          id: generateId(),
+                          name: title,
+                          channels: items.map(item => item.id),
+                          description: '',
+                          links: {
+                            tags: []
+                          }
+                        }
+                        const newCreators = {
+                          ...creators,
+                          [newCreator.id]: newCreator
+                        }
+                        onChange(newCreators);
+                      }
+                    }
+                    const handleDismiss = () => {
+                      const newDismissed = new Set(Array.from(dismissedSuggestions));
+                      newDismissed.add(suggestion.id);
+                      setDismissedSuggestions(newDismissed);
+                    }
+                    return (
+                      <SuggestionCard
+                        suggestion={suggestion}
+                        onAccept={handleAccept}
+                        onDismiss={handleDismiss}
+                        key={suggestion.id}
+                      />
+                    )
+                  })
+              }
+            </ul>
           </>
         </CollapsibleSection>
         <CollapsibleSection
@@ -196,42 +198,44 @@ export default function ChannelsEdition({
           disabled={!Object.values(creators).length}
         >
           <>
-          <input
-            placeholder="Rechercher une entrée existante"
-            value={creatorSearchTerm}
-            onChange={e => setCreatorSearchTerm(e.target.value)}
-          />
-          <ul className="cards-list">
-            {
-              Object.values(creators)
-              .filter(c => creatorSearchTerm.length > 2 ? c.name.toLowerCase().includes(creatorSearchTerm.toLowerCase()) : true)
-              .sort((c1, c2) => {
-                if (c1.name.toLowerCase() > c2.name.toLowerCase()) {
-                  return 1;
-                }
-                return -1;
-              })
-              .map(creator => {
-                return (
-                  <CreatorCard
-                    key={creator.id}
-                    creator={creator}
-                    {...{ tags, availableChannels, soloChannels, creators }}
-                    onChange={newCreator => {
-                      const newCreators = {
-                        ...creators,
-                        [newCreator.id]: newCreator
-                      }
-                      onChange(newCreators);
-                    }}
-                    onDelete={() => {
-                      onDeleteItem(creator.id)
-                    }}
-                  />
-                )
-              })
-            }
-          </ul>
+          <div className="ui-row">
+            <input
+              placeholder="Rechercher une entrée existante"
+              value={creatorSearchTerm}
+              onChange={e => setCreatorSearchTerm(e.target.value)}
+            />
+            </div>
+            <ul className="cards-list">
+              {
+                Object.values(creators)
+                  .filter(c => creatorSearchTerm.length > 2 ? c.name.toLowerCase().includes(creatorSearchTerm.toLowerCase()) : true)
+                  .sort((c1, c2) => {
+                    if (c1.name.toLowerCase() > c2.name.toLowerCase()) {
+                      return 1;
+                    }
+                    return -1;
+                  })
+                  .map(creator => {
+                    return (
+                      <CreatorCard
+                        key={creator.id}
+                        creator={creator}
+                        {...{ tags, availableChannels, soloChannels, creators }}
+                        onChange={newCreator => {
+                          const newCreators = {
+                            ...creators,
+                            [newCreator.id]: newCreator
+                          }
+                          onChange(newCreators);
+                        }}
+                        onDelete={() => {
+                          onDeleteItem(creator.id)
+                        }}
+                      />
+                    )
+                  })
+              }
+            </ul>
           </>
         </CollapsibleSection>
         <CollapsibleSection
@@ -239,57 +243,18 @@ export default function ChannelsEdition({
           disabled={!Object.values(soloChannels).length}
         >
           <>
-          <input
-            placeholder="Rechercher une chaîne"
-            value={channelSearchTerm}
-            onChange={e => setChannelSearchTerm(e.target.value)}
-          />
-          {Object.values(soloChannels).length ? <div>
-            <button
-              onClick={() => {
-                const newCreators = Object.values(soloChannels)
-                .reduce((tempCreators, channel) => {
-                  const newCreator: Creator = {
-                    id: generateId(),
-                    name: channel.channelName || channel.channelId,
-                    channels: [channel.id],
-                    description: '',
-                    links: {
-                      tags: []
-                    }
-                  }
-                  const newCreators = {
-                    ...tempCreators,
-                    [newCreator.id]: newCreator
-                  }
-                  return newCreators;
-                }, creators)
-                onChange(newCreators);
-              }}
-            >Créer automatiquement des entrées de créateurs/créatrices pour toutes ces chaînes</button>
-          </div>
-          : null}
-          <ul className="cards-list">
-          {
-              Object.values(soloChannels)
-              .filter(c => channelSearchTerm.length > 2 ? (c.channelName || c.channelId).toLowerCase().includes(creatorSearchTerm.toLowerCase()) : true)
-              .map(channel => {
-                return (
-                  <ChannelCard
-                    key={channel.id}
-                    channel={channel}
-                    creators={creators}
-                    onSelect={creatorId => {
-                      const newCreators = {
-                        ...creators,
-                        [creatorId]: {
-                          ...creators[creatorId],
-                          channels: [...creators[creatorId].channels, channel.id]
-                        }
-                      }
-                      onChange(newCreators);
-                    }}
-                    onCreateEponym={() => {
+            
+            {Object.values(soloChannels).length ? <div className="ui-row">
+              <input
+              placeholder="Rechercher une chaîne"
+              value={channelSearchTerm}
+              onChange={e => setChannelSearchTerm(e.target.value)}
+            />
+              <button
+                className="important-button"
+                onClick={() => {
+                  const newCreators = Object.values(soloChannels)
+                    .reduce((tempCreators, channel) => {
                       const newCreator: Creator = {
                         id: generateId(),
                         name: channel.channelName || channel.channelId,
@@ -300,21 +265,63 @@ export default function ChannelsEdition({
                         }
                       }
                       const newCreators = {
-                        ...creators,
+                        ...tempCreators,
                         [newCreator.id]: newCreator
                       }
-                      onChange(newCreators);
-                    }}
-                  />
-                )
-              })
-            }
-          </ul>
+                      return newCreators;
+                    }, creators)
+                  onChange(newCreators);
+                }}
+              >Associer automatiquement toutes ces chaînes</button>
+            </div>
+              : null}
+            <ul className="cards-list">
+              {
+                Object.values(soloChannels)
+                  .filter(c => channelSearchTerm.length > 2 ? (c.channelName || c.channelId).toLowerCase().includes(creatorSearchTerm.toLowerCase()) : true)
+                  .map(channel => {
+                    return (
+                      <ChannelCard
+                        key={channel.id}
+                        channel={channel}
+                        creators={creators}
+                        onSelect={creatorId => {
+                          const newCreators = {
+                            ...creators,
+                            [creatorId]: {
+                              ...creators[creatorId],
+                              channels: [...creators[creatorId].channels, channel.id]
+                            }
+                          }
+                          onChange(newCreators);
+                        }}
+                        onCreateEponym={() => {
+                          const newCreator: Creator = {
+                            id: generateId(),
+                            name: channel.channelName || channel.channelId,
+                            channels: [channel.id],
+                            description: '',
+                            links: {
+                              tags: []
+                            }
+                          }
+                          const newCreators = {
+                            ...creators,
+                            [newCreator.id]: newCreator
+                          }
+                          onChange(newCreators);
+                        }}
+                      />
+                    )
+                  })
+              }
+            </ul>
           </>
         </CollapsibleSection>
       </div>
       <div className="form-footer">
         <button
+          className="important-button"
           onClick={() => {
             const name = prompt('Quelle est le nom de la créatrice ou du créateur que vous voulez ajouter (note : vous pourrez la modifier ensuite) ?');
             if (name.length) {

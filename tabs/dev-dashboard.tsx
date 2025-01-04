@@ -117,6 +117,7 @@ function DevDashboard() {
     }
     if (data.actionType === DELETE_ALL_DATA && data.result.status === 'success') {
       setIsWorking(false)
+      requestPreviewUpdate();
     }
   })
   activitiesPort.listen(data => {
@@ -317,8 +318,7 @@ function DevDashboard() {
               if (confirmed) {
                 // console.log('send cud port action')
                 setIsWorking(true);
-                activitiesPort.send({ actionType: DELETE_ALL_DATA })
-                annotationsPort.send({ actionType: DELETE_ALL_DATA })
+                ioPort.send({ actionType: DELETE_ALL_DATA })
               }
             }}
           >

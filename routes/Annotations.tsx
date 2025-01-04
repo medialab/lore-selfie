@@ -28,7 +28,7 @@ function Annotations() {
   const requestPort = useMemo(() => async (port: Object, actionType: string, payload: object) => {
     const requestId = generateId();
     pendingRequestsIds.add(requestId);
-    console.log('adding pending request', Array.from(pendingRequestsIds))
+    // console.log('adding pending request', Array.from(pendingRequestsIds))
     setPendingRequestsIds(pendingRequestsIds);
     await port.send({
       actionType,
@@ -51,7 +51,7 @@ function Annotations() {
 
   useEffect(() => {
     [activityPort, annotationsPort].forEach(p => p.listen(response => {
-      console.log('response', response, 'pending requests', Array.from(pendingRequestsIds), 'has pending request', pendingRequestsIds.has(response.requestId))
+      // console.log('response', response, 'pending requests', Array.from(pendingRequestsIds), 'has pending request', pendingRequestsIds.has(response.requestId))
       if (!pendingRequestsIds.has(response.requestId)) {
         return;
       }

@@ -1,0 +1,200 @@
+@use "fonts";
+@use "lib";
+@use "constants";
+
+.Popup {
+  @include lib.generic-rules;
+
+  padding: 0;
+  margin: 0;
+  border: none;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: stretch;
+  width: 400px;
+  max-width: 100vw;
+
+  max-height: 80vh;
+  height: 400px;
+  min-height: 400px;
+
+  .header {
+    @include fonts.kanit-bold;
+    background: constants.$color-app-main;
+    padding: constants.$gutter;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    align-items: end;
+    pointer-events: none;
+    h1 {
+      pointer-events: all;
+      flex: 1;
+      margin: 0;
+      padding: 0;
+      color: white;
+      button {
+        color: inherit;
+        border: none;
+        background: none;
+        font-family: inherit;
+        font-size: inherit;
+        transition: 0.5s ease all;
+        font-size: 1.5rem;
+        .title {
+          @include fonts.kanit-bold;
+        }
+        .version {
+          padding-left: constants.$gutter-small;
+          opacity: 0.5;
+          @include fonts.kanit-light;
+        }
+
+        &:hover {
+          background: none;
+          font-family: inherit;
+          font-size: inherit;
+        }
+      }
+    }
+    .actions {
+      pointer-events: all;
+      padding-bottom: 0.4rem;
+      .indicator {
+        padding-right: constants.$gutter-small;
+        color: white;
+        @include fonts.kanit-light;
+      }
+    }
+    &:hover {
+      background: constants.$color-app-main-accent;
+    }
+  }
+  .body {
+    flex: 1;
+
+    padding: constants.$gutter;
+    padding-left: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow: hidden;
+
+    h2 {
+      margin: 0;
+      margin-left: constants.$gutter * 2;
+    }
+    .contents {
+      flex: 1;
+      overflow: auto;
+      padding-top: constants.$gutter * 2;
+
+      .loading-activity-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .recent-contents-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        .recent-contents-item {
+          a,
+          a:visited {
+            text-decoration: none;
+            color: inherit;
+          }
+          .recent-contents-item-contents {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: stretch;
+            transition: .5s ease all;
+            padding: constants.$gutter-small 0;
+            &:hover {
+              background: rgba(0,0,0,0.1);
+            }
+            .platform-marker-container {
+              padding-left: constants.$gutter-small;
+              padding-right: constants.$gutter-small;
+              .platform-marker {
+                display: inline-block;
+                height: 0.5rem;
+                width: 0.5rem;
+                margin-top: 0.5rem;
+                border-radius: 50%;
+                &.youtube {
+                  background: constants.$color-youtube;
+                }
+                &.twitch {
+                  background: constants.$color-twitch;
+                }
+              }
+            }
+            .metadata-container {
+              flex: 1;
+              .title {
+                margin: 0;
+                padding: 0;
+              }
+              .channel {
+                margin: 0;
+                padding: 0;
+                @include fonts.kanit-light;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .footer {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    button {
+      text-align: left;
+      padding: constants.$gutter;
+      box-sizing: border-box;
+      font-size: 1rem;
+      flex: 2;
+      &.primary {
+        background: constants.$color-app-main;
+        padding-left: constants.$gutter * 2;
+        &:hover {
+          background: constants.$color-app-main-accent;
+        }
+      }
+      &.special {
+        flex: 1;
+        background: none;
+        color: black;
+        border: none;
+        font-size: 0.8rem;
+        @include fonts.kanit-light;
+        &:hover {
+          @include fonts.kanit-regular;
+        }
+      }
+    }
+  }
+
+  .loading-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    color: white;
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    transition: 0.5s ease all;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+  }
+}

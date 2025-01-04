@@ -1,7 +1,13 @@
 import { v4 as generateId } from 'uuid';
-import { BLUR_ON_REACTION_INPUT, CHAT_ACTIVITY_RECORD, FOCUS_ON_REACTION_INPUT, LIVE_USER_ACTIVITY_RECORD } from '~constants';
+import { BLUR_ON_REACTION_INPUT, CHAT_ACTIVITY_RECORD, DEFAULT_SETTINGS, FOCUS_ON_REACTION_INPUT, LIVE_USER_ACTIVITY_RECORD } from '~constants';
 import type { BlurOnReactionInputEvent, ChatActivityRecordEvent, FocusOnReactionInputEvent, IsPlayingActivityRecord, LiveUserActivityRecord } from "~types/captureEventsTypes";
+import { Storage } from "@plasmohq/storage"
+import type { Settings } from '~types/settings';
 
+const storage = new Storage({
+  area: "local",
+  // copiedKeyList: ["shield-modulation"],
+})
 const trackers = {
   twitch: {
     live: async ({
@@ -65,6 +71,11 @@ const trackers = {
 
 
       return setInterval(async () => {
+        // check settings still allow recording
+        const settings: Settings = await storage.get("lore-selfie-settings") || DEFAULT_SETTINGS;
+        if (!settings.recordActivity || !settings.recordOnPlatforms.includes(platform)){
+          return;
+        } 
         console.debug('track live data', new Date().toLocaleTimeString());
 
         if (currentURL !== document.location.href) {
@@ -171,9 +182,14 @@ const trackers = {
         mousePosition = { posX, posY }
       }
       let prevMousePosition = mousePosition;
-      console.log('in video youtube, interval', liveRecordingInterval)
+      // console.log('in video youtube, interval', liveRecordingInterval)
       // let prevIsPlaying = document.querySelector('.ytd-player .playing-mode') !== null;
       return setInterval(async () => {
+        // check settings still allow recording
+        const settings: Settings = await storage.get("lore-selfie-settings") || DEFAULT_SETTINGS;
+        if (!settings.recordActivity || !settings.recordOnPlatforms.includes(platform)){
+          return;
+        } 
         console.debug('track live data', new Date().toLocaleTimeString());
         const isPlaying = document.querySelector('.ytd-player .playing-mode') !== null;
         const currentMediaTime = document.querySelector('.ytp-time-current')?.textContent;
