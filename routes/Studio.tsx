@@ -15,6 +15,7 @@ import Diary from "~components/Diary";
 import { GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PLATFORMS } from "~constants";
 
 import '../styles/Studio.scss';
+import { downloadTextfile, JSONArrayToCSVStr } from "~helpers";
 
 
 interface StudioSettings {
@@ -336,12 +337,21 @@ function Studio({
           <div className="footer">
             <ul>
               <li>
-                <button className="important-button">
+                <button 
+                  onClick={() => {
+                    downloadTextfile(JSONArrayToCSVStr(visibleEvents), `lore-selfie-edition-data-${new Date().toISOString()}.csv`, 'text/csv')
+                  }}
+
+                  className="important-button"
+                >
                   Télécharger au format CSV
                 </button>
               </li>
               <li>
-                <button className="important-button">
+                <button 
+                  onClick={() => downloadTextfile(JSON.stringify(visibleEvents, null, 2), `lore-selfie-edition-data-${new Date().toISOString()}.json`)}
+                  className="important-button"
+                >
                   Télécharger au format JSON
                 </button>
               </li>
