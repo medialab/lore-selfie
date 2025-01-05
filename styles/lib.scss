@@ -386,9 +386,10 @@
                 align-items: center;
                 justify-content: center;
                 .value-indicator {
-                  background: lightgrey;
+                  background: constants.$color-app-main;
                   border-radius: 50%;
                   display: inline-block;
+                  opacity: .5;
                 }
                 
               }
@@ -400,16 +401,17 @@
                 flex: 1;
                 width: 100%;
                 box-sizing: border-box;
-                height: 1.5rem;
-                max-height: 1.5rem;
+                height: 1.8rem;
+                max-height: 1.8rem;
               }
               &.out-of-month {
                 opacity: 0.5;
               }
               &.is-selected {
+                background: rgba(0,0,0,0.1);
                 button {
-                  @include fonts.kanit-extrabold;
-                  border: 1px solid #333;
+                  // @include fonts.kanit-extrabold;
+                  // border: 1px solid #333;
                   // text-decoration: underline;
                 }
               }
