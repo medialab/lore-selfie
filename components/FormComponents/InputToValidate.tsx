@@ -47,7 +47,7 @@ const InputToValidate = ({
                 type={type}
               />
               <button role="submit">
-                S
+                Sauv.
               </button>
             </form>
         }

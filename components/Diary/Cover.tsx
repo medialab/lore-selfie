@@ -11,7 +11,7 @@ function Cover({
   if (!firstDay || !lastDay) {
     return (
       <section className={`page cover ${format} ${imposed ? 'is-imposed' : ''}`}>
-      <h2>{'Lore selfie'}</h2>
+      <h2>{'lore selfie'}</h2>
       <h3>
         Chargement
       </h3>
@@ -20,12 +20,16 @@ function Cover({
   }
   return (
     <section className={`page cover ${format} ${imposed ? 'is-imposed' : ''}`}>
-      <h2>{'Lore selfie'}</h2>
-      <h3 
-        dangerouslySetInnerHTML={{
-          __html: `Du ${firstDay} au ${lastDay}`
-        }}
-      />        
+      <div className="cover-header">
+        <div>
+        <h1>{'lore selfie'}</h1>
+        <h3 
+          dangerouslySetInnerHTML={{
+            __html: `Du ${firstDay} au ${lastDay}`
+          }}
+        /> 
+        </div>
+      </div>       
     </section>
   )
 

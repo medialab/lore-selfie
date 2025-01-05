@@ -33,7 +33,7 @@ function Popup() {
 
   activityPort.listen(response => {
     if (response.result.status === 'success') {
-      console.log(response.result.data)
+      // console.log(response.result.data)
       const validEvents = response.result.data
         .filter(event => event.type === BROWSE_VIEW && event.url && event.metadata.title);
       const uniqueContents = new Map();

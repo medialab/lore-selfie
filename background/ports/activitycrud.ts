@@ -4,6 +4,9 @@ import { v4 as generateId } from 'uuid';
 import { type captureEventsList } from "~types/captureEventsTypes"
 import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
 
+
+const DAY = 24 * 3600 * 1000;
+
 const storage = new Storage({
   area: "local",
   // copiedKeyList: ["shield-modulation"],
@@ -20,9 +23,13 @@ const checkTimeOfDaySpan = (date, [from, to]) => {
   const [toHours, toMinutes] = to.split(':')
   fromDate.setHours(+fromHours)
   fromDate.setMinutes(+fromMinutes)
-  const toDate = new Date(referenceDate.getTime());
+  let toDate = new Date(referenceDate.getTime());
   toDate.setHours(+toHours);
   toDate.setMinutes(+toMinutes);
+  // if to date is smaller than from date extend to next day
+  if (+toHours < +fromHours) {
+    toDate = new Date(toDate.getTime() + DAY);
+  }
   return date > fromDate.getTime() && date < toDate.getTime();
 }
 const checkDaysOfWeek = (date, days = []) => {

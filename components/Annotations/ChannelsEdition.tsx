@@ -278,7 +278,7 @@ export default function ChannelsEdition({
             <ul className="cards-list">
               {
                 Object.values(soloChannels)
-                  .filter(c => channelSearchTerm.length > 2 ? (c.channelName || c.channelId).toLowerCase().includes(creatorSearchTerm.toLowerCase()) : true)
+                  .filter(c => channelSearchTerm.length > 2 ? (c.channelName || c.channelId).toLowerCase().includes(channelSearchTerm.toLowerCase()) : true)
                   .map(channel => {
                     return (
                       <ChannelCard

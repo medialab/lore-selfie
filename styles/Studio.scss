@@ -25,12 +25,24 @@
       margin: 0;
     }
   }
+
+  .ChannelsVisibilityEdition {
+    .header {
+      margin-bottom: constants.$gutter;
+      display: flex;
+      flex-flow: row nowrap;
+      input {
+        flex: 1;
+      }
+    }
+  }
   .ui-container {
     display: flex;
     flex-flow: column nowrap;
     justify-content: stretch;
     max-width: 30vw;
     padding: constants.$gutter;
+    padding-left: 0;
     .header {
     }
     .body {

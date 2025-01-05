@@ -45,13 +45,13 @@ function delay(t) {
     url,
     addEvent,
   }) => {
-    await delay(1000);
-    let title = document.title;
+    await delay(2000);
+    // let title = document.title;
     let browseViewEvent: BrowseViewEvent;
     // console.debug('record new view content for platform', platform);
     const { viewType, parsedMetadata = {} } = await parsers[platform].sniffer(url);
     let metadata = {
-      title,
+      // title,
       ...parsedMetadata
     }
     let scrapedMetadata = {}

@@ -176,7 +176,7 @@ export default function DatePicker({
   }, [startOfWeekId]);
 
   const prettyDate = useMemo(() => date => {
-    return `${daysMap[date.getDay()].toLowerCase()} ${date.getDate()} ${monthsMap[date.getMonth()]} ${date.getFullYear()}`
+    return `${daysMap[date.getDay()].toLowerCase()} ${date.getDate() === 1 ? '1<sup>er</sup>' : date.getDate()} ${monthsMap[date.getMonth()]} ${date.getFullYear()}`
   }, []);
 
 
@@ -270,7 +270,7 @@ export default function DatePicker({
                         const isSelected = !tempValue ? false : range ?
                           date >= tempValue[0] && date <= tempValue[1]
                           : date === tempValue;
-                        const key = new Date(date).toJSON().split('T')[0];
+                        const key = new Date(date.getTime() + DAY).toJSON().split('T')[0];
                         const data = daysData[key];
                         const count = data?.value || 0;
                         const radius = count ? radiusScale(count) : 0;
@@ -341,8 +341,8 @@ export default function DatePicker({
                 <span></span>
                 {
                   range ?
-                    <span>du <strong>{prettyDate(tempValue[0])}</strong> au <strong>{prettyDate(tempValue[1])}</strong></span>
-                    : prettyDate(tempValue)
+                    <span>du <strong dangerouslySetInnerHTML={{ __html: prettyDate(tempValue[0]) }} /> au <strong dangerouslySetInnerHTML={{ __html: prettyDate(tempValue[1]) }} /></span>
+                    : <span dangerouslySetInnerHTML={{ __html: prettyDate(tempValue) }} />
                 }
               </div>
               : null

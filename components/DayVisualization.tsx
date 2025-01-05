@@ -3,6 +3,7 @@ import { scaleLinear } from 'd3-scale';
 import { extent, max } from 'd3-array';
 import { Tooltip } from 'react-tooltip';
 import { useInterval } from 'usehooks-ts'
+import {inferTickTimespan} from 'helpers';
 
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -10,33 +11,6 @@ import Session from './DailyVisualizationSession'
 
 const MIN_ZOOM = .8;
 
-function inferTickTimespan(timeSpan, zoomLevel) {
-  const scale = timeSpan / zoomLevel;
-  let span;
-  if (scale < 150000) {
-    span = 15000;
-  } else if (scale < 300000) {
-    span = 30000;
-  }
-  else if (scale < 300000) {
-    span = 30000;
-  } else if (scale < 600000) {
-    span = 60000;
-  } else if (scale < 1000000) {
-    span = 60000 * 2;
-  } else if (scale < 2000000) {
-    span = 60000 * 5;
-  } else if (scale < 5000000) {
-    span = 60000 * 10;
-  } else if (scale < 10000000) {
-    span = 60000 * 15;
-  } else if (scale < 100000000) {
-    span = 3600 * 1000;
-  } else {
-    span = 3600 * 1000 * 3;
-  }
-  return span;
-}
 
 function DayVisualization({
   sessions = new Map(),

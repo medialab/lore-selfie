@@ -177,7 +177,7 @@ export const formatNumber = (n: Number, style: String  = 'fr'): String => {
     .split('')
     .reverse()
     .reduce(({ count, result }, digit, index) => {
-      const endOfLine = count === 3 || (count === 0 && index === intPart.length - 1);
+      const endOfLine = intPart.length > 3 && (count === 3 || (count === 0 && index === intPart.length - 1));
       if (endOfLine) {
         return {
           count: 1,
@@ -202,4 +202,36 @@ export function lengthInUtf8Bytes(str) {
   // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
   const m = encodeURIComponent(str).match(/%[89ABab]/g);
   return str.length + (m ? m.length : 0);
+}
+export function timeOfDayToMs (span) {
+  const [hours, minutes] = span.split(':');
+  return +hours * 3600 * 1000 + (+minutes) * 60 * 1000;
+}
+
+export  function inferTickTimespan(timeSpan, zoomLevel = 1) {
+  const scale = timeSpan / zoomLevel;
+  let span;
+  if (scale < 150000) {
+    span = 15000;
+  } else if (scale < 300000) {
+    span = 30000;
+  }
+  else if (scale < 300000) {
+    span = 30000;
+  } else if (scale < 600000) {
+    span = 60000;
+  } else if (scale < 1000000) {
+    span = 60000 * 2;
+  } else if (scale < 2000000) {
+    span = 60000 * 5;
+  } else if (scale < 5000000) {
+    span = 60000 * 10;
+  } else if (scale < 10000000) {
+    span = 60000 * 15;
+  } else if (scale < 100000000) {
+    span = 3600 * 1000;
+  } else {
+    span = 3600 * 1000 * 3;
+  }
+  return span;
 }

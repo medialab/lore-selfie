@@ -211,10 +211,7 @@ function Studio({
     setChannelsSettings(newChannelsSettings);
   }, [availableChannels]);
 
-
-
-  // console.log('availableChannels', availableChannels)
-  // console.log('visible events', visibleEvents.length, 'settings', settings);
+  
   return (
     <div className="Studio contents-wrapper">
       <div className="contents width-limited-contents">

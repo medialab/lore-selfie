@@ -32,7 +32,7 @@ function ChannelsVisibilityEdition({
   const handleHideAll = () => handleChangeAll('hidden');
   return (
     <div className={'ChannelsVisibilityEdition'}>
-      <div>
+      <div className="header">
         <input
           placeholder="rechercher"
           value={searchString}
