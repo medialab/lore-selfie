@@ -87,6 +87,7 @@
       flex: 1;
       overflow: auto;
       padding-top: constants.$gutter * 2;
+      padding-left: constants.$gutter * 2;
 
       .loading-activity-container {
         display: flex;
@@ -114,7 +115,7 @@
               background: rgba(0,0,0,0.1);
             }
             .platform-marker-container {
-              padding-left: constants.$gutter-small;
+              padding-left: constants.$gutter;
               padding-right: constants.$gutter-small;
               .platform-marker {
                 display: inline-block;

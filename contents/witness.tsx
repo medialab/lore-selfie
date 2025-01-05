@@ -11,6 +11,8 @@ import type {
 import { getPlatform } from "~helpers"
 // import { DEFAULT_SETTINGS } from "~constants"
 import { useEffect, useState } from "react"
+import { DEFAULT_SETTINGS } from "~constants"
+import { useInterval } from "usehooks-ts"
 
 /**
  * Content script config
@@ -46,15 +48,26 @@ const storage = new Storage({
 const Witness = () => {
   const [isActive, setIsActive] = useState(false);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   storage.get("lore-selfie-settings")
+  //   .then((settings = DEFAULT_SETTINGS) => {
+  //     const platform = getPlatform(window.location.href);
+  //     if (settings && settings.recordActivity && settings.recordOnPlatforms.includes(platform)) {
+  //       setIsActive(true);
+  //     }
+  //   })
+  // }, []);
+
+  useInterval(() => {
     storage.get("lore-selfie-settings")
-    .then((settings) => {
+    .then((settings = DEFAULT_SETTINGS) => {
       const platform = getPlatform(window.location.href);
       if (settings && settings.recordActivity && settings.recordOnPlatforms.includes(platform)) {
         setIsActive(true);
       }
     })
-  }, []);
+  }, 30 * 1000);
+
   if (!isActive) {
     return null;
   }

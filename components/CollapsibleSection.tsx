@@ -11,9 +11,9 @@ export default function CollapsibleSection({
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   return (
     <section className={`CollapsibleSection ${isCollapsed || disabled ? 'is-collapsed' : ''} ${disabled ? 'is-disabled' : ''}`}>
-      <div className="header">
+      <div className="header" onClick={() => disabled ? undefined : setIsCollapsed(!isCollapsed)}>
         <h2 className="title">{title}</h2>
-        <button onClick={() => disabled ? undefined : setIsCollapsed(!isCollapsed)}>
+        <button>
           <span>
           {
             isCollapsed ? '▼' : '▲'

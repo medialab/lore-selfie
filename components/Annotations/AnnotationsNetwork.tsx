@@ -69,12 +69,15 @@ export const LoadGraph = ({ annotations, channels, legend }) => {
 
     forceAtlas2.assign(graph, {
       iterations: 50,
-      settings: sensibleSettings,
+      settings: {
+        ...sensibleSettings,
+        gravity: 10
+      },
       // settings: {
       //   gravity: 10
       // }
     });
-    console.log('spatialized', sensibleSettings)
+    // console.log('spatialized', sensibleSettings)
 
     loadGraph(graph);
   }, [loadGraph, annotations, channels, legend]);

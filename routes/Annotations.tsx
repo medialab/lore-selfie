@@ -12,6 +12,7 @@ import AnnotationsNetwork from "~components/Annotations/AnnotationsNetwork";
 
 
 import "../styles/Annotations.scss";
+import { useInterval } from "usehooks-ts";
 
 
 function Annotations() {
@@ -46,7 +47,12 @@ function Annotations() {
   useEffect(() => {
     requestPort(activityPort, GET_CHANNELS, {});
     requestPort(annotationsPort, GET_ANNOTATIONS, {});
-  }, [])
+  }, []);
+
+  useInterval(() => {
+    requestPort(activityPort, GET_CHANNELS, {});
+    // requestPort(annotationsPort, GET_ANNOTATIONS, {});
+  }, 10000)
 
 
   useEffect(() => {

@@ -8,7 +8,8 @@ const parsers = {
         return {
           viewType: "live",
           parsedMetadata: {
-            channelId
+            channelId,
+            channelName: channelId
           }
         }
       } else {

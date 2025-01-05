@@ -144,7 +144,12 @@
       .title {
         flex: 1;
         margin: 0;
+        padding: constants.$gutter;
       }
+      background: #333;
+      color: white;
+      margin-bottom: constants.$gutter;
+
       button {
         min-width: constants.$gutter * 3;
         max-width: constants.$gutter * 3;
@@ -153,8 +158,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        margin-top: constants.$gutter;
+        margin-right: constants.$gutter;
         padding-top: 0.3rem;
         padding-bottom: 0.3rem;
+        background: #333;
+        border: none;
       }
     }
     .body {

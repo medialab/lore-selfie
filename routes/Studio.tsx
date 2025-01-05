@@ -253,7 +253,7 @@ function Studio({
             </div>
             <div className="form-group">
               <h3>
-                Plages horaires de la journée
+                Plages horaires de la journée à prendre en compte
               </h3>
               <div className="row">
                 <TimePicker
@@ -278,7 +278,7 @@ function Studio({
             </div>
             <div className="form-group">
               <h3>
-                Jours de la semaine
+                Jours de la semaine à prendre en compte
               </h3>
               <WeekdaysPicker
                 state={daysOfWeek}
@@ -287,7 +287,7 @@ function Studio({
             </div>
             <div className="form-group">
               <h3>
-                Plateformes
+                Plateformes à prendre en compte
               </h3>
               <ul className="tags-list">
                 {
