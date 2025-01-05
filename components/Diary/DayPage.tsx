@@ -5,6 +5,7 @@ function DayPage({
   events,
   format,
   imposed,
+  type = 'left'
 }) {
   return (
     <section className={`page DayPage ${format}  ${imposed ? 'is-imposed' : ''}`}>
@@ -13,6 +14,7 @@ function DayPage({
           __html: label
         }}
       />
+      {type}
     </section>
   )
 }

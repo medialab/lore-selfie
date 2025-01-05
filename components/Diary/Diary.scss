@@ -30,8 +30,13 @@
     flex: 1;
     overflow: auto;
     background: rgba(230,230,230,1);
+    margin: constants.$gutter;
+    box-sizing: border-box;
     @media print {
       background: none;
+      .pages-container {
+        overflow: visible;
+      }
       .page {
         &.imposition-page {
           display: flex;
@@ -77,7 +82,7 @@
       .page {
         &:not(.is-imposed) {
           background: white;
-          margin: 3rem;
+          margin: constants.$gutter * 2;
           box-shadow:  0 0px 50px grey;
         }
         &.imposition-page {
@@ -118,6 +123,7 @@
   .App {
     position: relative;
     overflow: visible;
+    background: none;
     header {
       display: none;
     }
@@ -141,6 +147,13 @@
       }
       .document-space {
         overflow: visible;
+        background: none;
+        margin: 0;
+        padding: 0;
+        .pages-container {
+          overflow: visible;
+          scale: none!important;
+        }
         // position: fixed;
         // left: 0;
         // top: 0;

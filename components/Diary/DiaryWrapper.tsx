@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import Measure from 'react-measure';
 import './Diary.scss';
 import Cover from './Cover';
 import DayPage from './DayPage';
@@ -15,6 +16,7 @@ function DiaryWrapper({
   visibleEvents,
 }) {
   const [format, setFormat] = useState('A5-imposed');
+  const [dimensions, setDimensions] = useState({ width: 100, height: 100 })
   const daysMap = {
     0: 'Dimanche',
     1: 'Lundi',
@@ -55,16 +57,29 @@ function DiaryWrapper({
           events: []
         }
       }
-      
+
       current += DAY;
     }
     return days;
-  }, [visibleEvents, timeSpan, daysOfWeek])
+  }, [visibleEvents, timeSpan, daysOfWeek]);
+
+
+  const formatWidth = {
+    A5: 1754 / 3,
+    A4: 3508 / 4.2,
+    'A5-imposed': 2480 / 2.1,
+  }
+
+  const previewScaleRatio = useMemo(() => {
+    const contentWidth = formatWidth[format];
+    return dimensions.width / contentWidth
+  }, [format, dimensions])
+
   return (
     <div className="DiaryWrapper">
       <div className="header">
-      <div>{Object.keys(dataByDay).length} jours, </div>
-      <div>{formatNumber(visibleEvents.length)} évènements visualisés.</div>
+        <div>{Object.keys(dataByDay).length} jours, </div>
+        <div>{formatNumber(visibleEvents.length)} évènements visualisés.</div>
         <ul className="settings">
           <li className="format-picker">
             <span className="format-label">Format</span>
@@ -80,62 +95,94 @@ function DiaryWrapper({
 
           </li>
           <li>
-            <button className="important-button" onClick={() => {window.print()}}>Imprimer</button>
+            <button className="important-button" onClick={() => { window.print() }}>Imprimer</button>
           </li>
         </ul>
       </div>
-      <div className={`document-space ${format}`}>
-        {
-          format === 'A5-imposed' ?
-            <A5Imposed
-              numberOfPages={Object.entries(dataByDay).length + 1}
-              renderPage={(index) => {
-                // console.log('render page', index, Object.entries(dataByDay).length);
-                if (index === 0) {
-                  return <Cover days={dataByDay} format={'A5'} imposed={true} />
-                } else if (index >= Object.entries(dataByDay).length) {
-                  return <div className="page A5 blank is-imposed" />
-                } else {
-                  const [id, day] = Object.entries(dataByDay)[index];
-                  return (
-                    <DayPage
-                      key={`day-${id}`}
-                      {
-                      ...{
-                        format: 'A5',
-                        events: day.events,
-                        label: day.label,
-                        imposed: true
-                      }
-                      }
-                    />
-                  )
-                }
-              }}
-            />
-            :
-            <>
-              <Cover days={dataByDay} format={format} imposed={false} />
+      <Measure
+        bounds
+        onResize={contentRect => {
+          setDimensions(contentRect.bounds)
+        }}
+      >
+        {({ measureRef }) => (
+          <div ref={measureRef} className={`document-space ${format}`}>
+            <div style={{transformOrigin: 'top left', transform: `scale(${previewScaleRatio})`}} className="pages-container">
               {
-                Object.entries(dataByDay).map(([id, day]: [string, object]) => {
-                  return (
-                    <DayPage
-                      key={`day-${id}`}
-                      {
-                      ...{
-                        format,
-                        events: day.events,
-                        label: day.label,
-                        imposed: false
+                format === 'A5-imposed' ?
+                  <A5Imposed
+                    numberOfPages={(Object.entries(dataByDay).length + 1) * 2}
+                    renderPage={(index) => {
+                      // console.log('render page', index, Object.entries(dataByDay).length);
+                      if (index === 0) {
+                        return <Cover days={dataByDay} format={'A5'} imposed={true} />
+                      } else if (index >= (Object.entries(dataByDay).length + 1) * 2 - 1) {
+                        return <div className="page A5 blank is-imposed" />
+                      } else {
+                        const roundIndex = index + index % 2;
+                        const dayIndex = (roundIndex / 2) - 1;
+                        const [id, day] = Object.entries(dataByDay)[dayIndex];
+                        const isOdd = index % 2 !== 0;
+                        const type = isOdd ? 'left' : 'right'
+                        return (
+                          <DayPage
+                            key={`day-${id}-${type}`}
+                            {
+                            ...{
+                              format: 'A5',
+                              events: day.events,
+                              label: day.label,
+                              type,
+                              imposed: true
+                            }
+                            }
+                          />
+                        )
                       }
-                      }
-                    />
-                  )
-                })
+                    }}
+                  />
+                  :
+                  <>
+                    <Cover days={dataByDay} format={format} imposed={false} />
+                    {
+                      Object.entries(dataByDay).map(([id, day]: [string, object]) => {
+                        return (
+                          <>
+                            <DayPage
+                              key={`day-${id}-left`}
+                              {
+                              ...{
+                                format,
+                                events: day.events,
+                                label: day.label,
+                                type: 'left',
+                                imposed: false
+                              }
+                              }
+                            />
+                            <DayPage
+                              key={`day-${id}-right`}
+                              {
+                              ...{
+                                format,
+                                events: day.events,
+                                label: day.label,
+                                type: 'right',
+                                imposed: false
+                              }
+                              }
+                            />
+                          </>
+                        )
+                      })
+                    }
+                  </>
               }
-            </>
-        }
-      </div>
+            </div>
+          </div>
+        )}
+      </Measure>
+
     </div>
   )
 }
