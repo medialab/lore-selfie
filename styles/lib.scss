@@ -1,7 +1,6 @@
 @use "fonts";
 @use "constants";
 
-
 @mixin generic-rules {
   /*
     default fonts
@@ -81,6 +80,9 @@
       &:hover {
         color: lightgrey;
       }
+      &.active {
+        background: constants.$color-app-main-accent;
+      }
     }
   }
 
@@ -92,7 +94,8 @@
     display: flex;
     flex-flow: row nowrap;
     justify-content: stretch;
-    button, input {
+    button,
+    input {
       flex: 1;
     }
     margin-bottom: constants.$gutter;
@@ -291,5 +294,129 @@
   .tab-content {
     flex: 1;
     overflow: hidden;
+  }
+
+  .TimePicker {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    align-items: center;
+    margin-bottom: constants.$gutter;
+    .label {
+      flex: 1;
+      text-align: right;
+      padding-right: constants.$gutter;
+    }
+    select {
+      flex: 1;
+    }
+  }
+
+  .form-group {
+    .row {
+      display: flex;
+      flex-flow: row nowrap;
+      // justify-content: space-between;
+      .TimePicker {
+        margin-right: constants.$gutter;
+      }
+    }
+  }
+
+  .DatePicker {
+    .selecting-placeholder {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .month-picker {
+      position: relative;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: stretch;
+      align-items: center;
+      margin-bottom: constants.$gutter;
+
+      button {
+      }
+      .current-month {
+        flex: 1;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+    .date-picker {
+      .days-of-week {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: stretch;
+        &.name-of-days {
+          margin-bottom: constants.$gutter;
+        }
+        li {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+      .weeks {
+        position: relative;
+        .week {
+          .days-of-week {
+            .day {
+              flex: 1;
+              position: relative;
+              .value-indicator-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                display: flex;
+                width: 100%;
+                height: 100%;
+                align-items: center;
+                justify-content: center;
+                .value-indicator {
+                  background: lightgrey;
+                  border-radius: 50%;
+                  display: inline-block;
+                }
+                
+              }
+              button {
+                position: relative;
+                color: inherit;
+                background: none;
+                // border: 3px solid #333;
+                flex: 1;
+                width: 100%;
+                box-sizing: border-box;
+                height: 1.5rem;
+                max-height: 1.5rem;
+              }
+              &.out-of-month {
+                opacity: 0.5;
+              }
+              &.is-selected {
+                button {
+                  @include fonts.kanit-extrabold;
+                  border: 1px solid #333;
+                  // text-decoration: underline;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

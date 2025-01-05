@@ -257,9 +257,11 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     case GET_BINNED_ACTIVITY_OUTLINE:
       const DAY = 24 * 3600 * 1000;
       const {
-        bin = DAY // 'day'
+        bin = DAY, // 'day',
+        ...settings
       } = payload;
-      const units = activity.reduce((cur, event) => {
+      const filteredEvents = filterEvents(activity, settings)
+      const units = filteredEvents.reduce((cur, event) => {
         const time = new Date(event.date).getTime();
         const key = time - time % bin;
         if (cur && !cur.has(key)) {

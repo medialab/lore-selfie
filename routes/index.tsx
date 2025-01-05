@@ -9,7 +9,8 @@ import Settings from "./Settings";
 
 export const Routing = () => (
   <Routes>
-    <Route path="/" element={<Home />} />
+    {/* <Route path="/" element={<Home />} /> */}
+    <Route path="/:tab?" element={<Home />} />
     <Route path="/about" element={<About />} />
     <Route path="/studio" element={<Studio />} />
     <Route path="/annotations/:tab?" element={<Annotations />} />

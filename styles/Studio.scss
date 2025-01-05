@@ -10,6 +10,21 @@
     width: 100%;
     overflow: hidden;
   }
+  .header {
+    h2 {
+      margin-top: 0;
+    }
+  }
+  .form-group {
+    margin-bottom: constants.$gutter;
+    h3 {
+      margin: 0;
+      margin-bottom: constants.$gutter-small;
+    }
+    ul {
+      margin: 0;
+    }
+  }
   .ui-container {
     display: flex;
     flex-flow: column nowrap;

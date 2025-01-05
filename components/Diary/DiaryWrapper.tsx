@@ -64,23 +64,23 @@ function DiaryWrapper({
     <div className="DiaryWrapper">
       <div className="header">
       <div>{Object.keys(dataByDay).length} jours, </div>
-      <div>{formatNumber(visibleEvents.length)} évènements enregistrés.</div>
+      <div>{formatNumber(visibleEvents.length)} évènements visualisés.</div>
         <ul className="settings">
           <li className="format-picker">
-            <span>Format</span>
-            <button className={format === 'A5-imposed' ? 'active' : ''} onClick={() => setFormat('A5-imposed')}>
+            <span className="format-label">Format</span>
+            <button className={`important-button ${format === 'A5-imposed' ? 'active' : ''}`} onClick={() => setFormat('A5-imposed')}>
               A5 imposé sur A4 (livret)
             </button>
-            <button className={format === 'A4' ? 'active' : ''} onClick={() => setFormat('A4')}>
+            <button className={`important-button ${format === 'A4' ? 'active' : ''}`} onClick={() => setFormat('A4')}>
               A4
             </button>
-            <button className={format === 'A5' ? 'active' : ''} onClick={() => setFormat('A5')}>
+            <button className={`important-button ${format === 'A5' ? 'active' : ''}`} onClick={() => setFormat('A5')}>
               A5
             </button>
 
           </li>
           <li>
-            <button onClick={() => {window.print()}}>Imprimer</button>
+            <button className="important-button" onClick={() => {window.print()}}>Imprimer</button>
           </li>
         </ul>
       </div>

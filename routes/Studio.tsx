@@ -1,21 +1,23 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import DatePicker from "react-multi-date-picker"
-import { TimePicker } from '@vaadin/react-components/TimePicker.js';
-import { Storage } from "@plasmohq/storage"
-import { usePort } from "@plasmohq/messaging/hook"
+import DatePicker from "react-multi-date-picker";
+import DatePickerCustom from "~components/FormComponents/DatePicker";
+// import { TimePicker } from '@vaadin/react-components/TimePicker.js';
+import { Storage } from "@plasmohq/storage";
+import { usePort } from "@plasmohq/messaging/hook";
 import { v4 as generateId } from 'uuid';
 import { CodeBlock, dracula } from "react-code-blocks";
 
 import ChannelsVisibilityEdition from "~components/ChannelsVisibilityEdition";
 import FilterInputsList from "~components/FormComponents/FilterInputsList";
 import WeekdaysPicker from "~components/WeekdaysPicker";
+import TimePicker from "~components/FormComponents/TimePicker";
 import Diary from "~components/Diary";
-import { GET_ACTIVITY_EVENTS, GET_CHANNELS, PLATFORMS } from "~constants";
+import { GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PLATFORMS } from "~constants";
 
 import '../styles/Studio.scss';
 
 
-interface Settings {
+interface StudioSettings {
   editionMode: string
   timeSpan: Array<Date | number>
   timeOfDaySpan: Array<string>
@@ -46,10 +48,8 @@ function Studio({
 }) {
   const [visibleEvents, setVisibleEvents] = useState([]);
   const [pendingRequestsIds, setPendingRequestsIds] = useState(new Set())
-
+  const [daysData, setDaysData] = useState();
   const crudPort = usePort("activitycrud");
-
-
   const defaultSettings = useMemo(() => {
     const DAY = 24 * 3600 * 1000;
     const today = new Date().getTime();
@@ -66,7 +66,7 @@ function Studio({
     }
   }, []);
 
-  const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [settings, setSettings] = useState<StudioSettings>(defaultSettings);
   const [availableChannels, setAvailableChannels] = useState([]);
   const settingsWithoutChannelsStringified = useMemo(() => {
     // console.log('update settings without channels')
@@ -88,7 +88,7 @@ function Studio({
 
   useEffect(() => {
     storage.set('lore-selfie-studio-settings', settings)
-  }, [settings])
+  }, [settings]);
 
   const {
     editionMode,
@@ -101,9 +101,9 @@ function Studio({
   } = settings;
 
   useEffect(() => {
+    const DAY = 3600 * 24 * 1000;
     if (timeSpan && timeSpan?.length === 2 && daysOfWeek.length > 0 && timeSpan.map(d => d).length) {
       const [fromSpan, toSpan] = timeSpan;
-      const DAY = 3600 * 24 * 1000;
       const from = new Date(fromSpan).getTime();
       const to = new Date(new Date(toSpan).getTime() + DAY - 1).getTime();
       requestFromActivityCrud(GET_ACTIVITY_EVENTS, {
@@ -112,10 +112,15 @@ function Studio({
         ...settings,
       })
     }
-  }, [settings])
+    // @todo also query filtered events according to other settings
+    requestFromActivityCrud(GET_BINNED_ACTIVITY_OUTLINE, {
+      bin: DAY
+    })
+  }, [settings]);
+
   useEffect(() => {
     requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
-  }, [settingsWithoutChannelsStringified])
+  }, [settingsWithoutChannelsStringified]);
 
 
 
@@ -170,6 +175,20 @@ function Studio({
         case GET_ACTIVITY_EVENTS:
           setVisibleEvents(data);
           break;
+        case GET_BINNED_ACTIVITY_OUTLINE:
+          const formatted = data.reduce((cur, { date, eventsCount }) => {
+            const key = new Date(date).toJSON().split('T')[0]
+            return {
+              ...cur,
+              [key]: {
+                value: eventsCount,
+                key,
+                date: new Date(date),
+              }
+            }
+          }, {});
+          setDaysData(formatted);
+          break;
         default:
           break;
       }
@@ -189,7 +208,9 @@ function Studio({
       }
     })
     setChannelsSettings(newChannelsSettings);
-  }, [availableChannels])
+  }, [availableChannels]);
+
+
 
   // console.log('availableChannels', availableChannels)
   // console.log('visible events', visibleEvents.length, 'settings', settings);
@@ -198,8 +219,9 @@ function Studio({
       <div className="contents width-limited-contents">
         <div className="ui-container">
           <div className="header">
-            <h2>Choisir un type d'édition</h2>
-            <select value={editionMode} onChange={e => setEditionMode(e.target.value)}>
+            <h2>Exporter votre selfie</h2>
+            {/* <h2>Choisir un type d'édition</h2> */}
+            {/* <select value={editionMode} onChange={e => setEditionMode(e.target.value)}>
               {
                 EDITION_MODES.map(mode => (
                   <option key={mode} value={mode}>
@@ -207,43 +229,51 @@ function Studio({
                   </option>
                 ))
               }
-            </select>
+            </select> */}
           </div>
           <div className="body">
             <div className="form-group">
               <h3>
                 Dates de début et de fin
               </h3>
-              <DatePicker
+              {/* <DatePicker
                 value={timeSpan}
                 onChange={dates => setTimespan(dates.map(formatDatepickerDate))}
                 range
                 // numberOfMonths={3}
                 rangeHover
+              /> */}
+              <DatePickerCustom
+                value={timeSpan.map(d => new Date(d))}
+                onChange={(dates) => setTimespan(dates)}
+                daysData={daysData}
+                range
               />
             </div>
             <div className="form-group">
               <h3>
                 Plages horaires de la journée
               </h3>
-              <TimePicker
-                label="Début"
-                value={timeOfDaySpan[0]}
-                onValueChanged={(event) => {
-                  const val = event.detail.value;
-                  const newVal = [val, timeOfDaySpan[1]].sort();
-                  setTimeOfDaySpan(newVal)
-                }}
-              />
-              <TimePicker
-                label="Fin"
-                value={timeOfDaySpan[1]}
-                onValueChanged={(event) => {
-                  const val = event.detail.value;
-                  const newVal = [timeOfDaySpan[0], val].sort();
-                  setTimeOfDaySpan(newVal)
-                }}
-              />
+              <div className="row">
+                <TimePicker
+                  label="début"
+                  value={timeOfDaySpan[0]}
+                  onChange={(val) => {
+                    const newVal = [val, timeOfDaySpan[1]];
+                    // const newVal = [val, timeOfDaySpan[1]].sort();
+                    setTimeOfDaySpan(newVal)
+                  }}
+                />
+                <TimePicker
+                  label="fin"
+                  value={timeOfDaySpan[1]}
+                  onChange={(val) => {
+                    const newVal = [timeOfDaySpan[0], val];
+                    // const newVal = [timeOfDaySpan[0], val].sort();
+                    setTimeOfDaySpan(newVal)
+                  }}
+                />
+              </div>
             </div>
             <div className="form-group">
               <h3>

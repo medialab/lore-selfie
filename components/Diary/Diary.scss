@@ -1,3 +1,5 @@
+@use "../../styles/constants";
+
 .DiaryWrapper {
   display: flex;
   flex-flow: column nowrap;
@@ -19,7 +21,10 @@
       padding: 0;
       margin: 0;
       flex: 1;
-    }
+      .format-label {
+        margin-right: constants.$gutter;
+      }
+    } 
   }
   .document-space {
     flex: 1;

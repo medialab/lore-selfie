@@ -22,13 +22,10 @@ function Header() {
           <li>
             <NavLink to="/studio">exporter</NavLink>
           </li>
-          <li>
+          <li className="secondary">
             <NavLink to="/settings">paramètres</NavLink>
           </li>
-          {/* <li>
-            <NavLink to="/participate">Participer à la recherche</NavLink>
-          </li> */}
-          <li>
+          <li className="secondary">
             <NavLink to="/about">à propos</NavLink>
           </li>
         </ul>

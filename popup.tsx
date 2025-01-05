@@ -103,7 +103,10 @@ function Popup() {
                 <button
                   onClick={() => {
                     if (settings.recordActivity) {
-                      alert(`L'enregistrement réalisé par l'extension lore selfie va être mis en pause ! veuillez rafraîchir les onglets youtube, twitch etc. déjà ouverts pour que votre activité sur ces derniers ne soient plus enregistrés (note : ceci sera géré automatiquement dans une prochaine version).`)
+                      alert(`L'enregistrement réalisé par l'extension lore selfie va être mis en pause ! veuillez rafraîchir les onglets youtube, twitch etc. déjà ouverts pour que votre activité sur ces derniers ne soit plus enregistrée (note : ceci sera géré automatiquement dans une prochaine version).`)
+                    } else {
+                      alert(`L'enregistrement réalisé par l'extension lore selfie va être repris ! veuillez rafraîchir les onglets youtube, twitch etc. déjà ouverts pour que votre activité sur ces derniers soit enregistrée (note : ceci sera géré automatiquement dans une prochaine version).`)
+
                     }
                     settingsPort.send({
                       actionType: SET_SETTING,

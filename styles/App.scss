@@ -43,6 +43,7 @@
       padding: constants.$gutter 0;
       width: constants.$max-content-width;
       max-width: constants.$max-content-width;
+      align-items: end;
     }
     h1 {
       margin: 0;
@@ -63,10 +64,15 @@
       display: flex;
       flex-flow: row nowrap;
       margin: 0;
+      align-items: end;
       li {
         margin-left: constants.$gutter;
         @include fonts.kanit-light;
-        font-size: 2rem;
+        font-size: 1.8rem;
+        &.secondary {
+          font-size: 1rem;
+          margin-bottom: .4rem;
+        }
         a,
         a.active {
           text-decoration: none;
