@@ -145,8 +145,9 @@ function Annotations() {
                             {...{
                               availableChannels,
                               // expressions: annotations.expressions,
-                              tags: annotations.tags,
-                              creators: annotations.creators,
+                              // tags: annotations.tags,
+                              // creators: annotations.creators,
+                              ...annotations,
                               onChange: (data) => {
                                 requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data, id: 'creators' })
                               },
@@ -161,13 +162,58 @@ function Annotations() {
                         tab === 'tags' ?
                           <TagsEdition
                             {...{
-                              tags: annotations.tags,
+                              ...annotations,
+                              onLinkCreators: (tagId, ids) => {
+                                const newCreators = Object.entries(annotations?.creators || {}).reduce((res, [key, obj]) => {
+                                  let tags = obj.links.tags || [];
+                                  if (tags.includes(tagId) && !ids.includes(obj.id)) {
+                                    tags = tags.filter(t => t !== tagId);
+                                  } else if (!tags.includes(tagId) && ids.includes(obj.id)) {
+                                    tags = [...tags, tagId];
+                                  }
+                                  return {
+                                    ...res,
+                                    [key]: {
+                                      ...obj,
+                                      links: {
+                                        ...obj.links,
+                                        tags
+                                      }
+                                    }
+                                  }
+                                }, {})
+                                requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data: newCreators, id: 'creators' })
+                              },
+                              // @todo finish this
+                              // onLinkExpressions: (expressionId, ids) => {
+                              //   const newExpressions = Object.entries(annotations?.expressions || {}).reduce((res, [key, obj]) => {
+                              //     let expressions = obj.links.expressions || [];
+                              //     // if (expressions.includes(expressionId) && !ids.includes(obj.id)) {
+                              //     //   expressions = expressions.filter(t => t !== expressionId);
+                              //     // } else if (!expressions.includes(expressionId) && ids.includes(obj.id)) {
+                              //     //   expressions = [...expressions, expressionId];
+                              //     // }
+                              //     return {
+                              //       ...res,
+                              //       [key]: {
+                              //         ...obj,
+                              //         links: {
+                              //           ...obj.links,
+                              //           expressions
+                              //         }
+                              //       }
+                              //     }
+                              //   }, {})
+                              //   requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data: newExpressions, id: 'creators' })
+                              // },
+                              // tags: annotations.tags,
                               onChange: (data) => {
                                 requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data, id: 'tags' })
                               },
                               onDeleteItem: id => {
                                 requestPort(annotationsPort, DELETE_ANNOTATION, { collection: 'tags', id })
                               }
+                              
                             }}
                           />
                           : null
@@ -176,9 +222,11 @@ function Annotations() {
                         tab === 'expressions' ?
                           <ExpressionsEdition
                             {...{
-                              expressions: annotations.expressions,
-                              tags: annotations.tags,
-                              creators: annotations.creators,
+                              ...annotations,
+                              
+                              // expressions: annotations.expressions,
+                              // tags: annotations.tags,
+                              // creators: annotations.creators,
                               onChange: (data) => {
                                 requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data, id: 'expressions' })
                               },

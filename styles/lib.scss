@@ -121,6 +121,18 @@
     }
   }
 
+  .TagChip {
+    display: inline-block;
+    padding: constants.$gutter-small;
+    // color: white;
+    background: lightgrey;
+    border-radius: 2px;
+    .chip-content {
+      display: flex;
+      align-items: center;
+    }
+  }
+
   .InputToValidate {
     display: flex;
     .small-card-body {
@@ -225,6 +237,7 @@
     display: inline-block;
     width: 1em;
     height: 1em;
+    margin-right: constants.$gutter;
   }
 
   .cards-list {
@@ -251,10 +264,47 @@
           flex: 1;
           box-sizing: border-box;
           padding-right: constants.$gutter;
+
+          h2 {
+            margin: 0;
+            margin-bottom: constants.$gutter;
+          }
+          .form-subgroup {
+            margin: 0 0 constants.$gutter * 2 0;
+            // display: flex;
+            // flex-flow: row nowrap;
+            ul {
+              list-style: none;
+              padding: 0;
+              margin: 0;
+            }
+            h4 {
+              margin: 0;
+              margin-bottom: constants.$gutter-small;
+              // padding-top: constants.$gutter;
+            }
+          }
+          .card-readonly-content {
+            // display: flex;
+            // flex-flow: row nowrap;
+            // align-items: center;
+            height: 100%;
+            padding-top: constants.$gutter * 2;
+            h4 {
+              margin: 0;
+              display: flex;
+              flex-flow: row nowrap;
+              align-items: center;
+              font-size: 1.1rem;
+            }
+          }
         }
         .card-actions {
           display: flex;
           flex-flow: column nowrap;
+          button {
+            padding: constants.$gutter;
+          }
         }
       }
     }
@@ -435,7 +485,7 @@
                 height: 1.8rem;
                 max-height: 1.8rem;
               }
-              
+
               &.out-of-month {
                 opacity: 0.5;
               }

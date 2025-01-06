@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { v4 as generateId } from 'uuid';
 import TextareaAutosize from 'react-textarea-autosize';
 import Select from 'react-select';
+import TagChip from './TagChip';
 export default function ExpressionCard({
   expression,
   tags,
@@ -24,6 +25,7 @@ export default function ExpressionCard({
       value: id,
     }))
   }, [tags]);
+  // @todo put upstream
   const creatorsOptions = useMemo(() => {
     return Object.values(creators).map(({ id, name }) => ({
       label: name,
@@ -56,13 +58,14 @@ export default function ExpressionCard({
               <>
                 <h2>Vous éditez l'expression {name}</h2>
                 <form
+                  className="form-subgroup"
                   onSubmit={e => {
                     e.preventDefault();
                     setIsEdited(false);
                     onChange(tempExpression);
                   }}>
                   <div className="input-group">
-                    <label>Nom de l'expression</label>
+                    <h4>Nom de l'expression</h4>
                     <input
                       type="text"
                       placeholder="Nom"
@@ -72,7 +75,7 @@ export default function ExpressionCard({
                   </div>
 
                   <div className="input-group">
-                    <label>Définition</label>
+                    <h4>Définition</h4>
                     <TextareaAutosize
                       placeholder="Définition"
                       value={tempExpression.definition}
@@ -210,21 +213,20 @@ export default function ExpressionCard({
                   {(definition || '').split('\n').map((t, index) => <p key={index}>{t}</p>)}
                 </div>
                 <div>
-                  <i>
                     <span>Variantes cherchées dans les contenus :</span>
                     <span>{queries.map(q => '"' + q.query.trim() + '"').join(', ')}</span>
-                  </i>
                 </div>
                 {
                   linkedTagsIds.length ?
                     <div>
-                      <i>
                         Étiquettes associées : <span>
                           {
-                            linkedTagsIds.map(id => tags[id]?.name).join(', ')
+                            linkedTagsIds
+                            .map(id => <TagChip key={id} tag={tags[id]} />)
+                            // .map(id => tags[id]?.name)
+                            // .join(', ')
                           }
                         </span>
-                      </i>
                     </div>
                     : null
                 }

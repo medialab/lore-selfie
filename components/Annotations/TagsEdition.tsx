@@ -3,8 +3,13 @@ import {v4 as generateId} from 'uuid';
 
 export default function TagsEdition({
   tags,
+  creators,
+  expressions,
   onChange,
-  onDeleteItem
+  onDeleteItem,
+
+  onLinkCreators,
+  onLinkExpressions,
 }) {
   return (
     <section className="TagsEdition annotation-form">
@@ -23,16 +28,36 @@ export default function TagsEdition({
             <ul className="cards-list">
               {
                 Object.values(tags).map(tag => {
+                  const relatedCreators = Object.values(creators)
+                  .filter(({links}) => links?.tags?.includes(tag.id));
+                  const relatedExpressions = Object.values(expressions)
+                  .filter(({links}) => links?.tags?.includes(tag.id));
                   return (
                     <TagCard
                       key={tag.id}
                       tag={tag}
+                      {
+                        ...{
+                          relatedCreators,
+                          relatedExpressions,
+                          creators,
+                          expressions,
+                        }
+                      }
                       onChange={newTag => {
                         const newTags = {
                           ...tags,
                           [newTag.id]: newTag
                         }
                         onChange(newTags);
+                      }}
+                      onLinkCreators={(creatorsIds) => {
+                        onLinkCreators(tag.id, creatorsIds);
+                        // console.log('on link creators', creatorsIds);
+                      }}
+                      onLinkExpressions={expressionsIds => {
+                        onLinkExpressions(tag.id, expressionsIds);
+                        // console.log('on link creators', creatorsIds);
                       }}
                       onDelete={() => {
                         onDeleteItem(tag.id)

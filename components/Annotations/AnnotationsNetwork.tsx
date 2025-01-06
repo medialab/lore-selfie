@@ -35,12 +35,12 @@ export const LoadGraph = ({ annotations, channels, legend }) => {
     })
     Object.values(annotations.creators).forEach((creator, index) => {
       graph.addNode(`creator-${creator.id}`, { x: 2, y: index, size: 1, label: creator.name, color: legend.creator.color });
-      creator.channels.forEach(channelId => {
+      creator?.channels?.forEach(channelId => {
         const nodeId = `channel-${channelId}`;
         graph.addEdge(`creator-${creator.id}`, nodeId)
         graph.updateNodeAttribute(`creator-${creator.id}`, 'size', val => val + channelsMap[channelId].urlsCount)
       })
-      creator.links.tags.forEach(tagId => {
+      creator?.links?.tags?.forEach(tagId => {
         const nodeId = `tag-${tagId}`;
         graph.addEdge(`creator-${creator.id}`, nodeId);
         creator.channels.forEach(channelId => {

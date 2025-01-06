@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { v4 as generateId } from 'uuid';
 import TextareaAutosize from 'react-textarea-autosize';
 import Select from 'react-select';
+import TagChip from './TagChip';
 
 export default function CreatorCard({
   creator,
@@ -52,13 +53,14 @@ export default function CreatorCard({
               <>
                 <h2>Vous éditez la fiche de {name}</h2>
                 <form
+                  className="form-subgroup"
                   onSubmit={e => {
                     e.preventDefault();
                     setIsEdited(false);
                     onChange(tempCreator);
                   }}>
                   <div className="input-group">
-                    <label>Nom de la créatrice ou du créateur</label>
+                    <h4>Nom de la créatrice ou du créateur</h4>
                     <input
                       type="text"
                       placeholder="Nom"
@@ -68,9 +70,9 @@ export default function CreatorCard({
                   </div>
 
                   <div className="input-group">
-                    <label>Description</label>
+                    <h4>Description</h4>
                     <TextareaAutosize
-                      placeholder="Définition"
+                      placeholder="Votre description de la chaîne"
                       value={tempCreator.description}
                       onChange={e => setTempCreator({ ...tempCreator, description: e.target.value })}
                     />
@@ -108,10 +110,13 @@ export default function CreatorCard({
                 <div className="form-subgroup">
                   <h4>Étiquettes associées</h4>
                   <Select
-                    value={linkedTagsIds.map(tagId => ({
-                      value: tagId,
-                      label: tags[tagId]?.name,
-                    }))}
+                    value={
+                      linkedTagsIds
+                      .map(tagId => ({
+                        value: tagId,
+                        label: tags[tagId]?.name,
+                      }))
+                    }
                     onChange={(items) => {
                       const itemsIds = items.map(i => i.value);
                       const newCreator = {
@@ -141,7 +146,6 @@ export default function CreatorCard({
                 {
                   channels.length ?
                     <div>
-                      <i>
                         Chaînes : <span>
                           {
                             channels
@@ -153,20 +157,20 @@ export default function CreatorCard({
                               .join(', ')
                           }
                         </span>
-                      </i>
                     </div>
                     : null
                 }
                 {
                   linkedTagsIds.length ?
                     <div>
-                      <i>
                         Étiquettes associées : <span>
                           {
-                            linkedTagsIds.map(id => tags[id]?.name).join(', ')
+                            linkedTagsIds
+                            .map(id => <TagChip key={id} tag={tags[id]} />)
+                            
+                            // .map(id => tags[id]?.name).join(', ')
                           }
                         </span>
-                      </i>
                     </div>
                     : null
                 }
