@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import DatePicker from "react-multi-date-picker";
 import DatePickerCustom from "~components/FormComponents/DatePicker";
 // import { TimePicker } from '@vaadin/react-components/TimePicker.js';
@@ -6,6 +6,7 @@ import { Storage } from "@plasmohq/storage";
 import { usePort } from "@plasmohq/messaging/hook";
 import { v4 as generateId } from 'uuid';
 import { CodeBlock, dracula } from "react-code-blocks";
+import { useInterval } from "usehooks-ts";
 
 import ChannelsVisibilityEdition from "~components/ChannelsVisibilityEdition";
 import FilterInputsList from "~components/FormComponents/FilterInputsList";
@@ -36,14 +37,14 @@ const storage = new Storage({
   // copiedKeyList: ["shield-modulation"],
 })
 
-const formatDatepickerDate = d => {
-  const formatted = new Date(+d.unix * 1000);
-  formatted.setHours(0);
-  formatted.setMinutes(0);
-  formatted.setSeconds(0);
-  formatted.setMilliseconds(0);
-  return formatted;
-}
+// const formatDatepickerDate = d => {
+//   const formatted = new Date(+d.unix * 1000);
+//   formatted.setHours(0);
+//   formatted.setMinutes(0);
+//   formatted.setSeconds(0);
+//   formatted.setMilliseconds(0);
+//   return formatted;
+// }
 
 function Studio({
 }) {
@@ -101,28 +102,6 @@ function Studio({
     excludedTitlePatterns,
   } = settings;
 
-  useEffect(() => {
-    const DAY = 3600 * 24 * 1000;
-    if (timeSpan && timeSpan?.length === 2 && daysOfWeek.length > 0 && timeSpan.map(d => d).length) {
-      const [fromSpan, toSpan] = timeSpan;
-      const from = new Date(fromSpan).getTime();
-      const to = new Date(new Date(toSpan).getTime() + DAY - 1).getTime();
-      requestFromActivityCrud(GET_ACTIVITY_EVENTS, {
-        from,
-        to,
-        ...settings,
-      })
-    }
-    // @todo also query filtered events according to other settings
-    requestFromActivityCrud(GET_BINNED_ACTIVITY_OUTLINE, {
-      bin: DAY
-    })
-  }, [settings]);
-
-  useEffect(() => {
-    requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
-  }, [settingsWithoutChannelsStringified]);
-
 
 
   const onUpdateSettings = async (key, value) => {
@@ -154,6 +133,38 @@ function Studio({
       requestId
     })
   }, [pendingRequestsIds]);
+
+  const requestBinnedData = useMemo(() => () => {
+    const DAY = 3600 * 24 * 1000;
+    if (timeSpan && timeSpan?.length === 2 && daysOfWeek.length > 0 && timeSpan.map(d => d).length) {
+      const [fromSpan, toSpan] = timeSpan;
+      const from = new Date(fromSpan).getTime();
+      const to = new Date(new Date(toSpan).getTime() + DAY - 1).getTime();
+      requestFromActivityCrud(GET_ACTIVITY_EVENTS, {
+        from,
+        to,
+        ...settings,
+      })
+    }
+    // @todo also query filtered events according to other settings
+    requestFromActivityCrud(GET_BINNED_ACTIVITY_OUTLINE, {
+      bin: DAY
+    })
+  }, [settings, timeSpan, daysOfWeek, requestFromActivityCrud])
+
+  useEffect(() => {
+    requestBinnedData();
+  }, [settings]);
+
+  // update data in live
+  useInterval(() => {
+    requestBinnedData();
+    requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
+  }, 10000)
+
+  useEffect(() => {
+    requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
+  }, [settingsWithoutChannelsStringified]);
 
   useEffect(() => {
     crudPort.listen(response => {

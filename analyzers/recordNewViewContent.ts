@@ -4,6 +4,9 @@ import type { BrowseViewEvent } from "~types/captureEventsTypes";
 import parsers from './parsers';
 import { BROWSE_VIEW } from '~constants';
 
+
+const DYNAMIC_LOADING_DELAY = 2000;
+
 function delay(t) {
   return new Promise(resolve => {
     setTimeout(resolve, t);
@@ -17,10 +20,11 @@ function delay(t) {
     maxRetries = 10,
     delayTimeMs = 500,
   }, currentRetry = 0) => {
-    console.debug('try scraping page metadata (%s) try n°%s', scrapingName, currentRetry);
+    console.debug('try scraping page metadata (%s) try n°%s', scrapingName, currentRetry + 1);
     const canScrape = testFn();
+
     if (canScrape) {
-      console.debug('will scrape page metadata (%s) try n°%s', scrapingName, currentRetry)
+      console.debug('will scrape page metadata (%s) try n°%s', scrapingName, currentRetry + 1)
       return scrapeFn();
     }
     if (currentRetry < maxRetries) {
@@ -45,7 +49,10 @@ function delay(t) {
     url,
     addEvent,
   }) => {
-    await delay(2000);
+    // wait for metadata loading (youtube essentially)
+    // @todo find a more robust way to ensure new video metadata is loaded
+    console.log('will record new view in contents, waiting %s seconds', DYNAMIC_LOADING_DELAY / 1000)
+    await delay(DYNAMIC_LOADING_DELAY);
     // let title = document.title;
     let browseViewEvent: BrowseViewEvent;
     // console.debug('record new view content for platform', platform);
@@ -57,11 +64,13 @@ function delay(t) {
     let scrapedMetadata = {}
 
     if (parsers[platform]?.scrapers[viewType]) {
+      console.debug('scraping with %s %s script', platform, viewType);
       scrapedMetadata = await scrapePageMetadata({
         testFn: parsers[platform].scrapers[viewType].test,
         scrapeFn: parsers[platform].scrapers[viewType].scrape,
         scrapingName: `${platform} ${viewType}`,
       });
+      console.debug('scraped metadata', scrapedMetadata)
     }
     metadata = {
       ...metadata,

@@ -63,9 +63,9 @@ const parsers = {
     },
     scrapers: {
       short: {
-        test: () => document.querySelector('.YtReelMetapanelViewModelHost')?.textContent.trim(),
+        test: () => document.querySelector('.YtReelMetapanelViewModelHost,.YtShortsVideoTitleViewModelShortsVideoTitle,.ytReelMultiFormatLinkViewModelTitle,.ytShortsVideoTitleViewModelShortsVideoTitle')?.textContent.trim().length > 0,
         scrape: () => ({
-          title: document.querySelector('.YtShortsVideoTitleViewModelShortsVideoTitle')?.textContent.trim(),
+          title: document.querySelector('.YtShortsVideoTitleViewModelShortsVideoTitle, .ytd-shorts[is-active]  .ytReelMultiFormatLinkViewModelTitle, .ytd-shorts[is-active] .ytShortsVideoTitleViewModelShortsVideoTitle')?.textContent.trim(),
           // following commented bc it only works with the first short being watched
           // ...[
           //   // "title",
@@ -82,8 +82,8 @@ const parsers = {
           // shortlinkUrl: document.querySelector('link[rel="shortlinkUrl"]')?.getAttribute('href'),
           // videoimageSrc: document.querySelector('link[rel="image_src"]')?.getAttribute('href'),
 
-          channelName: document.querySelector('.YtReelChannelBarViewModelChannelName a')?.textContent.trim(),
-          channelId: decodeURI(document.querySelector('.YtReelChannelBarViewModelChannelName a')?.getAttribute('href'))?.split('@').pop(),
+          channelName: document.querySelector('.YtReelChannelBarViewModelChannelName a, .ytReelChannelBarViewModelChannelName a')?.textContent.trim().replace(/^@/, ''),
+          channelId: decodeURI(document.querySelector('.YtReelChannelBarViewModelChannelName a, .ytReelChannelBarViewModelChannelName a')?.getAttribute('href'))?.split('@').pop().split('/')[0],
           channelImageSrc: document.querySelector('.yt-spec-avatar-shape img')?.getAttribute('src'),
           commentsCount: document.querySelector('#actions #comments-button .yt-spec-button-shape-with-label')?.textContent.trim(),
           likesCount: document.querySelector('#actions #like-button #like-button .yt-spec-button-shape-with-label, .ytLikeButtonViewModelHost')?.textContent.trim(),

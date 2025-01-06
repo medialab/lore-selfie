@@ -60,7 +60,7 @@
     box-sizing: border-box;
     cursor: pointer;
     &:hover:not(:disabled) {
-      background: #333;
+      background: #807f7f;
     }
     &:disabled {
       cursor: not-allowed;

@@ -20,7 +20,7 @@ function DayPage({
     const validEvents = events
       .filter(event => event.type === BROWSE_VIEW && event.url && event.metadata.title
 
-        && ['live', 'video'].includes(event.viewType)
+        && ['live', 'video', 'short'].includes(event.viewType)
       );
       const contents = new Map();
     const channels = new Map();

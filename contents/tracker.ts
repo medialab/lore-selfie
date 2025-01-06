@@ -48,8 +48,8 @@ const addEvent = async (evt: EventGeneric) => {
 }
 
 const main = async () => {
-  console.log('init tracker');
   const settings: Settings = await storage.get("lore-selfie-settings") || DEFAULT_SETTINGS;
+  console.log('init lore selfie tracker with settings', settings);
   const browser = getBrowser();
   const injectionId = generateId();
   const platform = getPlatform(window.location.href);
@@ -73,6 +73,7 @@ const main = async () => {
     url: window.location.href,
     addEvent,
   });
+  // disabled because it added a confirmation alert each time platform was exited
   // window.onbeforeunload = async function () {
   //   const closePlatformInTabEvent: ClosePlatformInTabEvent = {
   //     type: "CLOSE_PLATFORM_IN_TAB",
