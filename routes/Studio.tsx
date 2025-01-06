@@ -13,7 +13,7 @@ import FilterInputsList from "~components/FormComponents/FilterInputsList";
 import WeekdaysPicker from "~components/WeekdaysPicker";
 import TimePicker from "~components/FormComponents/TimePicker";
 import Diary from "~components/Diary";
-import { GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PLATFORMS } from "~constants";
+import { GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PLATFORMS } from "~constants";
 
 import '../styles/Studio.scss';
 import { downloadTextfile, JSONArrayToCSVStr } from "~helpers";
@@ -35,23 +35,16 @@ const EDITION_MODES = [
 const storage = new Storage({
   area: "local",
   // copiedKeyList: ["shield-modulation"],
-})
-
-// const formatDatepickerDate = d => {
-//   const formatted = new Date(+d.unix * 1000);
-//   formatted.setHours(0);
-//   formatted.setMinutes(0);
-//   formatted.setSeconds(0);
-//   formatted.setMilliseconds(0);
-//   return formatted;
-// }
+});
 
 function Studio({
 }) {
   const [visibleEvents, setVisibleEvents] = useState([]);
-  const [pendingRequestsIds, setPendingRequestsIds] = useState(new Set())
+  const [pendingRequestsIds, setPendingRequestsIds] = useState(new Set());
+  const [annotations, setAnnotations] = useState();
   const [daysData, setDaysData] = useState();
   const crudPort = usePort("activitycrud");
+  const annotationsPort = usePort("annotationscrud");
   const defaultSettings = useMemo(() => {
     const DAY = 24 * 3600 * 1000;
     const today = new Date().getTime();
@@ -134,6 +127,16 @@ function Studio({
       requestId
     })
   }, [pendingRequestsIds]);
+  const requestFromAnnotationsCrud = useMemo(() => async (actionType: string, payload: object) => {
+    const requestId = generateId();
+    pendingRequestsIds.add(requestId);
+    setPendingRequestsIds(pendingRequestsIds);
+    await annotationsPort.send({
+      actionType,
+      payload,
+      requestId
+    })
+  }, [pendingRequestsIds, annotationsPort]);
 
   const requestBinnedData = useMemo(() => () => {
     const DAY = 3600 * 24 * 1000;
@@ -157,20 +160,27 @@ function Studio({
     requestBinnedData();
   }, [settings]);
 
+  useEffect(() => {
+    requestFromAnnotationsCrud(GET_ANNOTATIONS, {});
+  }, [])
+
   // update data in live
   useInterval(() => {
     requestBinnedData();
+    requestFromAnnotationsCrud(GET_ANNOTATIONS, {});
     // console.debug('request get channels in interval', JSON.parse(settingsWithoutChannelsStringified))
     requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
-  }, 10000)
+  }, 10000);
 
   useEffect(() => {
-    console.debug('request get channels', JSON.parse(settingsWithoutChannelsStringified))
+    // console.debug('request get channels', JSON.parse(settingsWithoutChannelsStringified))
     requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
   }, [settingsWithoutChannelsStringified]);
 
   useEffect(() => {
-    crudPort.listen(response => {
+    [annotationsPort, crudPort]
+    .forEach(thatPort => 
+    thatPort.listen(response => {
       // console.debug('received data : ', response.actionType, response?.result?.data?.length);
       if (!pendingRequestsIds.has(response.requestId)) {
         return;
@@ -190,6 +200,9 @@ function Studio({
         case GET_ACTIVITY_EVENTS:
           setVisibleEvents(data);
           break;
+        case GET_ANNOTATIONS:
+          setAnnotations(data);
+          break;
         case GET_BINNED_ACTIVITY_OUTLINE:
           const formatted = data.reduce((cur, { date, eventsCount }) => {
             const key = new Date(date).toJSON().split('T')[0]
@@ -207,7 +220,7 @@ function Studio({
         default:
           break;
       }
-    })
+    }));
   }, [settings])
 
   useEffect(() => {
@@ -382,6 +395,7 @@ function Studio({
                   channelsSettings,
                   excludedTitlePatterns,
                   visibleEvents,
+                  annotations,
                 }
                 }
               />

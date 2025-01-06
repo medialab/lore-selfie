@@ -12,9 +12,11 @@ function DayPage({
   imposed,
   timeOfDaySpan,
   previewScaleRatio,
+  annotations = {},
   pageNumber,
   type = 'left'
 }) {
+  const {creators = {}, tags = {}, expressions = {}} = annotations;
   const [vizSpaceDimensions, setVizSpaceDimensions] = useState({ width: 100, height: 100 });
   const {channelsMap, contentsMap, rowsCount} = useMemo(() => {
     const validEvents = events
@@ -27,7 +29,11 @@ function DayPage({
     let index = 0;
     let rCount = 0;
     validEvents.forEach(event => {
-      const channel = event.metadata.channelName || event.metadata.channelId;
+      let channel = event.metadata.channelName || event.metadata.channelId;
+      const channelSlug = `${event.metadata.channelId}-${event.platform}`;
+      const creator = Object.values(creators).find(c => c.channels.includes(channelSlug));
+      channel = creator ? creator.name : channel;
+      // console.log('creators', creators, channelSlug);
       if (!channels.has(channel)) {
         channels.set(channel, new Map());
         rCount++;
@@ -58,7 +64,7 @@ function DayPage({
       channelsMap: channels,
       rowsCount: rCount
     }
-  }, [events])
+  }, [events, creators])
   return (
     <section className={`page DayPage ${format}  ${imposed ? 'is-imposed' : ''} ${type}`}>
       <div className="page-content">

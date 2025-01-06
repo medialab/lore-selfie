@@ -14,6 +14,7 @@ function DiaryWrapper({
   channelsSettings,
   excludedTitlePatterns,
   visibleEvents,
+  annotations,
 }) {
   const previewerRef = useRef(null);
   const [format, setFormat] = useState('A4-landscape');
@@ -164,6 +165,7 @@ function DiaryWrapper({
                             ...{
                               format: 'A5',
                               ...day,
+                              annotations,
                               timeOfDaySpan,
                               previewScaleRatio,
                               type,
@@ -190,6 +192,7 @@ function DiaryWrapper({
                               ...{
                                 format: 'A5',
                                 ...day,
+                                annotations,
 
                                 timeOfDaySpan,
                                 previewScaleRatio,
@@ -206,6 +209,7 @@ function DiaryWrapper({
                               ...{
                                 format: 'A5',
                                 ...day,
+                                annotations,
 
                                 timeOfDaySpan,
                                 previewScaleRatio,
@@ -233,6 +237,7 @@ function DiaryWrapper({
                               ...{
                                 format,
                                 ...day,
+                                annotations,
 
                                 timeOfDaySpan,
                                 previewScaleRatio,
@@ -248,6 +253,7 @@ function DiaryWrapper({
                               ...{
                                 format,
                                 ...day,
+                                annotations,
                                 timeOfDaySpan,
                                 previewScaleRatio,
                                 type: 'right',
