@@ -25,7 +25,7 @@ function Cover({
         <h1>{'lore selfie'}</h1>
         <h3 
           dangerouslySetInnerHTML={{
-            __html: `Du ${firstDay} au ${lastDay}`
+            __html: `Mon activité du ${firstDay.toLowerCase()} au ${lastDay.toLowerCase()}`
           }}
         /> 
         </div>

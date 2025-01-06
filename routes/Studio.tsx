@@ -359,6 +359,9 @@ function Studio({
               <FilterInputsList
                 value={excludedTitlePatterns}
                 onChange={setExcludedTitlePatterns}
+                messages={{
+                  newItem: 'Ajouter un titre (ou morceau de titre) à exclure',
+                }}
               />
             </div>
             <div className="form-group">
@@ -368,6 +371,9 @@ function Studio({
               <FilterInputsList
                 value={annotationColumnsNames}
                 onChange={setAnnotationsColumnsNames}
+                messages={{
+                  newItem: 'Ajouter une colonne',
+                }}
               />
             </div>
           </div>

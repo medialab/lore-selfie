@@ -105,15 +105,17 @@ function DiaryWrapper({
         <ul className="settings">
           <li className="format-picker">
             <span className="format-label">format</span>
+            <button className={`important-button ${format === 'A4-landscape' ? 'active' : ''}`} onClick={() => setFormat('A4-landscape')}>
+              A4 paysage
+            </button>
             <button className={`important-button ${format === 'A5-imposed' ? 'active' : ''}`} onClick={() => setFormat('A5-imposed')}>
               A5 imposé sur A4 (livret)
             </button>
             <button className={`important-button ${format === 'A4' ? 'active' : ''}`} onClick={() => setFormat('A4')}>
               A4 portrait
             </button>
-            <button className={`important-button ${format === 'A4-landscape' ? 'active' : ''}`} onClick={() => setFormat('A4-landscape')}>
-              A4 paysage
-            </button>
+            
+            
             <button className={`important-button ${format === 'A5' ? 'active' : ''}`} onClick={() => setFormat('A5')}>
               A5
             </button>
@@ -132,7 +134,9 @@ function DiaryWrapper({
       >
         {({ measureRef }) => (
           <div ref={measureRef} className={`document-space ${format}`}>
-            <div 
+            {
+              Object.keys(dataByDay).length ?
+              <div 
               ref={previewerRef}
               style={{
                 transformOrigin: 'top left', 
@@ -274,6 +278,10 @@ function DiaryWrapper({
                   </>
               }
             </div>
+              :
+              <div className="empty-placeholder"><div>Rien à afficher</div></div>
+            }
+            
           </div>
         )}
       </Measure>

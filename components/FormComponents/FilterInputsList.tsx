@@ -2,7 +2,10 @@ import InputToValidate from "./InputToValidate";
 
 const FilterInputsList = ({
   value = [],
-  onChange
+  onChange,
+  messages: {
+    newItem: newItemMessage
+  }
 }) => {
   return (
     <ul className="FilterInputsList small-cards-container capped">
@@ -42,7 +45,7 @@ const FilterInputsList = ({
           onChange(newValue);
 
         }}>
-          Ajouter un titre (ou morceau de titre) à exclure
+          {newItemMessage}
         </button>
       </li>
     </ul>
