@@ -71,7 +71,7 @@ function Studio({
   const [settings, setSettings] = useState<StudioSettings>(defaultSettings);
   const [availableChannels, setAvailableChannels] = useState([]);
   const settingsWithoutChannelsStringified = useMemo(() => {
-    // console.log('update settings without channels')
+    console.log('update settings without channels')
     return JSON.stringify({
       ...settings,
       channelsSettings: undefined
@@ -80,6 +80,7 @@ function Studio({
   useEffect(() => {
     storage.get('lore-selfie-studio-settings')
       .then((storedSettings) => {
+        console.debug('got stored settings', storedSettings);
         if (storedSettings) {
           setSettings(storedSettings);
         } else {
@@ -159,10 +160,12 @@ function Studio({
   // update data in live
   useInterval(() => {
     requestBinnedData();
+    // console.debug('request get channels in interval', JSON.parse(settingsWithoutChannelsStringified))
     requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
   }, 10000)
 
   useEffect(() => {
+    console.debug('request get channels', JSON.parse(settingsWithoutChannelsStringified))
     requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
   }, [settingsWithoutChannelsStringified]);
 

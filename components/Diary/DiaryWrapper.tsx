@@ -16,7 +16,7 @@ function DiaryWrapper({
   visibleEvents,
 }) {
   const previewerRef = useRef(null);
-  const [format, setFormat] = useState('A5-imposed');
+  const [format, setFormat] = useState('A4-landscape');
   const [dimensions, setDimensions] = useState({ width: 100, height: 100 })
   const daysMap = {
     0: 'Dimanche',

@@ -278,8 +278,9 @@ export default function DatePicker({
                         const handleClick = () => {
                           if (range) {
                             if (isSelecting) {
-                              setTempValue([tempValue[0], date]);
-                              onChange([tempValue[0], date]);
+                              const toDate = date.getTime() === tempValue[0].getTime() ? new Date(date.getTime() + DAY - 1) : date;
+                              setTempValue([tempValue[0], toDate]);
+                              onChange([tempValue[0], toDate]);
                               setIsSelecting(false);
                             } else {
                               setIsSelecting(true);

@@ -1,23 +1,23 @@
 
 
 
-const DAYS_OF_WEEK_MAP = {
-  'Lundi': 0,
-  'Mardi': 1,
-  'Mercredi': 2,
-  'Jeudi': 3,
-  'Vendredi': 4,
-  'Samedi': 5,
-  'Dimanche': 6,
-}
+// const DAYS_OF_WEEK_MAP = {
+//   'Lundi': 0,
+//   'Mardi': 1,
+//   'Mercredi': 2,
+//   'Jeudi': 3,
+//   'Vendredi': 4,
+//   'Samedi': 5,
+//   'Dimanche': 6,
+// }
 const DAYS_OF_WEEK_MAP_REVERSE = {
-  0: 'Lundi',
-  1: 'Mardi',
-  2: 'Mercredi',
-  3: 'Jeudi',
-  4: 'Vendredi',
-  5: 'Samedi',
-  6: 'Dimanche',
+  0: 'Dimanche',
+  1: 'Lundi',
+  2: 'Mardi',
+  3: 'Mercredi',
+  4: 'Jeudi',
+  5: 'Vendredi',
+  6: 'Samedi',
 }
 
 const WeekdaysPicker = ({state = [], setState}) => {
@@ -25,8 +25,8 @@ const WeekdaysPicker = ({state = [], setState}) => {
   return (
     <ul className="WeekdaysPicker tags-list">
       {
-        Object.entries(DAYS_OF_WEEK_MAP_REVERSE).map(([keyStr, label]) => {
-          const key = +keyStr;
+        [1,2,3,4,5,6,0].map((key) => {
+          const label = DAYS_OF_WEEK_MAP_REVERSE[key];
           return (
             <li key={key}>
               <button

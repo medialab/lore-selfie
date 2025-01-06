@@ -154,7 +154,7 @@ const applyChannelSettings = (events, channelsSettings) => {
   // console.log('hiddenURLs', hiddenURLs);
   return transformedEvents;
 }
-const filterEvents = (events, payload) => {
+const filterEvents = (events, payload, tag) => {
   const {
     from: initialFrom,
     to: initialTo,
@@ -176,15 +176,22 @@ const filterEvents = (events, payload) => {
     from = initialFrom;
     to = initialTo;
   }
+  // console.log('filter events from %s to %s', from, to);
+  // console.log('will apply filters to', events)
   // const events = activity.filter(e => true);
   let filtered = events.filter((event) => {
     const date = new Date(event.date).getTime();
 
     const matchesTimespan = date > from && date < to;
-    const matchesTimeOfDaySpan = timeOfDaySpan === undefined ? true : checkTimeOfDaySpan(date, timeOfDaySpan)
-    const matchesDaysOfWeek = daysOfWeek === undefined ? true : checkDaysOfWeek(date, daysOfWeek)
+    const matchesTimeOfDaySpan = timeOfDaySpan === undefined ? true : checkTimeOfDaySpan(date, timeOfDaySpan);
+    const matchesDaysOfWeek = daysOfWeek === undefined ? true : checkDaysOfWeek(date, daysOfWeek);
+    const matchesPlatforms = platforms === undefined ? true : platforms.includes(event.platform);
+    // console.log('matches platforms', matchesPlatforms, event.platform)
+    // if (tag === GET_CHANNELS) {      
+    //   console.log('test for event in filters', matchesTimespan && matchesTimeOfDaySpan && matchesDaysOfWeek && matchesPlatforms, {matchesTimespan, matchesTimeOfDaySpan, matchesDaysOfWeek, matchesPlatforms}, event, {timeOfDaySpan, date: new Date(event.date), from: new Date(from), to: new Date(to)})
+    // }
 
-    return matchesTimespan && matchesTimeOfDaySpan && matchesDaysOfWeek;
+    return matchesTimespan && matchesTimeOfDaySpan && matchesDaysOfWeek && matchesPlatforms;
   });
   return filtered;
 }
@@ -197,13 +204,14 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   let filteredEvents;
   switch (actionType) {
     case GET_CHANNELS:
+      // console.debug('filter events in get channels', payload, filterEvents(activity, payload, GET_CHANNELS))
       filteredEvents = filterEvents(activity, payload)
         .filter(event => {
           if (event.type === BROWSE_VIEW) {
-            return event.metadata && event.metadata.channelId
+            return event.metadata && event.metadata.channelId;
           }
         });
-      // console.log('filtered events for get channels', filteredEvents, filterEvents(activity, payload));
+      // console.log('filtered events for get channels', filteredEvents, activity.length, payload);
       const channelsList = new Map();
       filteredEvents.forEach(event => {
         const { channelId, channelName } = event.metadata;
