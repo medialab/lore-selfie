@@ -101,6 +101,24 @@
     margin-bottom: constants.$gutter;
   }
 
+  .rc-slider {
+    .rc-slider-rail {
+      background: lightgrey;
+
+    }
+    .rc-slider-track {
+      background: grey;
+    }
+    .rc-slider-step {
+      background: grey;
+
+    }
+    .rc-slider-handle {
+      background: #333;
+      border: none;
+    }
+  }
+
   .InputToValidate {
     display: flex;
     .small-card-body {
