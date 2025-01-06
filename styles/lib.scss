@@ -78,10 +78,14 @@
       background: constants.$color-app-main;
       padding: constants.$gutter;
       &:hover {
-        color: lightgrey;
+        background: constants.$color-app-main-accent;
+        opacity: 0.7;
       }
       &.active {
         background: constants.$color-app-main-accent;
+        &:hover {
+          opacity: 0.8;
+        }
       }
     }
   }
@@ -104,14 +108,12 @@
   .rc-slider {
     .rc-slider-rail {
       background: lightgrey;
-
     }
     .rc-slider-track {
       background: grey;
     }
     .rc-slider-step {
       background: grey;
-
     }
     .rc-slider-handle {
       background: #333;
@@ -199,9 +201,9 @@
     }
     &.is-disabled {
       opacity: 0.5;
-      
+
       .header {
-          cursor: not-allowed;
+        cursor: not-allowed;
       }
     }
   }
@@ -419,9 +421,8 @@
                   background: constants.$color-app-main;
                   border-radius: 50%;
                   display: inline-block;
-                  opacity: .5;
+                  opacity: 0.5;
                 }
-                
               }
               button {
                 position: relative;
@@ -434,11 +435,18 @@
                 height: 1.8rem;
                 max-height: 1.8rem;
               }
+              
               &.out-of-month {
                 opacity: 0.5;
               }
+              &.is-disabled {
+                opacity: 0.3;
+                button {
+                  cursor: not-allowed;
+                }
+              }
               &.is-selected {
-                background: rgba(0,0,0,0.1);
+                background: rgba(0, 0, 0, 0.1);
                 button {
                   // @include fonts.kanit-extrabold;
                   // border: 1px solid #333;

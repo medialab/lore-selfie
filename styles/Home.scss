@@ -1,0 +1,82 @@
+@use "constants";
+@use "fonts";
+
+
+.Home {
+  width: 100%;
+    overflow: hidden;
+    height: 100%;
+  .contents {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    width: 100%;
+    overflow: hidden;
+    height: 100%;
+  }
+  
+  h1 {
+    margin: 0;
+  }
+  .ui-container {
+    display: flex;
+    flex-flow: column nowrap;
+    min-width: 30vw;
+    padding-right: constants.$gutter;
+    box-sizing: border-box;
+  }
+  .visualization-column {
+    flex: 3;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    padding: constants.$gutter;
+    box-sizing: border-box;
+    // overflow: auto;
+
+    .visualization-container {
+      max-width: 100%;
+      position: relative;
+      flex: 1;
+      .Daily {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        overflow: auto;
+      }
+
+    }
+
+    .visualization-footer {
+      .row {
+        display: flex;
+        flex-flow: row nowrap;
+        width: 100%;
+        align-items: center;
+        padding: constants.$gutter;
+        justify-content: start;
+        align-items: center;
+        .group {
+          padding: 0 constants.$gutter;
+        }
+        .slider-container {
+          position: relative;
+          width: 50%;
+          flex: 1;
+          padding-right: constants.$gutter;
+        }
+        .stretched-buttons {
+          width: 100%;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: stretch;
+          button {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+}

@@ -16,7 +16,7 @@ import Diary from "~components/Diary";
 import { GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PLATFORMS } from "~constants";
 
 import '../styles/Studio.scss';
-import { downloadTextfile, JSONArrayToCSVStr } from "~helpers";
+import { buildDateKey, downloadTextfile, JSONArrayToCSVStr } from "~helpers";
 
 
 interface StudioSettings {
@@ -196,7 +196,6 @@ function Studio({
       pendingRequestsIds.delete(response.requestId);
       setPendingRequestsIds(pendingRequestsIds);
       const { result: { data = [] } } = response;
-      // const today = new Date().toJSON().split('T')[0];
       switch (response.actionType) {
         case GET_CHANNELS:
           setAvailableChannels(data);
@@ -209,7 +208,7 @@ function Studio({
           break;
         case GET_BINNED_ACTIVITY_OUTLINE:
           const formatted = data.reduce((cur, { date, eventsCount }) => {
-            const key = new Date(date).toJSON().split('T')[0]
+            const key = buildDateKey(date);
             return {
               ...cur,
               [key]: {

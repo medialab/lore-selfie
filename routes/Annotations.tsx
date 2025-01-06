@@ -71,7 +71,6 @@ function Annotations() {
       if (data === undefined) {
         return;
       }
-      // const today = new Date().toJSON().split('T')[0];
       switch (response.actionType) {
         case GET_ANNOTATIONS:
         case CREATE_ANNOTATION:

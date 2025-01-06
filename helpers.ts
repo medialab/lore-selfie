@@ -235,3 +235,13 @@ export  function inferTickTimespan(timeSpan, zoomLevel = 1) {
   }
   return span;
 }
+
+export function buildDateKey (date) {
+  return new Date(date).toJSON().split('T')[0];
+}
+
+export function prettyDate(date, daysMap, monthsMap) {
+  return `${daysMap[date.getDay()].toLowerCase()} ${date.getDate() === 1 ? '1<sup>er</sup>' : date.getDate()} ${monthsMap[date.getMonth()]} ${date.getFullYear()}`
+};
+
+export default function helpers(){}

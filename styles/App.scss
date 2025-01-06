@@ -115,13 +115,4 @@
     max-width: constants.$max-content-width;
     width: constants.$max-content-width;
   }
-
-
-  .Home {
-    .contents {
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: stretch;
-    }
-  }
 }

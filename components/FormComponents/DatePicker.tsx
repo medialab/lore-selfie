@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Tooltip } from 'react-tooltip'
 import { scaleLinear } from 'd3-scale';
+import { prettyDate } from '~helpers';
 
 import 'react-tooltip/dist/react-tooltip.css'
+import {buildDateKey} from '~helpers';
 
 const formatDatepickerDate = d => {
   d.setHours(0);
@@ -20,6 +22,7 @@ export default function DatePicker({
   startOfWeekId = 1,
   daysData = {},
   onChange,
+  disableDatalessDays = false,
 }) {
   const daysMap = {
     1: 'Lundi',
@@ -175,17 +178,12 @@ export default function DatePicker({
     return d;
   }, [startOfWeekId]);
 
-  const prettyDate = useMemo(() => date => {
-    return `${daysMap[date.getDay()].toLowerCase()} ${date.getDate() === 1 ? '1<sup>er</sup>' : date.getDate()} ${monthsMap[date.getMonth()]} ${date.getFullYear()}`
-  }, []);
-
-
   const radiusScale = useMemo(() => {
     if (daysData) {
       const maxCount = Math.max(...Object.values(daysData).map(d => d.value));
       return scaleLinear()
         .domain([0, maxCount])
-        .range([0, 1])
+        .range([0, .8])
     }
     return scaleLinear()
   }, [daysData])
@@ -266,16 +264,19 @@ export default function DatePicker({
                         dateNumber,
                         date
                       }) => {
-
                         const isSelected = !tempValue ? false : range ?
                           date >= tempValue[0] && date <= tempValue[1]
                           : date === tempValue;
-                        const key = new Date(date.getTime() + DAY).toJSON().split('T')[0];
+                        const key = buildDateKey(new Date(date.getTime() + DAY));
                         const data = daysData[key];
+                        const isDisabled = disableDatalessDays && !data;
                         const count = data?.value || 0;
                         const radius = count ? radiusScale(count) : 0;
                         // console.log({radius, count, data, key, daysData})
                         const handleClick = () => {
+                          if (isDisabled) {
+                            return;
+                          }
                           if (range) {
                             if (isSelecting) {
                               const toDate = date.getTime() === tempValue[0].getTime() ? new Date(date.getTime() + DAY - 1) : date;
@@ -302,7 +303,7 @@ export default function DatePicker({
                             key={dateNumber}
                             onClick={handleClick}
                             onMouseEnter={handleMouseEnter}
-                            className={`day ${isSelected ? 'is-selected' : ''} ${outOfMonth ? 'out-of-month' : ''}`}
+                            className={`day ${isSelected ? 'is-selected' : ''} ${outOfMonth ? 'out-of-month' : ''} ${isDisabled ? 'is-disabled': ''}`}
                             data-tooltip-id="datepicker-tooltip"
                             data-tooltip-html={`${daysMap[weekId]} ${dateNumber === 1 ? '1<sup>er</sup>' : dateNumber} ${monthsMap[date.getMonth()]} ${date.getFullYear()}`}
                           >
@@ -342,8 +343,8 @@ export default function DatePicker({
                 <span></span>
                 {
                   range ?
-                    <span>du <strong dangerouslySetInnerHTML={{ __html: prettyDate(tempValue[0]) }} /> au <strong dangerouslySetInnerHTML={{ __html: prettyDate(tempValue[1]) }} /></span>
-                    : <span dangerouslySetInnerHTML={{ __html: prettyDate(tempValue) }} />
+                    <span>du <strong dangerouslySetInnerHTML={{ __html: prettyDate(tempValue[0], daysMap, monthsMap) }} /> au <strong dangerouslySetInnerHTML={{ __html: prettyDate(tempValue[1], daysMap, monthsMap) }} /></span>
+                    : <span dangerouslySetInnerHTML={{ __html: prettyDate(tempValue, daysMap, monthsMap) }} />
                 }
               </div>
               : null

@@ -2,51 +2,6 @@
 @use "fonts";
 
 .Daily {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: stretch;
-  width: 100%;
-  overflow: hidden;
-  height: 100%;
-  h1 {
-    margin: 0;
-  }
-  .ui {
-    display: flex;
-    flex-flow: row nowrap;
-    > div {
-      flex: 1;
-      display: flex;
-      align-items: center;
-    }
-  }
-  .visualization-container {
-    flex: 1;
-    overflow: auto;
-  }
-  .date-picker-container {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    ul {
-      list-style: none;
-      padding: 0;
-      display: flex;
-      flex-flow: row nowrap;
-      align-items: center;
-      margin: 0;
-      li {
-        display: flex;
-        flex-flow: row nowrap;
-        align-items: center;
-        margin-left: 1rem;
-        button {
-          margin-left: 1rem;
-        }
-      }
-    }
-  }
-
   .DailyVisualizationSession {
     .session-background {
       fill: rgba(0, 0, 0, 0.05);

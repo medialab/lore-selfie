@@ -3,6 +3,7 @@ import { Storage } from "@plasmohq/storage"
 import { v4 as generateId } from 'uuid';
 import { type captureEventsList } from "~types/captureEventsTypes"
 import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
+import {buildDateKey} from "~helpers";
 
 
 const DAY = 24 * 3600 * 1000;
@@ -409,7 +410,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     case DUPLICATE_DAY_DATA:
       if (payload.daySlug && payload.numberOfDays) {
         const dayEvents = activity.filter(event => {
-          const daySlug = new Date(event.date).toJSON().split('T')[0];
+          const daySlug = buildDateKey(event.date);
           return daySlug === daySlug;
         });
         const injectionIds = Array.from(new Set(dayEvents.map(e => e.injectionId)));

@@ -6,7 +6,7 @@ import { FileDrop } from 'react-file-drop'
 import { CodeBlock, dracula } from "react-code-blocks";
 import { v4 as generateId } from 'uuid';
 
-import { downloadTextfile, formatNumber } from "~helpers";
+import { downloadTextfile, formatNumber, buildDateKey } from "~helpers";
 
 import '~styles/DevDashboard.scss';
 import { EVENT_TYPES, ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA, SET_SETTINGS, SET_ANNOTATIONS, GET_SETTINGS, GET_ANNOTATIONS } from "~constants";
@@ -281,7 +281,7 @@ function DevDashboard() {
     if (!confirm(`Vous allez définitivement modifier l'historique en multipliant sa taille par ${numberOfDays} dans le cadre du test de charge. Continuer ?`)) {
       return;
     }
-    const todaySlug = new Date().toJSON().split('T')[0];
+    const todaySlug = buildDateKey(new Date());
     setIsWorking(true);
     activitiesPort.send({
       actionType: DUPLICATE_DAY_DATA,
