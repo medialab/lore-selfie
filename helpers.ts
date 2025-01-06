@@ -241,7 +241,17 @@ export function buildDateKey (date) {
 }
 
 export function prettyDate(date, daysMap, monthsMap) {
-  return `${daysMap[date.getDay()].toLowerCase()} ${date.getDate() === 1 ? '1<sup>er</sup>' : date.getDate()} ${monthsMap[date.getMonth()]} ${date.getFullYear()}`
+  return date?.getTime ? `${daysMap[date.getDay()].toLowerCase()} ${date.getDate() === 1 ? '1<sup>er</sup>' : date.getDate()} ${monthsMap[date.getMonth()]} ${date.getFullYear()}` : ''
 };
 
+export function getDateBin(date, binInMs) {
+  const timeInMs = date.getHours() * 3600 * 1000 + date.getMinutes() * 60 * 1000 + date.getSeconds() * 1000 + date.getMilliseconds();
+  return timeInMs - timeInMs%binInMs;
+}
+
+export function msToNiceDuration (d) {
+  const hours = Math.floor(d / 3600000);
+  const minutes = Math.floor((d - hours * 3600000) / 60000);
+  return hours ? `${hours}h${minutes}mn` : minutes + 'mn'
+}
 export default function helpers(){}

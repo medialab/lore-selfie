@@ -32,6 +32,29 @@
       flex-flow: column nowrap;
       justify-content: stretch;
     }
+
+    .ui-group {
+      margin: constants.$gutter 0;
+      h5{
+        margin: 0;
+        margin-bottom: constants.$gutter-small;
+        font-size: .8rem;
+      }
+      .buttons-row {
+        list-style: none;
+        display: flex;
+        flex-flow: row nowrap;
+        padding: 0;
+        margin: 0;
+        li {
+          flex: 1;
+          button {
+            width: 100%;
+            padding: constants.$gutter;
+          }
+        }
+      }
+    }
     .contents-container {
       overflow: hidden;
       display: flex;
@@ -148,6 +171,7 @@
         h5 {
           margin: 0;
           padding-left: constants.$gutter * 5;
+          font-size: .8rem;
         }
 
         &.legend-row {

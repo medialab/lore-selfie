@@ -80,6 +80,9 @@ importers:
       sigma:
         specifier: ^3.0.0
         version: 3.0.0(graphology-types@0.24.8)
+      svg-partial-circle:
+        specifier: ^1.0.0
+        version: 1.0.0
       talisman:
         specifier: ^1.1.4
         version: 1.1.4
@@ -4321,6 +4324,10 @@ packages:
 
   svg-parser@2.0.4:
     resolution: {integrity: sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==}
+
+  svg-partial-circle@1.0.0:
+    resolution: {integrity: sha512-jDWgNzrlpsGo9A7/tdjCy6+1RzeeANYV1a3JtNYC/0ZXI3U+3VMucuNv7JuKti9VVBdyNxNO1CZs/k0xS1lUFA==}
+    engines: {node: '>=6'}
 
   svgo@2.8.0:
     resolution: {integrity: sha512-+N/Q9kV1+F+UeWYoSiULYo4xYSDQlTgb+ayMobAXPwMnLvop7oxKMo9OzIrX5x3eS4L4f2UHhc9axXwY8DpChg==}
@@ -9473,6 +9480,8 @@ snapshots:
       periscopic: 3.1.0
 
   svg-parser@2.0.4: {}
+
+  svg-partial-circle@1.0.0: {}
 
   svgo@2.8.0:
     dependencies:

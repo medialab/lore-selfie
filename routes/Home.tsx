@@ -8,15 +8,105 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 import '../styles/Home.scss';
-import { BROWSE_VIEW, GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE } from "~constants";
+import { BROWSE_VIEW, GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_HABITS_DATA, PLATFORMS_COLORS } from "~constants";
 import { useInterval } from "usehooks-ts";
 import DatePicker from "~components/FormComponents/DatePicker";
 import { prettyDate, buildDateKey } from "~helpers";
+import Habits from "~components/Habits";
 
 const UPDATE_RATE = 10000;
 const MIN_ZOOM = .5;
+const DAY = 24 * 3600 * 1000;
 
-// 
+
+function DailyLegend({ spansSettings }) {
+  return (
+    <ul className="legend-container">
+      {
+        Object.entries(spansSettings)
+          .map(([id, { legendLabel }]) => {
+            const markerDimension = 10;
+            return (
+              <li key={id}>
+                <svg width={markerDimension} height={markerDimension}>
+                  <rect
+                    x={0}
+                    y={0}
+                    width={markerDimension}
+                    height={markerDimension}
+                    fill={`url(#diagonalHatch-for-${id})`}
+                  />
+                  {
+                    Object.entries(spansSettings).map(([value, { color, markType }], index) => (
+                      <pattern key={index} id={`diagonalHatch-for-${value}`} patternUnits="userSpaceOnUse" width="4" height="4">
+                        {
+                          markType === 'regular' || markType === 'reverse' ?
+                            <path
+                              d={
+                                markType === 'regular' ?
+                                  `M-1,1 l2,-2
+                      M0,4 l4,-4
+                      M3,5 l2,-2`
+                                  : `M1,1 l2,-2
+                      M0,4 l4,-4
+                      M3,5 l2,-2`}
+                              style={{ stroke: color, opacity: 1, strokeWidth: 1, transform: markType === 'regular' ? '' : 'scale(1)' }} />
+                            :
+                            <circle cx={0} cy={0} r={1} fill="transparent"
+                              style={{ stroke: color, opacity: 1, strokeWidth: 1 }} />
+                        }
+
+                      </pattern>
+                    ))
+                  }
+                </svg>
+                <div className={'legend-label'}>
+                  {legendLabel}
+                </div>
+
+              </li>
+
+            )
+          })
+      }
+    </ul>
+  )
+}
+
+
+function HabitsLegend({ }) {
+  return (
+    <ul className="legend-container">
+      {
+
+        Object.entries(PLATFORMS_COLORS)
+          .map(([id, color]) => {
+            const markerDimension = 10;
+            return (
+              <li key={id}>
+                <svg width={markerDimension} height={markerDimension}>
+                  <rect
+                    x={0}
+                    y={0}
+                    width={markerDimension}
+                    height={markerDimension}
+                    fill={color}
+                  />
+
+                </svg>
+                <div className={'legend-label'}>
+                  {id}
+                </div>
+
+              </li>
+
+            )
+          })
+      }
+    </ul>
+  )
+}
+
 function Home() {
 
   const daysMap = {
@@ -47,10 +137,13 @@ function Home() {
   const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
   const [pendingRequestsIds, setPendingRequestsIds] = useState(new Set())
   const [displayedDayDate, setDisplayedDayDate] = useState();
+  const [habitsTimespan, setHabitsTimespan] = useState();
+  const [habitsBinDuration, setHabitsBinDuration] = useState(3600 * 3 * 1000);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [roundDay, setRoundDay] = useState(false);
   const [daysData, setDaysData] = useState([]);
   const [visibleEvents, setVisibleEvents] = useState([]);
+  const [habitsData, setHabitsData] = useState();
   const [annotations, setAnnotations] = useState([]);
   const crudPort = usePort("activitycrud");
   const annotationsPort = usePort("annotationscrud");
@@ -110,7 +203,7 @@ function Home() {
           }
           pendingRequestsIds.delete(response.requestId);
           setPendingRequestsIds(pendingRequestsIds);
-          const { result: { data = [] } } = response;
+          const { result: { data = [] }, payload } = response;
           // const today = buildDateKey(new Date());
           switch (response.actionType) {
             case GET_ACTIVITY_EVENTS:
@@ -139,18 +232,34 @@ function Home() {
                 setDisplayedDayDate(latestDay);
               }
               break;
+            case GET_HABITS_DATA:
+              setHabitsData(data);
+              break;
             default:
               break;
           }
         }));
 
   useEffect(() => {
-    const DAY = 24 * 3600 * 1000;
     requestFromActivityCrud(GET_BINNED_ACTIVITY_OUTLINE, {
-      bin: DAY
-    })
+      bin: DAY,
+      tag: 'daily'
+    });
     requestFromAnnotationsCrud(GET_ANNOTATIONS, {});
+
   }, []);
+
+  useEffect(() => {
+    if (habitsTimespan) {
+      // console.log('request habits data', habitsTimespan)
+      requestFromActivityCrud(GET_HABITS_DATA, {
+        bin: habitsBinDuration,
+        from: habitsTimespan[0].getTime(),
+        to: habitsTimespan[1].getTime() + DAY - 1,
+        tag: 'habits-data'
+      });
+    }
+  }, [habitsBinDuration, habitsTimespan])
 
   useEffect(() => {
     if (displayedDayDate) {
@@ -162,7 +271,22 @@ function Home() {
         to: toTime,
       })
     }
-  }, [displayedDayDate])
+  }, [displayedDayDate]);
+
+
+  useEffect(() => {
+    // console.log('got days data', daysData, habitsTimespan)
+    if (!habitsTimespan && Object.keys(daysData).length) {
+      const dates = Object.keys(daysData).map(key => {
+        const d = new Date(key);
+        d.setHours(0);
+        return d.getTime();
+      });
+      const extent = [Math.min(...dates), Math.max(...dates) + DAY - 1];
+      setHabitsTimespan(extent.map(d => new Date(d)));
+      // console.log('dates', dates);
+    }
+  }, [daysData])
 
   const isVisualizingToday = useMemo(() => {
     const today = buildDateKey(new Date());
@@ -190,6 +314,18 @@ function Home() {
     },
     UPDATE_RATE,
   );
+
+  useInterval(() => {
+    if (habitsTimespan) {
+      // console.log('request habits data', habitsTimespan)
+      requestFromActivityCrud(GET_HABITS_DATA, {
+        bin: habitsBinDuration,
+        from: habitsTimespan[0].getTime(),
+        to: habitsTimespan[1].getTime(),
+        tag: 'habits-data'
+      });
+    }
+  }, UPDATE_RATE * 2);
 
 
   const { channelsMap, contentsMap, rowsCount } = useMemo(() => {
@@ -292,70 +428,130 @@ function Home() {
                 </ul>
               </div>
               <div className="tab-content">
-                <h2>
-                  {isVisualizingToday ? `Aujourd'hui` : displayedDayDate ? prettyDate(displayedDayDate, daysMap, monthsMap) : 'chargement'}
-                </h2>
+                <h2
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      activeTab === 'daily' ?
+                        isVisualizingToday ? `Aujourd'hui` : displayedDayDate ? prettyDate(displayedDayDate, daysMap, monthsMap) : 'chargement'
+                        :
+                        habitsTimespan ?
+                          `Du ${prettyDate(habitsTimespan[0], daysMap, monthsMap)} au ${prettyDate(habitsTimespan[1], daysMap, monthsMap)}`
+                          : 'chargement'
+                  }}
+                />
                 <DatePicker
-                  value={displayedDayDate}
-                  onChange={(date) => {
-                    const key = buildDateKey(date);
-                    if (daysData[key]) {
-                      setDisplayedDayDate(date);
+                  value={activeTab === 'daily' ? displayedDayDate : habitsTimespan || [new Date(), new Date()]}
+                  onChange={(val) => {
+                    if (activeTab === 'daily') {
+                      const key = buildDateKey(val);
+                      if (daysData[key]) {
+                        setDisplayedDayDate(val);
+                      }
+                    } else {
+                      setHabitsTimespan(val);
                     }
+
                   }}
                   daysData={daysData}
-                  range={false}
-                  disableDatalessDays={true}
+                  range={activeTab !== 'daily'}
+                  disableDatalessDays={activeTab === 'daily'}
                 />
-                <div className="contents-container">
-                  <h3>Contenus consultés</h3>
-                  <div className="contents-list-container">
-                    {
-                      Array.from(channelsMap.entries())
-                        .map(([channel, contents]) => {
+                {
+                  activeTab === 'habits' ?
+                  <>
+                    <div className="ui-group">
+                      <h5>
+                        Taile des tranches horaires
+                      </h5>
+                      <ul className="buttons-row">
+                        {[
+                          {
+                            label: '1h',
+                            value: 1 * 3600 * 1000
+                          },
+                          {
+                            label: '3h',
+                            value: 3 * 3600 * 1000
+                          },
+                          {
+                            label: '6h',
+                            value: 6 * 3600 * 1000
+                          },
+                        ]
+                        .map(({label, value}) => {
                           return (
-                            <div
-                              key={channel}
-                              className="channel"
-                            >
-                              <h4 className="channel-title">{channel}</h4>
-                              <ul className="contents-list">
-                                {
-                                  Array.from(contents.values())
-                                    .map(({
-                                      url,
-                                      title,
-                                      channel,
-                                      platform,
-                                      index,
-                                    }) => {
-                                      return (
-                                        <li key={url} className="contents-item">
-                                          <a
-                                            target="blank"
-                                            href={url}
-                                          >
-                                            <div className="platform-marker-container">
-                                              <div className={`platform-marker ${platform}`}>
-                                                <span>{index}</span>
-                                              </div>
-                                            </div>
-                                            <div className="metadata-container">
-                                              <h3 className={'title'}>{title}</h3>
-                                              {/* <h4 className="channel">{channel ? `${channel} - ${platform}` : platform}</h4> */}
-                                            </div>
-                                          </a>
-                                        </li>
-                                      );
-                                    })
-                                }
-                              </ul>
-                            </div>
+                            <li key={value}>
+                              <button
+                                className={value === habitsBinDuration ? 'active' : ''}
+                                onClick={() => {
+                                  setHabitsBinDuration(value);
+                                }}
+                              >
+                                {label}
+                              </button>
+                            </li>
                           )
                         })
-                    }
-                  </div>
-                </div>
+                        }
+                      </ul>
+                    </div>
+                  </>
+                  : null
+                }
+                {
+                  activeTab === 'daily' ?
+                    <div className="contents-container">
+                      <h3>Contenus consultés</h3>
+                      <div className="contents-list-container">
+                        {
+                          Array.from(channelsMap.entries())
+                            .map(([channel, contents]) => {
+                              return (
+                                <div
+                                  key={channel}
+                                  className="channel"
+                                >
+                                  <h4 className="channel-title">{channel}</h4>
+                                  <ul className="contents-list">
+                                    {
+                                      Array.from(contents.values())
+                                        .map(({
+                                          url,
+                                          title,
+                                          channel,
+                                          platform,
+                                          index,
+                                        }) => {
+                                          return (
+                                            <li key={url} className="contents-item">
+                                              <a
+                                                target="blank"
+                                                href={url}
+                                              >
+                                                <div className="platform-marker-container">
+                                                  <div className={`platform-marker ${platform}`}>
+                                                    <span>{index}</span>
+                                                  </div>
+                                                </div>
+                                                <div className="metadata-container">
+                                                  <h3 className={'title'}>{title}</h3>
+                                                  {/* <h4 className="channel">{channel ? `${channel} - ${platform}` : platform}</h4> */}
+                                                </div>
+                                              </a>
+                                            </li>
+                                          );
+                                        })
+                                    }
+                                  </ul>
+                                </div>
+                              )
+                            })
+                        }
+                      </div>
+                    </div>
+                    : null
+                }
+
               </div>
 
             </div>
@@ -377,111 +573,94 @@ function Home() {
                     />
                     : null
                 }
+                {
+                  activeTab === 'habits' ?
+                    <Habits
+                      {
+                      ...{
+                        habitsTimespan,
+                        habitsBinDuration,
+                        data: habitsData,
+                        // displayedDayDate,
+                        // visibleEvents,
+                        // zoomLevel,
+                        // roundDay,
+                        // contentsMap, channelsMap,
+                        // spansSettings,
+                      }
+                      }
+                    />
+                    : null
+                }
               </div>
               <div className="visualization-footer">
 
                 <div className="row legend-row">
                   <h5>Légende</h5>
-                  <ul className="legend-container">
-                    {
-                      Object.entries(spansSettings)
-                        .map(([id, { legendLabel }]) => {
-                          const markerDimension = 10;
-                          return (
-                            <li key={id}>
-                              <svg width={markerDimension} height={markerDimension}>
-                                <rect
-                                  x={0}
-                                  y={0}
-                                  width={markerDimension}
-                                  height={markerDimension}
-                                  fill={`url(#diagonalHatch-for-${id})`}
-                                />
-                                {
-                                  Object.entries(spansSettings).map(([value, { color, markType }], index) => (
-                                    <pattern key={index} id={`diagonalHatch-for-${value}`} patternUnits="userSpaceOnUse" width="4" height="4">
-                                      {
-                                        markType === 'regular' || markType === 'reverse' ?
-                                          <path
-                                            d={
-                                              markType === 'regular' ?
-                                                `M-1,1 l2,-2
-                      M0,4 l4,-4
-                      M3,5 l2,-2`
-                                                : `M1,1 l2,-2
-                      M0,4 l4,-4
-                      M3,5 l2,-2`}
-                                            style={{ stroke: color, opacity: 1, strokeWidth: 1, transform: markType === 'regular' ? '' : 'scale(1)' }} />
-                                          :
-                                          <circle cx={0} cy={0} r={1} fill="transparent"
-                                            style={{ stroke: color, opacity: 1, strokeWidth: 1 }} />
-                                      }
-
-                                    </pattern>
-                                  ))
-                                }
-                              </svg>
-                              <div className={'legend-label'}>
-                                {legendLabel}
-                              </div>
-
-                            </li>
-
-                          )
-                        })
-                    }
-                  </ul>
+                  {
+                    activeTab === 'daily' ?
+                      <DailyLegend {...{ spansSettings }} />
+                      :
+                      <HabitsLegend />
+                  }
                 </div>
-                <div className="row">
-                  <div className="group">
-                    <h5>Zoom</h5>
-                  </div>
-                  <span className="group">
+                {
+                  activeTab === 'daily' ?
+                    <>
+                      <div className="row">
+                        <div className="group">
+                          <h5>Zoom</h5>
+                        </div>
+                        <span className="group">
 
-                    <button disabled={zoomLevel === MIN_ZOOM} onMouseDown={() => {
-                      let newZoomLevel = zoomLevel / 1.05;
-                      if (newZoomLevel < MIN_ZOOM) {
-                        newZoomLevel = MIN_ZOOM;
-                      }
-                      setZoomLevel(newZoomLevel)
-                    }}>-</button>
-                    <button onMouseDown={() => {
-                      setZoomLevel(zoomLevel * 1.05)
-                    }}>+</button>
-                    <button onMouseDown={() => {
-                      setZoomLevel(1)
-                    }}>par défaut</button>
-                  </span>
-                  <div
-                    className="slider-container"
-                  >
-                    <Slider
-                      step={0.5}
-                      min={0.5}
-                      max={50}
-                      onChange={(value: number) => {
-                        setZoomLevel(value)
-                      }}
-                      value={zoomLevel}
-                    />
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="stretched-buttons">
-                    <button
-                      className={`${roundDay ? '' : 'active'}`}
-                      onClick={() => setRoundDay(false)}
-                    >
-                      visualiser uniquement les créneaux de la journée actifs
-                    </button>
-                    <button
-                      className={`${roundDay ? 'active' : ''}`}
-                      onClick={() => setRoundDay(true)}
-                    >
-                      visualiser toute la journée
-                    </button>
-                  </div>
-                </div>
+                          <button disabled={zoomLevel === MIN_ZOOM} onMouseDown={() => {
+                            let newZoomLevel = zoomLevel / 1.05;
+                            if (newZoomLevel < MIN_ZOOM) {
+                              newZoomLevel = MIN_ZOOM;
+                            }
+                            setZoomLevel(newZoomLevel)
+                          }}>-</button>
+                          <button onMouseDown={() => {
+                            setZoomLevel(zoomLevel * 1.05)
+                          }}>+</button>
+                          <button onMouseDown={() => {
+                            setZoomLevel(1)
+                          }}>par défaut</button>
+                        </span>
+                        <div
+                          className="slider-container"
+                        >
+                          <Slider
+                            step={0.5}
+                            min={0.5}
+                            max={50}
+                            onChange={(value: number) => {
+                              setZoomLevel(value)
+                            }}
+                            value={zoomLevel}
+                          />
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="stretched-buttons">
+                          <button
+                            className={`${roundDay ? '' : 'active'}`}
+                            onClick={() => setRoundDay(false)}
+                          >
+                            visualiser uniquement les créneaux de la journée actifs
+                          </button>
+                          <button
+                            className={`${roundDay ? 'active' : ''}`}
+                            onClick={() => setRoundDay(true)}
+                          >
+                            visualiser toute la journée
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                    : null
+                }
+
               </div>
             </div>
 

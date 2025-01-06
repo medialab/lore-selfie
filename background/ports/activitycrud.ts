@@ -2,8 +2,8 @@ import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
 import { v4 as generateId } from 'uuid';
 import { type captureEventsList } from "~types/captureEventsTypes"
-import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
-import {buildDateKey} from "~helpers";
+import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, GET_HABITS_DATA, LIVE_USER_ACTIVITY_RECORD, PLATFORMS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
+import { buildDateKey, getDateBin } from "~helpers";
 
 
 const DAY = 24 * 3600 * 1000;
@@ -45,8 +45,8 @@ const applyExcludedTitlePatterns = (events: any[], inputPatterns: any[]) => {
   }
   const droppedURLs = new Set();
   return events.filter((event) => {
-    const {url, metadata = {}} = event;
-    const {title} = metadata;
+    const { url, metadata = {} } = event;
+    const { title } = metadata;
     let passes = true;
     if (title) {
       let patternIndex = 0;
@@ -207,7 +207,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   // console.log('req body', req.body);
   const baseActivity = await storage.get('lore-selfie-activity');
   const activity = baseActivity || [];
-  let filteredEvents;
+  let filteredEvents, units, loadedUnits;
   switch (actionType) {
     case GET_CHANNELS:
       // console.debug('filter events in get channels', payload, filterEvents(activity, payload, GET_CHANNELS))
@@ -276,13 +276,12 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       break;
 
     case GET_BINNED_ACTIVITY_OUTLINE:
-      const DAY = 24 * 3600 * 1000;
       const {
         bin = DAY, // 'day',
         ...settings
       } = payload;
-      const filteredEvents = filterEvents(activity, settings)
-      const units = filteredEvents.reduce((cur, event) => {
+      filteredEvents = filterEvents(activity, settings)
+      units = filteredEvents.reduce((cur, event) => {
         const time = new Date(event.date).getTime();
         const key = time - time % bin;
         if (cur && !cur.has(key)) {
@@ -292,7 +291,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         }
         return cur;
       }, new Map());
-      const loadedUnits = []
+      loadedUnits = []
       for ([dateTime, events] of units.entries()) {
         loadedUnits.push({
           date: dateTime,
@@ -307,6 +306,104 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         result: {
           status: 'success',
           data: loadedUnits
+        }
+      })
+      break;
+    case GET_HABITS_DATA:
+      console.log('in get habits data')
+      const {
+        bin: binsDuration, // 'day',
+        ...otherSettings
+      } = payload;
+
+      const bins = [];
+      for (let h = 0; h < 24 * 3600 * 1000; h += binsDuration) {
+        bins.push({
+          start: h,
+          end: h + binsDuration,
+          label: `${h / 3600000}h-${(h + binsDuration) / 3600000}h`
+        })
+      }
+      const output = [0, 1, 2, 3, 4, 5, 6]
+        .reduce((res1, dayId) => ({
+          ...res1,
+          [dayId]: bins.reduce((res2, bin) => {
+            const { start, end } = bin;
+            return {
+              ...res2,
+              [start]: {
+                count: 0,
+                duration: 0,
+                channels: [],
+                breakdown: {
+                  ...PLATFORMS.reduce((res3, platformId) => {
+                    return {
+                      ...res3,
+                      [platformId]: {
+                        count: 0,
+                        duration: 0,
+                      }
+                    }
+                  }, {})
+                }
+
+              }
+            }
+          }, {})
+        }), {});
+
+      filteredEvents = filterEvents(activity, otherSettings);
+
+      filteredEvents.forEach(event => {
+        const date = new Date(event.date);
+        const day = date.getDay();
+        const { platform, type } = event;
+        const thatBin = getDateBin(date, binsDuration);
+        output[day][thatBin].count += 1;
+        output[day][thatBin].breakdown[platform].count += 1;
+        if (type === LIVE_USER_ACTIVITY_RECORD) {
+          if (
+            true
+           // event.hasFocus
+          ) {
+            const thatSpan = event.timeSpan;
+            output[day][thatBin].duration += thatSpan;
+            output[day][thatBin].breakdown[platform].duration += thatSpan;
+          }
+        } else if (type === BROWSE_VIEW) {
+          let channel = event.metadata.channelName || event.metadata.channelId;
+          const channelSlug = `${channel} (${event.platform})`;
+          if (!output[day][thatBin].channels.includes(channelSlug)) {
+            output[day][thatBin].channels.push(channelSlug);
+          }
+        }
+      });
+
+      // units = filteredEvents.reduce((cur, event) => {
+      //   const time = new Date(event.date).getTime();
+      //   const key = time - time % binsDuration;
+      //   if (cur && !cur.has(key)) {
+      //     cur.set(key, [event]);
+      //   } else if (cur && cur.has(key)) {
+      //     cur.set(key, [...cur.get(key), event])
+      //   }
+      //   return cur;
+      // }, new Map());
+      // loadedUnits = []
+      // for ([dateTime, events] of units.entries()) {
+      //   loadedUnits.push({
+      //     date: dateTime,
+      //     eventsCount: events.length
+      //   })
+      // }
+      res.send({
+        responseType: ACTION_END,
+        requestId,
+        actionType,
+        payload,
+        result: {
+          status: 'success',
+          data: output
         }
       })
       break;

@@ -16,7 +16,7 @@ function Daily({
   channelsMap,
   spansSettings,
 }) {
-  const [dimensions, setDimensions] = useState({});
+  const [dimensions, setDimensions] = useState({width: 100, height: 100});
   
   const currentDaySessions = useMemo(() => {
     if (visibleEvents) {

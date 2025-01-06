@@ -42,6 +42,7 @@
     "react-textarea-autosize": "^8.5.6",
     "react-tooltip": "^5.28.0",
     "sigma": "^3.0.0",
+    "svg-partial-circle": "^1.0.0",
     "talisman": "^1.1.4",
     "usehooks-ts": "^3.1.0"
   },

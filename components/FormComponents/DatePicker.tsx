@@ -111,7 +111,6 @@ export default function DatePicker({
     for (let i = 0; i < numberOfWeeks; i++) {
       let daysOfThisWeek = [];
       if (i === 0) {
-
         // const startDateDay = firstOfMonth.getDay();
         // add days before
         let dayBefore = new Date(firstOfMonth.getTime() - DAY);
@@ -258,16 +257,17 @@ export default function DatePicker({
                 <li className="week" key={weekIndex}>
                   <ul className="days-of-week">
                     {
-                      days.map(({
+                      days
+                      .map(({
                         outOfMonth,
                         weekId,
                         dateNumber,
                         date
                       }) => {
-                        const isSelected = !tempValue ? false : range ?
-                          date >= tempValue[0] && date <= tempValue[1]
-                          : date === tempValue;
-                        const key = buildDateKey(new Date(date.getTime() + DAY));
+                        const isSelected = range ? tempValue ?
+                          date >= tempValue[0] && date <= tempValue[1] : false
+                          : date.getTime() === value?.getTime();
+                        const key = date ? buildDateKey(new Date(date.getTime() + DAY)) : '';
                         const data = daysData[key];
                         const isDisabled = disableDatalessDays && !data;
                         const count = data?.value || 0;
@@ -343,8 +343,8 @@ export default function DatePicker({
                 <span></span>
                 {
                   range ?
-                    <span>du <strong dangerouslySetInnerHTML={{ __html: prettyDate(tempValue[0], daysMap, monthsMap) }} /> au <strong dangerouslySetInnerHTML={{ __html: prettyDate(tempValue[1], daysMap, monthsMap) }} /></span>
-                    : <span dangerouslySetInnerHTML={{ __html: prettyDate(tempValue, daysMap, monthsMap) }} />
+                    <span>du <strong dangerouslySetInnerHTML={{ __html: tempValue?.length ? prettyDate(tempValue[0], daysMap, monthsMap) : null }} /> au <strong dangerouslySetInnerHTML={{ __html: tempValue?.length ? prettyDate(tempValue[1], daysMap, monthsMap) : null }} /></span>
+                    : <span dangerouslySetInnerHTML={{ __html: tempValue ? prettyDate(tempValue, daysMap, monthsMap) : null }} />
                 }
               </div>
               : null
