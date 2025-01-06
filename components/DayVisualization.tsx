@@ -18,6 +18,7 @@ function DayVisualization({
   width,
   height,
   contentsMap, channelsMap,
+  spansSettings,
 }) {
   const [nowLineY, setNowLineY] = useState();
   const datesDomain = useMemo(() => {
@@ -126,6 +127,12 @@ function DayVisualization({
                 focusSpans[focusSpans.length - 1].end = new Date(event.date);
               }
             }
+            if (isActive) {
+              isActive = false;
+              if (activeSpans.length) {
+                activeSpans[activeSpans.length - 1].end = new Date(event.date).getTime();
+              }
+            }
             break;
           case LIVE_USER_ACTIVITY_RECORD:
             if (event.isPlaying && !isPlaying) {
@@ -140,7 +147,7 @@ function DayVisualization({
             if (event.hasFocus && !isFocused) {
               isFocused = true;
               focusSpans.push({ start: new Date(event.date) })
-            } else if (!event.isPlaying && isPlaying) {
+            } else if (!event.hasFocus && isFocused && !event.pointerActivityScore) {
               isFocused = false;
               if (focusSpans.length) {
                 focusSpans[focusSpans.length - 1].end = new Date(event.date);
@@ -148,11 +155,15 @@ function DayVisualization({
             }
             if (event.pointerActivityScore && !isActive) {
               isActive = true;
-              activeSpans.push({ start: new Date(event.date) })
-            } else if (!event.pointerActivityScore && isActive) {
+              activeSpans.push({ start: new Date(event.date) });
+              if (!isFocused) {
+                isFocused = true;
+                focusSpans.push({ start: new Date(event.date) })
+              }
+            } else if ((!isFocused || !event.pointerActivityScore) && isActive) {
               isActive = false;
               if (activeSpans.length) {
-                activeSpans[activeSpans.length - 1].end = new Date(event.date);
+                activeSpans[activeSpans.length - 1].end = new Date(event.date).getTime();
               }
             }
             break;
@@ -251,7 +262,7 @@ function DayVisualization({
   const messageBarWidthScale = useMemo(() => {
     return scaleLinear()
       .domain([0, maxChatMessagesNumber])
-      .range([0, columnWidth - gutter])
+      .range([0, columnWidth / 2 - gutter])
   }, [maxChatMessagesNumber, columnWidth]);
 
   const updateNowLineY = useMemo(() => () => {
@@ -272,23 +283,7 @@ function DayVisualization({
   )
   useEffect(() => updateNowLineY(), [datesDomain, yScale])
 
-  const spansSettings = {
-    activity: {
-      color: 'red',
-      markType: 'regular',
-      tooltipFn: ({start, end}) => `Était de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
-    },
-    playing: {
-      color: 'green',
-      markType: 'reverse',
-      tooltipFn: ({start, end}) => `A joué le média de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
-    },
-    focus: {
-      color: 'blue',
-      markType: 'points',
-      tooltipFn: ({start, end}) => `Avait l'onglet visible de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
-    },
-  }
+  
   return (
     <>
       <svg className="DayVisualization" width={visualizationWidth} height={visualizationHeight}>

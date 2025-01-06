@@ -66,7 +66,7 @@ const Witness = () => {
         setIsActive(true);
       }
     })
-  }, 30 * 1000);
+  }, 10 * 1000);
 
   if (!isActive) {
     return null;

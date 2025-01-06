@@ -242,6 +242,27 @@ function Home() {
     }
   }, [visibleEvents, annotations]);
 
+  const spansSettings = {
+    activity: {
+      color: 'red',
+      markType: 'regular',
+      legendLabel: 'Le média est joué',
+      tooltipFn: ({ start, end }) => `Était actif sur l'onglet de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+    },
+    playing: {
+      color: 'green',
+      markType: 'reverse',
+      legendLabel: 'Activité de la souris',
+      tooltipFn: ({ start, end }) => `A joué le média de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+    },
+    focus: {
+      color: 'blue',
+      markType: 'points',
+      legendLabel: 'Onglet visible',
+      tooltipFn: ({ start, end }) => `Avait l'onglet visible de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+    },
+  }
+
   return (
     <div className="contents-wrapper Home">
       <Measure
@@ -350,6 +371,7 @@ function Home() {
                         zoomLevel,
                         roundDay,
                         contentsMap, channelsMap,
+                        spansSettings,
                       }
                       }
                     />
@@ -358,13 +380,62 @@ function Home() {
               </div>
               <div className="visualization-footer">
 
-                <div className="row">
-                  Légende
+                <div className="row legend-row">
+                  <h5>Légende</h5>
+                  <ul className="legend-container">
+                    {
+                      Object.entries(spansSettings)
+                        .map(([id, { legendLabel }]) => {
+                          const markerDimension = 10;
+                          return (
+                            <li key={id}>
+                              <svg width={markerDimension} height={markerDimension}>
+                                <rect
+                                  x={0}
+                                  y={0}
+                                  width={markerDimension}
+                                  height={markerDimension}
+                                  fill={`url(#diagonalHatch-for-${id})`}
+                                />
+                                {
+                                  Object.entries(spansSettings).map(([value, { color, markType }], index) => (
+                                    <pattern key={index} id={`diagonalHatch-for-${value}`} patternUnits="userSpaceOnUse" width="4" height="4">
+                                      {
+                                        markType === 'regular' || markType === 'reverse' ?
+                                          <path
+                                            d={
+                                              markType === 'regular' ?
+                                                `M-1,1 l2,-2
+                      M0,4 l4,-4
+                      M3,5 l2,-2`
+                                                : `M1,1 l2,-2
+                      M0,4 l4,-4
+                      M3,5 l2,-2`}
+                                            style={{ stroke: color, opacity: 1, strokeWidth: 1, transform: markType === 'regular' ? '' : 'scale(1)' }} />
+                                          :
+                                          <circle cx={0} cy={0} r={1} fill="transparent"
+                                            style={{ stroke: color, opacity: 1, strokeWidth: 1 }} />
+                                      }
+
+                                    </pattern>
+                                  ))
+                                }
+                              </svg>
+                              <div className={'legend-label'}>
+                                {legendLabel}
+                              </div>
+
+                            </li>
+
+                          )
+                        })
+                    }
+                  </ul>
                 </div>
                 <div className="row">
-                  <span className="group">
-                    <span>Zoom</span>
-                  </span>
+                  <div className="group">
+                    <h5>Zoom</h5>
+                  </div>
                   <span className="group">
 
                     <button disabled={zoomLevel === MIN_ZOOM} onMouseDown={() => {

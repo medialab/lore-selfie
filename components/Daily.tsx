@@ -14,6 +14,7 @@ function Daily({
   roundDay,
   contentsMap, 
   channelsMap,
+  spansSettings,
 }) {
   const [dimensions, setDimensions] = useState({});
   
@@ -50,7 +51,8 @@ function Daily({
                     roundDay,
                     width: dimensions.width,
                     height: dimensions.height,
-                    contentsMap, channelsMap
+                    contentsMap, channelsMap,
+                    spansSettings
                   }}
                 />
                 : null
