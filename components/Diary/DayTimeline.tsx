@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import { inferTickTimespan, timeOfDayToMs } from "~helpers"
 import { scaleLinear } from 'd3-scale';
 import Measure from 'react-measure';
+import { BROWSE_VIEW, LIVE_USER_ACTIVITY_RECORD, PLATFORMS_COLORS } from "~constants";
 
 const DAY = 24 * 3600 * 1000;
 
@@ -12,10 +13,18 @@ export default function DayTimeline({
   date,
   format,
   imposed,
+  channelsMap,
+  contentsMap,
+  annotationColumnsNames,
+  events,
 }) {
-  // @todo solve this non-sensical mystery
+  // @todo solve this non-sensical mystery with page dimensions
   const width = imposed ? inputWidth * 1.666 : format === 'A5' ? inputWidth * .8 : inputWidth * 1;
   const height = imposed ? inputHeight * 1.666 : format === 'A5' ? inputHeight * .8 : inputHeight * 1;
+
+  
+
+
   const tickTimespan = useMemo(() => {
     const inMs = timeOfDaySpan.map(timeOfDayToMs);
     return inferTickTimespan(Math.abs(inMs[1] - inMs[0]))
@@ -52,10 +61,87 @@ export default function DayTimeline({
   const topGutter = 50;
   const gutter = 5;
   const ticksX = 40;
-  const marginsStart = width * .4;
-  const vizSpaceX = [ticksX, marginsStart];
+  const marginsStart = width - width * annotationColumnsNames.length * .2;
+  const vizSpaceX = useMemo(() => [ticksX + gutter * 4, marginsStart], [ticksX, marginsStart, gutter]);
 
-  const marginsFields = ['moments', 'sentiments', 'projections']
+  const yScale = useMemo(() => {
+    return scaleLinear()
+      .domain([minDate, maxDate])
+      .range([topGutter, height - gutter * 7])
+  }, [minDate, maxDate, height, topGutter]);
+
+  const vizSequences = useMemo(() => {
+    const yTimeSpan = yScale.domain()[1] - yScale.domain()[0];
+    const minYDist = yTimeSpan / 20;
+    let sequences = [];
+    events.forEach(event => {
+      if (event.type === BROWSE_VIEW && contentsMap.has(event.url)) {
+        sequences.push({
+          start: new Date(event.date),
+          injectionId: event.injectionId,
+          // end: new Date(event.date),
+          liveRecords: [],
+          contentData: contentsMap.get(event.url)
+        })
+      } else if (event.type === LIVE_USER_ACTIVITY_RECORD) {
+        if (sequences.length && event.injectionId === sequences[sequences.length - 1].injectionId) {
+          // console.log('add live record')
+          sequences[sequences.length - 1].liveRecords.push(event);
+        } else if (sequences.length) {
+          // console.log(event.injectionId, sequences[sequences.length - 1].injectionId)
+        }
+      }
+    });
+    // compute time spans
+    sequences = sequences.map(sequence => {
+      const end = sequence.liveRecords.length ? new Date(sequence.liveRecords[sequence.liveRecords.length - 1].date) : sequence.start;
+      return {
+        ...sequence,
+        end,
+        dateExtent: [sequence.start, end],
+      }
+    });
+    let computed = [];
+    for (let i = 0 ; i < sequences.length ; i++) {
+      let columnIndex = 0;
+      const thatSequence = sequences[i];
+      const {dateExtent} = thatSequence;
+      // set column
+      computed.forEach(prevComputed => {
+        // console.log('prev computed', prevComputed)
+        const [prevMin, prevMax] = prevComputed.dateExtent;
+        const [min, max] = dateExtent;
+        let overlaps = false;
+        if (
+          // time conditions
+          (
+            (min < prevMax && max > prevMax) 
+            ||
+            (min - prevMin < minYDist)
+          )
+          // same column
+          && prevComputed.columnIndex === columnIndex) {
+          overlaps = true;
+        } else if (min > prevMin && max < prevMax) {
+          overlaps = true;
+        }
+        if (overlaps) {
+          columnIndex += 1;
+        }
+      });
+      computed.push({
+        ...thatSequence,
+        columnIndex,
+      })
+    }
+    return computed;
+  }, [events, contentsMap, channelsMap, yScale]);
+
+  const numberOfVizColumns = useMemo(() => Math.max(...vizSequences.map(v => v.columnIndex)) + 1, [vizSequences]);
+  const xScale = useMemo(() => scaleLinear().domain([0, numberOfVizColumns]).range(vizSpaceX), [numberOfVizColumns, vizSpaceX])
+  
+
+  const marginsFields = annotationColumnsNames; // ['moments', 'sentiments', 'projections']
   const marginsData = marginsFields
     .map((label, index) => {
       const totalWidth = width - marginsStart;
@@ -66,13 +152,7 @@ export default function DayTimeline({
         label,
         width: totalWidth / marginsFields.length
       }
-    })
-
-  const yScale = useMemo(() => {
-    return scaleLinear()
-      .domain([minDate, maxDate])
-      .range([topGutter, height - gutter * 7])
-  }, [minDate, maxDate, height, topGutter]);
+    });
 
 
   // console.log('tick timespan', tickValues.map(t => t.label))
@@ -136,7 +216,7 @@ export default function DayTimeline({
                     xmlns="http://www.w3.org/1999/xhtml"
                   >
                     <span>
-                    {label}
+                      {label}
                     </span>
                   </h4>
                 </foreignObject>
@@ -158,6 +238,61 @@ export default function DayTimeline({
                     />
                     : null
                 }
+              </g>
+            )
+          })
+        }
+      </g>
+      <g className="sequences-container">
+        {
+          vizSequences.map(({start, end, contentData, columnIndex}, i) => {
+            const {index, channel, platform, title, url} = contentData;
+            const y1 = yScale(start.getTime());
+            const y2 = yScale(end.getTime());
+            const x = xScale(columnIndex);
+            return (
+              <g 
+                className="sequence"
+                key={i}
+                transform={`translate(${x}, ${y1})`}
+              >
+                <line
+                  stroke={'lightgrey'}
+                  strokeDasharray={'5 2'}
+                  x1={0}
+                  x2={vizSpaceX[1] - x}
+                  y1={0}
+                  y2={0}
+                />
+                 <line
+                  stroke={PLATFORMS_COLORS[platform]}
+                  x1={0}
+                  x2={0}
+                  y1={0}
+                  y2={y2 - y1}
+                />
+                <line
+                  stroke={PLATFORMS_COLORS[platform]}
+                  x1={-5}
+                  x2={5}
+                  y1={y2 - y1}
+                  y2={y2 - y1}
+                />
+                <circle
+                  fill={PLATFORMS_COLORS[platform]}
+                  cx={0}
+                  cy={0}
+                  r={10}
+                />
+                <text
+                  fill="white"
+                  x={0}
+                  y={3}
+                  fontSize={10}
+                  textAnchor="middle"
+                >
+                  {index}
+                </text>
               </g>
             )
           })

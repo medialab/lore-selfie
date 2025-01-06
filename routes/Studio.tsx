@@ -27,6 +27,7 @@ interface StudioSettings {
   platforms: Array<string>
   channelsSettings: Array<Object>
   excludedTitlePatterns: Array<Object>
+  annotationColumnsNames: Array<String>
 }
 const EDITION_MODES = [
   'diary',
@@ -57,7 +58,8 @@ function Studio({
       daysOfWeek: [0, 1, 2, 3, 4],
       platforms: PLATFORMS,
       channelsSettings: {},
-      excludedTitlePatterns: []
+      excludedTitlePatterns: [],
+      annotationColumnsNames: ['moments', 'sentiments', 'projections']
     }
   }, []);
 
@@ -94,6 +96,7 @@ function Studio({
     platforms,
     channelsSettings,
     excludedTitlePatterns,
+    annotationColumnsNames,
   } = settings;
 
 
@@ -113,6 +116,7 @@ function Studio({
   const setPlatforms = value => onUpdateSettings('platforms', value);
   const setChannelsSettings = value => onUpdateSettings('channelsSettings', value);
   const setExcludedTitlePatterns = value => onUpdateSettings('excludedTitlePatterns', value);
+  const setAnnotationsColumnsNames = value => onUpdateSettings('annotationColumnsNames', value);
 
   /**
   * Sendings activity cud requests
@@ -357,6 +361,15 @@ function Studio({
                 onChange={setExcludedTitlePatterns}
               />
             </div>
+            <div className="form-group">
+              <h3>
+                Nom des colonnes d'annotation du journal
+              </h3>
+              <FilterInputsList
+                value={annotationColumnsNames}
+                onChange={setAnnotationsColumnsNames}
+              />
+            </div>
           </div>
           <div className="footer">
             <ul>
@@ -396,6 +409,7 @@ function Studio({
                   excludedTitlePatterns,
                   visibleEvents,
                   annotations,
+                  annotationColumnsNames,
                 }
                 }
               />

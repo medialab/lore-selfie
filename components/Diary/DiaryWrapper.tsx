@@ -15,6 +15,7 @@ function DiaryWrapper({
   excludedTitlePatterns,
   visibleEvents,
   annotations,
+  annotationColumnsNames,
 }) {
   const previewerRef = useRef(null);
   const [format, setFormat] = useState('A4-landscape');
@@ -96,7 +97,6 @@ function DiaryWrapper({
     return dimensions.width / contentWidth
   }, [format, dimensions]);
 
-  
   return (
     <div className="DiaryWrapper">
       <div className="header">
@@ -166,6 +166,7 @@ function DiaryWrapper({
                               format: 'A5',
                               ...day,
                               annotations,
+                              annotationColumnsNames,
                               timeOfDaySpan,
                               previewScaleRatio,
                               type,
@@ -193,6 +194,7 @@ function DiaryWrapper({
                                 format: 'A5',
                                 ...day,
                                 annotations,
+                                annotationColumnsNames,
 
                                 timeOfDaySpan,
                                 previewScaleRatio,
@@ -210,6 +212,7 @@ function DiaryWrapper({
                                 format: 'A5',
                                 ...day,
                                 annotations,
+                                annotationColumnsNames,
 
                                 timeOfDaySpan,
                                 previewScaleRatio,
@@ -238,6 +241,7 @@ function DiaryWrapper({
                                 format,
                                 ...day,
                                 annotations,
+                                annotationColumnsNames,
 
                                 timeOfDaySpan,
                                 previewScaleRatio,
@@ -254,6 +258,7 @@ function DiaryWrapper({
                                 format,
                                 ...day,
                                 annotations,
+                                annotationColumnsNames,
                                 timeOfDaySpan,
                                 previewScaleRatio,
                                 type: 'right',

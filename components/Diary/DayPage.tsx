@@ -14,6 +14,7 @@ function DayPage({
   previewScaleRatio,
   annotations = {},
   pageNumber,
+  annotationColumnsNames,
   type = 'left'
 }) {
   const {creators = {}, tags = {}, expressions = {}} = annotations;
@@ -64,7 +65,7 @@ function DayPage({
       channelsMap: channels,
       rowsCount: rCount
     }
-  }, [events, creators])
+  }, [events, creators]);
   return (
     <section className={`page DayPage ${format}  ${imposed ? 'is-imposed' : ''} ${type}`}>
       <div className="page-content">
@@ -92,12 +93,21 @@ function DayPage({
                 type === 'left' ?
                   <DayTimeline
                     {...vizSpaceDimensions}
-                    {...{date, timeOfDaySpan, format, imposed}}
+                    {...{
+                      date, 
+                      timeOfDaySpan, 
+                      format, 
+                      imposed,
+                      channelsMap, 
+                      contentsMap,
+                      events,
+                      annotationColumnsNames,
+                    }}
                   />
                   :
                   <DaySummary
                     {...vizSpaceDimensions}
-                    {...{date, timeOfDaySpan, channelsMap, rowsCount}}
+                    {...{date, timeOfDaySpan, channelsMap, rowsCount, annotationColumnsNames}}
                   
                   />
               }
