@@ -3,14 +3,12 @@ import { scaleLinear } from 'd3-scale';
 import { extent, max } from 'd3-array';
 import { Tooltip } from 'react-tooltip';
 import { useInterval } from 'usehooks-ts'
-import {inferTickTimespan} from 'helpers';
+import { inferTickTimespan } from 'helpers';
 
 import 'react-tooltip/dist/react-tooltip.css'
 
 import Session from './DailyVisualizationSession'
-
-const MIN_ZOOM = .8;
-
+import { BLUR_TAB, BROWSE_VIEW, FOCUS_TAB, LIVE_USER_ACTIVITY_RECORD } from "~constants";
 
 function DayVisualization({
   sessions = new Map(),
@@ -18,7 +16,8 @@ function DayVisualization({
   zoomLevel,
   roundDay,
   width,
-  height
+  height,
+  contentsMap, channelsMap,
 }) {
   const [nowLineY, setNowLineY] = useState();
   const datesDomain = useMemo(() => {
@@ -63,9 +62,9 @@ function DayVisualization({
   }, [date, sessions, roundDay, zoomLevel]);
   const tickTimeSpan = useMemo(() => inferTickTimespan(datesDomain[1] - datesDomain[0], zoomLevel), [datesDomain, zoomLevel]);
   const visualizationHeight = useMemo(() => {
-    return window.innerHeight * zoomLevel;
-  }, [zoomLevel, window.innerHeight]);
-  const visualizationWidth = window.innerWidth - 20;
+    return height * 2 * zoomLevel;
+  }, [zoomLevel, height]);
+  const visualizationWidth = width - 20;
   const gutter = 50;
   const yScale = useMemo(() => {
     return scaleLinear()
@@ -85,6 +84,7 @@ function DayVisualization({
     }
     return ticks;
   }, [datesDomain, yScale, tickTimeSpan]);
+
   const computedSessions = useMemo(() => {
     const computed = [];
     for (let [sessionId, events] of sessions.entries()) {
@@ -103,59 +103,74 @@ function DayVisualization({
         if (overlaps) {
           columnIndex += 1;
         }
-      })
-      // focused spans
-      const tabFocusEvents = events.filter(event => event.type === 'FOCUS_TAB' || event.type === 'BLUR_TAB');
-      let blurSpans = tabFocusEvents.reduce((current, event) => {
-        if (event.type === 'BLUR_TAB') {
-          if (!current.length || current[current.length - 1].end !== undefined) {
-            const start = new Date(event.date).getTime();
-            return [...current, { start }]
-          }
-        } else if (event.type === 'FOCUS_TAB' && current.length && current[current.length - 1].end === undefined) {
-          current[current.length - 1].end = new Date(event.date).getTime();
-          return current;
+      });
+      const playingSpans = [];
+      let isPlaying = false;
+      const focusSpans = [];
+      let isFocused = false;
+      const activeSpans = [];
+      let isActive = false;
+      events.forEach(event => {
+        switch (event.type) {
+          case FOCUS_TAB:
+          case BROWSE_VIEW:
+            if (!isFocused) {
+              isFocused = true;
+              focusSpans.push({ start: new Date(event.date) })
+            }
+            break;
+          case BLUR_TAB:
+            if (isFocused) {
+              isFocused = false;
+              if (focusSpans.length) {
+                focusSpans[focusSpans.length - 1].end = new Date(event.date);
+              }
+            }
+            break;
+          case LIVE_USER_ACTIVITY_RECORD:
+            if (event.isPlaying && !isPlaying) {
+              isPlaying = true;
+              playingSpans.push({ start: new Date(event.date) })
+            } else if (!event.isPlaying && isPlaying) {
+              isPlaying = false;
+              if (playingSpans.length) {
+                playingSpans[playingSpans.length - 1].end = new Date(event.date);
+              }
+            }
+            if (event.hasFocus && !isFocused) {
+              isFocused = true;
+              focusSpans.push({ start: new Date(event.date) })
+            } else if (!event.isPlaying && isPlaying) {
+              isFocused = false;
+              if (focusSpans.length) {
+                focusSpans[focusSpans.length - 1].end = new Date(event.date);
+              }
+            }
+            if (event.pointerActivityScore && !isActive) {
+              isActive = true;
+              activeSpans.push({ start: new Date(event.date) })
+            } else if (!event.pointerActivityScore && isActive) {
+              isActive = false;
+              if (activeSpans.length) {
+                activeSpans[activeSpans.length - 1].end = new Date(event.date);
+              }
+            }
+            break;
+          default:
+            break;
         }
-        return current;
-      }, []);
-      if (blurSpans.length && !blurSpans[blurSpans.length - 1].end) {
-        blurSpans[blurSpans.length - 1].end = dateExtent[1]
-      }
-      blurSpans = blurSpans.map(({ start, end }) => ({
-        start,
-        end,
-        startY: yScale(start),
-        endY: yScale(end),
-      }))
-      // activity spans
-      const activityEvents = events.filter(event => event.type === 'LIVE_USER_ACTIVITY_RECORD' && event.pointerActivityScore === 1);
-      const activitySpans = activityEvents.reduce((current, activityEvent) => {
-        const end = new Date(activityEvent.date).getTime();
-        const start = end - activityEvent.timeSpan;
-        // return [...current, {start, end}]
-        if (!current.length) {
-          return [{ start, end }]
-        } else if (start > current[current.length - 1].start && start <= current[current.length - 1].end) {
-          current[current.length - 1].end = end;
-          return current;
-        } else {
-          return [...current, { start, end }]
-        }
-      }, [])
-        .map(({ start, end }) => ({
-          start,
-          end,
-          startY: yScale(start),
-          endY: yScale(end),
-        }))
+      });
       // browse events
-      let browsingEvents = events.filter(event => event.type === 'BROWSE_VIEW')
+      let browsingEvents = events.filter(event => event.type === BROWSE_VIEW)
         .map(({ platform, metadata, date, url, viewType, id }) => {
           const y = yScale(new Date(date).getTime());
+          const computedContents = contentsMap.get(url);
+          // console.log('contents', thatContents);
           return {
             platform,
             id,
             metadata,
+            computedContents,
             date,
             url,
             viewType,
@@ -193,7 +208,8 @@ function DayVisualization({
             endY: yScale(end),
             messagesCount: event.messagesCount || event.messages?.length || 0,
             platform: event.platform,
-            timeSpan: event.timeSpan
+            timeSpan: event.timeSpan,
+
           }
         })
 
@@ -203,13 +219,19 @@ function DayVisualization({
         yExtent: dateExtent.map(d => yScale(d)),
         columnIndex,
         browsingEvents,
-        activitySpans,
-        blurSpans,
+        // //
+        // activitySpans,
+        // blurSpans,
+        //
+        playingSpans: playingSpans.map(d => ({ ...d, startY: yScale(d.start), endY: yScale(d.end) })),
+        focusSpans: focusSpans.map(d => ({ ...d, startY: yScale(d.start), endY: yScale(d.end) })),
+        activeSpans: activeSpans.map(d => ({ ...d, startY: yScale(d.start), endY: yScale(d.end) })),
+        //
         chatSlices,
       })
     }
     return computed;
-  }, [sessions, yScale]);
+  }, [sessions, yScale, contentsMap, channelsMap]);
   const maxChatMessagesNumber = useMemo(() => {
     return max(
       computedSessions.reduce((allCounts, session) => [...allCounts, ...session.chatSlices.map(m => m.messagesCount)], [])
@@ -229,11 +251,11 @@ function DayVisualization({
   const messageBarWidthScale = useMemo(() => {
     return scaleLinear()
       .domain([0, maxChatMessagesNumber])
-      .range([0, columnWidth / 2 - gutter])
+      .range([0, columnWidth - gutter])
   }, [maxChatMessagesNumber, columnWidth]);
 
   const updateNowLineY = useMemo(() => () => {
-    const now  = new Date().getTime();
+    const now = new Date().getTime();
     if (now > datesDomain[0] && now < datesDomain[1]) {
       const nowY = yScale(now);
       setNowLineY(nowY);
@@ -249,7 +271,24 @@ function DayVisualization({
     10000,
   )
   useEffect(() => updateNowLineY(), [datesDomain, yScale])
-  
+
+  const spansSettings = {
+    activity: {
+      color: 'red',
+      markType: 'regular',
+      tooltipFn: ({start, end}) => `Était de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+    },
+    playing: {
+      color: 'green',
+      markType: 'reverse',
+      tooltipFn: ({start, end}) => `A joué le média de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+    },
+    focus: {
+      color: 'blue',
+      markType: 'points',
+      tooltipFn: ({start, end}) => `Avait l'onglet visible de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+    },
+  }
   return (
     <>
       <svg className="DayVisualization" width={visualizationWidth} height={visualizationHeight}>
@@ -295,6 +334,7 @@ function DayVisualization({
                     width: columnWidth,
                     gutter,
                     messageBarWidthScale,
+                    spansSettings,
                   }
                   }
                 />
@@ -305,16 +345,39 @@ function DayVisualization({
 
         {
           nowLineY ?
-          <line
-            y1={nowLineY}
-            y2={nowLineY}
-            x1={gutter * 2}
-            x2={visualizationWidth}
-            stroke="red"
-          />
-          : null
+            <line
+              y1={nowLineY}
+              y2={nowLineY}
+              x1={gutter * 2}
+              x2={visualizationWidth}
+              stroke="red"
+            />
+            : null
         }
 
+        {
+          Object.entries(spansSettings).map(([value, {color, markType}], index) => (
+            <pattern key={index} id={`diagonalHatch-for-${value}`} patternUnits="userSpaceOnUse" width="4" height="4">
+              {
+                markType === 'regular' || markType === 'reverse' ?
+                <path 
+                d={
+                  markType === 'regular' ? 
+                  `M-1,1 l2,-2
+                      M0,4 l4,-4
+                      M3,5 l2,-2`
+                  : `M1,1 l2,-2
+                      M0,4 l4,-4
+                      M3,5 l2,-2`}
+                style={{ stroke: color, opacity: 1, strokeWidth: 1, transform: markType === 'regular' ? '' : 'scale(1)' }} />
+                : 
+                <circle  cx={0} cy={0} r={1} fill="transparent"
+                style={{ stroke: color, opacity: 1, strokeWidth: 1 }} />
+              }
+              
+            </pattern>
+          ))
+        }
       </svg>
       <Tooltip id="daily-vis-tooltip" />
     </>

@@ -12,6 +12,8 @@ function Daily({
   visibleEvents,
   zoomLevel,
   roundDay,
+  contentsMap, 
+  channelsMap,
 }) {
   const [dimensions, setDimensions] = useState({});
   
@@ -48,6 +50,7 @@ function Daily({
                     roundDay,
                     width: dimensions.width,
                     height: dimensions.height,
+                    contentsMap, channelsMap
                   }}
                 />
                 : null

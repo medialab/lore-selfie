@@ -8,13 +8,13 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 import '../styles/Home.scss';
-import { GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE } from "~constants";
+import { BROWSE_VIEW, GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE } from "~constants";
 import { useInterval } from "usehooks-ts";
 import DatePicker from "~components/FormComponents/DatePicker";
 import { prettyDate, buildDateKey } from "~helpers";
 
 const UPDATE_RATE = 10000;
-const MIN_ZOOM = .8;
+const MIN_ZOOM = .5;
 
 // 
 function Home() {
@@ -51,7 +51,9 @@ function Home() {
   const [roundDay, setRoundDay] = useState(false);
   const [daysData, setDaysData] = useState([]);
   const [visibleEvents, setVisibleEvents] = useState([]);
+  const [annotations, setAnnotations] = useState([]);
   const crudPort = usePort("activitycrud");
+  const annotationsPort = usePort("annotationscrud");
 
   const { tab } = useParams();
   const tabs = {
@@ -69,7 +71,7 @@ function Home() {
 
 
   /**
-   * Sendings activity cud requests
+   * Sendings cud requests
    */
   const requestFromActivityCrud = useMemo(() => (actionType: string, payload: object) => {
     const requestId = generateId();
@@ -81,56 +83,73 @@ function Home() {
       requestId
     })
   }, [pendingRequestsIds]);
+  const requestFromAnnotationsCrud = useMemo(() => async (actionType: string, payload: object) => {
+    const requestId = generateId();
+    pendingRequestsIds.add(requestId);
+    setPendingRequestsIds(pendingRequestsIds);
+    await annotationsPort.send({
+      actionType,
+      payload,
+      requestId
+    })
+  }, [pendingRequestsIds, annotationsPort]);
   /**
    * Responses
    */
-  crudPort.listen(response => {
-    // console.debug('received data : ', response);
-    if (!pendingRequestsIds.has(response.requestId)) {
-      return;
-    }
-    if (response.result.status === 'error') {
-      console.error('error : ', response);
-      return;
-    }
-    pendingRequestsIds.delete(response.requestId);
-    setPendingRequestsIds(pendingRequestsIds);
-    const { result: { data = [] } } = response;
-    const today = buildDateKey(new Date());
-    switch (response.actionType) {
-      case GET_ACTIVITY_EVENTS:
-        setVisibleEvents(data);
-        break;
-      case GET_BINNED_ACTIVITY_OUTLINE:
-        const formatted = data.reduce((cur, { date, eventsCount }) => {
-          const key = buildDateKey(date);
-          return {
-            ...cur,
-            [key]: {
-              value: eventsCount,
-              key,
-              date: new Date(date),
-            }
+  [crudPort, annotationsPort]
+    .map(thatPort =>
+      thatPort
+        .listen(response => {
+          // console.debug('received data : ', response);
+          if (!pendingRequestsIds.has(response.requestId)) {
+            return;
           }
-        }, {});
-        setDaysData(formatted);
-        if (!displayedDayDate && Object.entries(formatted).length) {
-          const latestDayKey = Object.keys(formatted).pop();
-          const latestDay = formatted[latestDayKey].date;
-          // console.log('set displayed day date to latest day', latestDay)
-          setDisplayedDayDate(latestDay);
-        }
-        break;
-      default:
-        break;
-    }
-  })
+          if (response.result.status === 'error') {
+            console.error('error : ', response);
+            return;
+          }
+          pendingRequestsIds.delete(response.requestId);
+          setPendingRequestsIds(pendingRequestsIds);
+          const { result: { data = [] } } = response;
+          // const today = buildDateKey(new Date());
+          switch (response.actionType) {
+            case GET_ACTIVITY_EVENTS:
+              setVisibleEvents(data);
+              break;
+            case GET_ANNOTATIONS:
+              setAnnotations(data);
+              break;
+            case GET_BINNED_ACTIVITY_OUTLINE:
+              const formatted = data.reduce((cur, { date, eventsCount }) => {
+                const key = buildDateKey(date);
+                return {
+                  ...cur,
+                  [key]: {
+                    value: eventsCount,
+                    key,
+                    date: new Date(date),
+                  }
+                }
+              }, {});
+              setDaysData(formatted);
+              if (!displayedDayDate && Object.entries(formatted).length) {
+                const latestDayKey = Object.keys(formatted).pop();
+                const latestDay = formatted[latestDayKey].date;
+                // console.log('set displayed day date to latest day', latestDay)
+                setDisplayedDayDate(latestDay);
+              }
+              break;
+            default:
+              break;
+          }
+        }));
 
   useEffect(() => {
     const DAY = 24 * 3600 * 1000;
     requestFromActivityCrud(GET_BINNED_ACTIVITY_OUTLINE, {
       bin: DAY
     })
+    requestFromAnnotationsCrud(GET_ANNOTATIONS, {});
   }, []);
 
   useEffect(() => {
@@ -171,6 +190,58 @@ function Home() {
     },
     UPDATE_RATE,
   );
+
+
+  const { channelsMap, contentsMap, rowsCount } = useMemo(() => {
+    const { creators = {} } = annotations || {};
+    const events = visibleEvents;
+    const validEvents = events
+      .filter(event => event.type === BROWSE_VIEW && event.url && event.metadata.title
+
+        && ['live', 'video', 'short'].includes(event.viewType)
+      );
+    const contents = new Map();
+    const channels = new Map();
+    let index = 0;
+    let rCount = 0;
+    validEvents.forEach(event => {
+      let channel = event.metadata.channelName || event.metadata.channelId;
+      const channelSlug = `${event.metadata.channelId}-${event.platform}`;
+      const creator = Object.values(creators).find(c => c.channels.includes(channelSlug));
+      channel = creator ? creator.name : channel;
+      // console.log('creators', creators, channelSlug);
+      if (!channels.has(channel)) {
+        channels.set(channel, new Map());
+        rCount++;
+      }
+      const uniqueContents = channels.get(channel);// || new Map();
+      if (!uniqueContents.has(event.url)) {
+        index++;
+        rCount++;
+        uniqueContents.set(event.url, {
+          url: event.url,
+          title: event.metadata.title,
+          channel,
+          platform: event.platform,
+          index
+        })
+        contents.set(event.url, {
+          url: event.url,
+          title: event.metadata.title,
+          channel,
+          platform: event.platform,
+          index
+        })
+      }
+      channels.set(channel, uniqueContents)
+    })
+    return {
+      contentsMap: contents,
+      channelsMap: channels,
+      rowsCount: rCount
+    }
+  }, [visibleEvents, annotations]);
+
   return (
     <div className="contents-wrapper Home">
       <Measure
@@ -215,7 +286,57 @@ function Home() {
                   range={false}
                   disableDatalessDays={true}
                 />
+                <div className="contents-container">
+                  <h3>Contenus consultés</h3>
+                  <div className="contents-list-container">
+                    {
+                      Array.from(channelsMap.entries())
+                        .map(([channel, contents]) => {
+                          return (
+                            <div
+                              key={channel}
+                              className="channel"
+                            >
+                              <h4 className="channel-title">{channel}</h4>
+                              <ul className="contents-list">
+                                {
+                                  Array.from(contents.values())
+                                    .map(({
+                                      url,
+                                      title,
+                                      channel,
+                                      platform,
+                                      index,
+                                    }) => {
+                                      return (
+                                        <li key={url} className="contents-item">
+                                          <a
+                                            target="blank"
+                                            href={url}
+                                          >
+                                            <div className="platform-marker-container">
+                                              <div className={`platform-marker ${platform}`}>
+                                                <span>{index}</span>
+                                              </div>
+                                            </div>
+                                            <div className="metadata-container">
+                                              <h3 className={'title'}>{title}</h3>
+                                              {/* <h4 className="channel">{channel ? `${channel} - ${platform}` : platform}</h4> */}
+                                            </div>
+                                          </a>
+                                        </li>
+                                      );
+                                    })
+                                }
+                              </ul>
+                            </div>
+                          )
+                        })
+                    }
+                  </div>
+                </div>
               </div>
+
             </div>
             <div className="visualization-column">
               <div className={`visualization-container ${activeTab}-container`}>
@@ -228,6 +349,7 @@ function Home() {
                         visibleEvents,
                         zoomLevel,
                         roundDay,
+                        contentsMap, channelsMap,
                       }
                       }
                     />
@@ -241,23 +363,23 @@ function Home() {
                 </div>
                 <div className="row">
                   <span className="group">
-                  <span>Zoom</span>
+                    <span>Zoom</span>
                   </span>
                   <span className="group">
 
-                  <button disabled={zoomLevel === MIN_ZOOM} onMouseDown={() => {
-                    let newZoomLevel = zoomLevel / 1.05;
-                    if (newZoomLevel < MIN_ZOOM) {
-                      newZoomLevel = MIN_ZOOM;
-                    }
-                    setZoomLevel(newZoomLevel)
-                  }}>-</button>
-                  <button onMouseDown={() => {
-                    setZoomLevel(zoomLevel * 1.05)
-                  }}>+</button>
-                  <button onMouseDown={() => {
-                    setZoomLevel(1)
-                  }}>par défaut</button>
+                    <button disabled={zoomLevel === MIN_ZOOM} onMouseDown={() => {
+                      let newZoomLevel = zoomLevel / 1.05;
+                      if (newZoomLevel < MIN_ZOOM) {
+                        newZoomLevel = MIN_ZOOM;
+                      }
+                      setZoomLevel(newZoomLevel)
+                    }}>-</button>
+                    <button onMouseDown={() => {
+                      setZoomLevel(zoomLevel * 1.05)
+                    }}>+</button>
+                    <button onMouseDown={() => {
+                      setZoomLevel(1)
+                    }}>par défaut</button>
                   </span>
                   <div
                     className="slider-container"

@@ -3,8 +3,8 @@
 const Session = ({
   dateExtent,
   browsingEvents,
-  activitySpans,
-  blurSpans,
+  // activitySpans,
+  // blurSpans,
   yExtent,
   columnIndex,
   yScale,
@@ -13,6 +13,11 @@ const Session = ({
   gutter,
   messageBarWidthScale,
   chatSlices,
+
+  playingSpans,
+  focusSpans,
+  activeSpans,
+  spansSettings,
 }) => {
   const x = xScale(columnIndex);
   const height = yExtent[1] - yExtent[0];
@@ -27,9 +32,49 @@ const Session = ({
         height={height}
         className="session-background"
       />
-      <g className="activity-spans-layer">
+      {[
+        { spanData: playingSpans, spanId: 'playing' },
+        { spanData: focusSpans, spanId: 'focus' },
+        { spanData: activeSpans, spanId: 'activity' },
+      ]
+        .map(({ spanData, spanId }, index) => {
+          return (
+            <g className={`spans-layer ${spanId}-spans-layer`}>
+              {
+                spanData.map(({
+                  startY,
+                  endY,
+                  start,
+                  end
+                }) => {
+                  return (
+                    <g
+                      key={startY}
+                      className={`${spanId}-span`}
+                      transform={`translate(${x}, ${startY})`}
+                    >
+                      <rect
+                        data-tooltip-id="daily-vis-tooltip"
+                        data-tooltip-html={spansSettings[spanId].tooltipFn({start, end})}
+                        // data-too ltip-content={`${className} de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`}
+                        x={gutter}
+                        y={0}
+                        height={Math.abs(endY - startY)}
+                        width={(width) - gutter - index * (width / 4)}
+                        stroke={'white'}
+                        strokeWidth={.5}
+                        fill={`url(#diagonalHatch-for-${spanId})`}
+                      />
+                    </g>
+                  )
+                })
+              }
+            </g>
+          )
+        })}
+      {/* <g className="activity-spans-layer">
         {
-          activitySpans.map(({
+          activeSpans.map(({
             startY,
             endY,
             start,
@@ -94,7 +139,7 @@ const Session = ({
             )
           })
         }
-      </g>
+      </g> */}
       <g className="chat-slices-layer">
         {
           chatSlices.map(({
@@ -114,7 +159,7 @@ const Session = ({
               <g
                 key={startY}
                 className={`chat-slice  ${platform}`}
-                transform={`translate(${x + width / 2}, ${startY})`}
+                transform={`translate(${x}, ${startY})`}
               >
                 <rect
                   data-tooltip-id="daily-vis-tooltip"
@@ -141,39 +186,53 @@ const Session = ({
             url,
             viewType,
             endY,
+            computedContents,
             y
           }) => {
-            const label = `${metadata.title} (${viewType} ${platform})`;
-            const tooltipHTML = `<ul class="event-tooltip-content">
-            ${
-              Object.entries(metadata).map(([key, value]) => `
-              <li>
-                <em>${key}</em><code>${JSON.stringify(value)}</code>
-              </li>
-              `).join('\n')
-            }
-            </ul>`
+            // const label = `${metadata.title} (${viewType} ${platform})`;
+            // const tooltipHTML = `<ul class="event-tooltip-content">
+            // ${Object.entries(metadata).map(([key, value]) => `
+            //   <li>
+            //     <em>${key}</em><code>${JSON.stringify(value)}</code>
+            //   </li>
+            //   `).join('\n')
+            //   }
+            // </ul>`;
+            const tooltipHTML = computedContents ? `
+            <h2>${computedContents.title}</h2>
+            <h3>${computedContents.channel} ${computedContents.platform}</h3>
+            ` : undefined;
             return (
               <g
                 key={id}
                 className={`browsing-event ${platform}`}
                 transform={`translate(${x + gutter}, ${y})`}
+                data-tooltip-id={'daily-vis-tooltip'}
+                    data-tooltip-html={tooltipHTML}
               >
                 <line
-                  x1={width / 2}
-                  x2={width / 2}
+                  x1={0}
+                  x2={0}
                   y1={0}
                   y2={endY - y}
                   className={`browsing-event-duration-line`}
                 />
                 <circle
-                  cx={width / 2}
+                  cx={0}
                   cy={0}
-                  r={5}
+                  r={computedContents ? 10 : 5}
                   className={`browsing-event-circle`}
                 />
+                {
+                  computedContents ?
+                    <text fill="white" fontSize={5} x={0} y={4} textAnchor="middle">
+                      {computedContents.index}
 
-                <foreignObject
+                    </text>
+                    : null
+                }
+
+                {/* <foreignObject
                   x={0}
                   y={-5}
                   width={(width - gutter) / 2}
@@ -188,7 +247,7 @@ const Session = ({
                   >
                     {label}
                   </div>
-                </foreignObject>
+                </foreignObject> */}
 
 
 

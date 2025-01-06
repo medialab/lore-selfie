@@ -6,16 +6,39 @@
     .session-background {
       fill: rgba(0, 0, 0, 0.05);
     }
-    .activity-span {
+    .spans-layer {
       rect {
-        fill: rgba(255, 0, 0, 0.3);
+        opacity: .5;
       }
     }
-    .blur-span {
-      rect {
-        fill: rgba(255, 255, 255, 0.3);
-      }
+    // .activity-span {
+    //   rect {
+    //     fill: red;
+    //   }
+    // }
+    // .playing-span {
+    //   rect {
+    //     fill: green;
+    //   }
+    // }
+    // .focus-span {
+    //   rect {
+    //     fill: blue;
+    //   }
+    // }
+    
+   
     }
+    // .activity-span {
+    //   rect {
+    //     fill: rgba(255, 0, 0, 0.3);
+    //   }
+    // }
+    // .blur-span {
+    //   rect {
+    //     fill: rgba(255, 255, 255, 0.3);
+    //   }
+    // }
     .chat-slice {
       &.twitch {
         rect {
@@ -76,5 +99,4 @@
       max-width: 30rem;
     }
   }
-}
 }

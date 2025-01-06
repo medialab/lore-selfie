@@ -44,6 +44,10 @@
       width: constants.$max-content-width;
       max-width: constants.$max-content-width;
       align-items: end;
+      box-sizing: border-box;
+    @media (max-width: constants.$max-content-width) {
+      padding: constants.$gutter;
+    }
     }
     h1 {
       margin: 0;
@@ -77,10 +81,10 @@
         a.active {
           text-decoration: none;
         }
-        a.active {
+        a.active,a.is-active {
           @include fonts.kanit-semibold;
         }
-        a:not(.active):hover {
+        a:not(.active):not(.is-active):hover {
           @include fonts.kanit-regular;
         }
       }
@@ -114,5 +118,9 @@
   .contents.width-limited-contents {
     max-width: constants.$max-content-width;
     width: constants.$max-content-width;
+    box-sizing: border-box;
+    @media (max-width: constants.$max-content-width) {
+      padding: constants.$gutter;
+    }
   }
 }

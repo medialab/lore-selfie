@@ -19,6 +19,7 @@ function DayPage({
 }) {
   const {creators = {}, tags = {}, expressions = {}} = annotations;
   const [vizSpaceDimensions, setVizSpaceDimensions] = useState({ width: 100, height: 100 });
+  // @todo factorize that with home view
   const {channelsMap, contentsMap, rowsCount} = useMemo(() => {
     const validEvents = events
       .filter(event => event.type === BROWSE_VIEW && event.url && event.metadata.title
