@@ -70,9 +70,11 @@ const applyExcludedTitlePatterns = (events: any[], inputPatterns: any[]) => {
 const applyChannelSettings = (events, channelsSettings) => {
   const transformedEvents = [];
   let anonIndex = 1;
+  let anonURLSIndex = 0;
   const anonMap = new Map();
   const hiddenInjections = new Set();
   const hiddenURLs = new Set();
+  const anonURLSMap = new Map();
   const anonURLs = new Set();
   let passing = true;
   for (let i = 0; i < events.length; i++) {
@@ -101,7 +103,9 @@ const applyChannelSettings = (events, channelsSettings) => {
         }
         if (channelsSettings[id].status === 'anon') {
           if (!anonURLs.has(event.url)) {
-            anonURLs.add(event.url)
+            anonURLs.add(event.url);
+            anonURLSIndex++;
+            anonURLSMap.set(event.url, `anon-url-${anonURLSIndex}`)
           }
           if (!anonMap.has(id)) {
             anonMap.set(id, {
@@ -145,7 +149,8 @@ const applyChannelSettings = (events, channelsSettings) => {
       passing = false;
     }
     if (anonURLs.has(event.url)) {
-      outputEvent.url = "anonymised";
+      // outputEvent.url = "anonymised";
+      outputEvent.url = anonURLSMap.get(event.url);
     }
     if (passing) {
       transformedEvents.push(outputEvent);
