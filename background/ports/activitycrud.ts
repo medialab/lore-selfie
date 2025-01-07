@@ -310,7 +310,6 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       })
       break;
     case GET_HABITS_DATA:
-      console.log('in get habits data')
       const {
         bin: binsDuration, // 'day',
         ...otherSettings

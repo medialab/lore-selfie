@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom";
+import { useMemo } from "react";
 function Header() {
+  const actualHref = useMemo(() => window.location.href, [window.location.href]);
   return (
     <header>
       <div className="header-contents">
@@ -16,7 +18,7 @@ function Header() {
           <li>
             {/* @todo clean following className hack */}
             <NavLink 
-              // className={['daily', 'habits'].find(t => window.location.href.includes(t)) ? 'is-active' : ''} 
+              // className={['daily', 'habits'].find(t => actualHref.includes(t)) ? 'is-active' : ''} 
               to="/">explorer</NavLink>
           </li>
           <li>

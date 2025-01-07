@@ -1,5 +1,5 @@
 import Daily from "~components/Daily";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import Measure from 'react-measure';
 import { useMemo, useState, useEffect } from "react";
 import { usePort } from "@plasmohq/messaging/hook";
@@ -148,7 +148,8 @@ function Home() {
   const crudPort = usePort("activitycrud");
   const annotationsPort = usePort("annotationscrud");
 
-  const { tab } = useParams();
+  // const { tab } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const tabs = {
     daily: {
       label: 'Au jour le jour'
@@ -160,7 +161,7 @@ function Home() {
     //   label: 'Mon historique'
     // }
   };
-  const activeTab = useMemo(() => tab in tabs ? tab : Object.keys(tabs)[0], [tab]);
+  const activeTab = useMemo(() => searchParams.has('tab') ? searchParams.get('tab') : Object.keys(tabs)[0], [searchParams.get('tab')]);
 
 
   /**
@@ -302,6 +303,7 @@ function Home() {
   useInterval(
     () => {
       if (isVisualizingToday) {
+        // console.log('request live update', new Date())
         let from = new Date(displayedDayDate)
         const fromTime = from.getTime();
         const toTime = fromTime + 24 * 3600 * 1000;
@@ -323,7 +325,7 @@ function Home() {
 
   useInterval(() => {
     if (habitsTimespan) {
-      // console.log('request habits data', habitsTimespan)
+      // console.log('request habits data', habitsTimespan, new Date())
       requestFromActivityCrud(GET_HABITS_DATA, {
         bin: habitsBinDuration,
         from: habitsTimespan[0].getTime(),
@@ -424,9 +426,15 @@ function Home() {
                       return (
                         <li className={`tab ${activeTab === id ? 'active' : ''}`} key={id}>
                           <h2>
-                            <Link to={`/${id}`}>
+                            <a onClick={() => {
+                              searchParams.set("tab", id);
+                              setSearchParams(searchParams);
+                            }}>
                               {label}
-                            </Link>
+                            </a>
+                            {/* <Link to={`/${id}`}>
+                              {label}
+                            </Link> */}
                           </h2>
                         </li>
                       )
