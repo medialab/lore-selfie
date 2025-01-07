@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>lore selfie - extension expérimentale</title>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>
+          <span> lore selfie </span>
+          <span class="alpha-mark">alpha</span>
+          <span class="baseline">extension expérimentale</span>
+        </h1>
+      </div>
+    </header>
+
+    <main>
+      <div>
+        <section>
+          <h2>Présentation</h2>
+          <p>
+            Qu'apprendriez-vous sur vous-même si vous pouviez explorer l'auto-portrait que font les traces laissées par votre activité en ligne sur les plateformes de vidéo connectée ?
+          </p>
+          <p>
+            Lore selfie est une extension de navigateur expérimentale développée dans un contexte de recherche au <a href="https://medialab.sciencespo.fr/" target="blank">médialab de Sciences Po</a> pour explorer les formes contemporaines de culture associée à la fréquentation des contenus vidéos en ligne sur les réseaux sociaux.
+          </p>
+          <p>
+            L'application vous permet d'enregistrer votre activité sur des plateformes telles que youtube et twitch puis de l'explorer sous la forme de visualisations et de petits documents à imprimer et annoter.
+          </p>
+          <p>
+            Elle est associée à un projet de recherche plus général, intitulé <i>Politiques du lore</i>, mais peut également être utilisée de manière complètement autonome.
+          </p>
+          <p>
+            <strong>Aucune donnée collectée par l'extension lore selfie ne quitte votre ordinateur</strong>. Ces données sont directement stockées sur votre disque dur et restent avant tout des données destinées à votre usage personnel.
+          </p>
+          <p>
+            L'outil permet tout de même également d'exporter les données sous une forme plus ou moins filtrée et annotée (aux formats csv et json) afin de les partager ou de les réutiliser avec d'autres outils d'analyse ou de visualisation.
+          </p>
+        </section>
+        <section>
+          <h2>Installation</h2>
+          <p>
+            Lore selfie étant une application expérimentale encore en développement, elle n'est pas encore accessible sur les stores officiels des navigateurs.
+          </p>
+          <p>
+            La procédure pour l'installer est donc un peu plus fastidieuse que d'habitude, mais accrochez-vous ! ça en vaut la peine, promis.
+          </p>
+          <div>
+            <h3>Sur chrome, brave ou edge</h3>
+            
+            <p>
+              Rendez-vous
+              <a
+                href="https://itero.plasmo.com/ext/ocpebaoomdhdodepljbjjoblnnagglem"
+                target="blank"
+                rel="no-opener"
+                >sur cette page</a
+              >
+              puis suivez les instructions.
+            </p>
+          </div>
+          <div>
+            <h3>Firefox</h3>
+            <ul>
+              <li>
+                Rendez-vous sur la
+                <a
+                  href="https://github.com/medialab/lore-selfie/releases"
+                  target="blank"
+                  >page <code>releases</code> du code source de l'extension</a
+                >
+              </li>
+              <li>
+                Ouvrez la version la plus récente puis cliquez sur firefox.zip
+                pour télécharger un dossier contenant les fichiers du plugin
+              </li>
+              <li>Décompressez l'archive pour obtenir un dossier contenant les fichiers du plugin</li>
+              <li>Ouvrez votre navigateur firefox</li>
+              <li>
+                Dans la barre d'adresse du navigateur tapez
+                <code>about:addons</code> puis entrée (ou accédez à la page des addons via les paramètres de l'application)
+              </li>
+              <li>
+                Sur la page des addons cliquez sur l'icône d'engrenage en haut à droite puis sur
+                <strong>Déboguer des modules</strong>
+              </li>
+              <li>
+                Cliquez sur
+                <strong>Charger un module complémentaire temporaire...</strong>
+              </li>
+              <li>
+                Rendez-vous dans le dossier contenant les fichiers du plugin et cherchez le fichier <code>Manifest.json</code> puis double-cliquez dessus.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer>
+      <div>
+        <div>
+          <a
+            target="blank"
+            rel="no-opener"
+            href="https://medialab.sciences-po.fr"
+            >médialab de Sciences Po</a
+          >
+        </div>
+        <div>
+          <a
+            target="blank"
+            rel="no-opener"
+            href="https://github.com/medialab/lore-selfie"
+            >Code source de l'extension</a
+          >
+        </div>
+      </div>
+    </footer>
+  </body>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Hammersmith+One&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+    body {
+      font-family: "ABeeZee", serif;
+      font-weight: 400;
+      font-style: normal;
+      padding: 0;
+      margin: 0;
+      /* position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh; */
+    }
+    header {
+      background: #9147ff;
+      color: white;
+    }
+    .alpha-mark {
+      opacity: 0.5;
+      font-family: "Kanit", serif;
+      font-weight: 400;
+    }
+    .baseline {
+      font-weight: 200;
+      font-size: 0.8em;
+    }
+    main {
+      min-height: calc(100vh - 10rem);
+    }
+    main,
+    header,
+    footer {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+    }
+    main > div,
+    header > div,
+    footer > div {
+      max-width: 1000px;
+      width: 1000px;
+    }
+    @media (max-width: 1000px) {
+      main > div,
+      header > div,
+      footer > div {
+        max-width: 100%;
+        width: 100%;
+        padding: 1rem;
+      }
+    }
+
+    footer {
+      background: rgba(0,0,0,0.1);
+      margin-top: 5rem;
+    }
+    footer > div {
+      padding: 1rem 0 3rem 0;
+    }
+    h1 {
+      font-family: "Kanit", serif;
+      font-weight: 500;
+      font-style: normal;
+    }
+    h2 {
+      font-family: "Kanit", serif;
+      font-weight: 500;
+      font-style: normal;
+    }
+    code {
+      font-size: 1.1em;
+    }
+    a {
+      color: #9147ff;
+
+    }
+  </style>
+</html>
