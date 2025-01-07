@@ -206,6 +206,8 @@ const Session = ({
             <h2>${computedContents.title}</h2>
             <h3>${computedContents.channel} ${computedContents.platform}</h3>
             ` : undefined;
+
+            const fontSize = computedContents ? 8 / ('' + computedContents.index).length * 1.5 : 5;
             return (
               <g
                 key={id}
@@ -229,7 +231,7 @@ const Session = ({
                 />
                 {
                   computedContents ?
-                    <text fill="white" fontSize={5} x={0} y={4} textAnchor="middle">
+                    <text fill="white" style={{fontSize}} x={0} y={fontSize * .3} textAnchor="middle">
                       {computedContents.index}
 
                     </text>
