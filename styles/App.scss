@@ -126,6 +126,28 @@
   }
 
   .Settings {
+    .settings-group:last-of-type {
+      padding-bottom: 5rem;
+    }
+    .Handle {
+      .input-group {
+        // display: flex;
+        // flex-flow: row nowrap;
+        h5 {
+          margin: 0;
+          // max-width: 30%;
+          // min-width: 30%;
+        }
+        .input-container {
+          flex: 1;
+          // padding-left: constants.$gutter;
+          input, select {
+            width: 100%;
+          }
+        }
+      }
+      
+    }
     button {
       padding: constants.$gutter;
     }
@@ -135,7 +157,7 @@
         padding: constants.$gutter;
       }
     }
-    ul {
+    .settings-subgroup ul {
       list-style: none;
       padding: 0;
       margin: 0;

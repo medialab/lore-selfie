@@ -23,23 +23,29 @@ function HandleEditor({
     id,
     alias
   } = handle;
+
   return (
     <li className="Handle card">
       <form className="card-content" onSubmit={(e) => {
         e.preventDefault();
-        onChange(handle)
+        onChange(handle);
       }}>
         <div className="card-body fields">
           <div className="input-group">
-            <label>Identifiant sur la plateforme (utilisé pour repérer vos commentaires et messages de chat)</label>
-            <input placeholder="identifiant" type="text" id="id" value={handle.id} onChange={e => setHandle({ ...handle, id: e.target.value })} />
+            <h5>Identifiant sur la plateforme (utilisé pour repérer vos commentaires et messages de chat)</h5>
+            <div className="input-container">
+            <input placeholder="identifiant" type="text" id="id" value={id} onChange={e => setHandle({ ...handle, id: e.target.value })} />
+            </div>
           </div>
           <div className="input-group">
-            <label>Alias pour les visualisations du plugin (optionnel)</label>
-            <input placeholder="alias" type="text" id="alias" value={handle.alias} onChange={e => setHandle({ ...handle, alias: e.target.value })} />
+            <h5>Alias pour les visualisations du plugin (optionnel)</h5>
+            <div className="input-container">
+            <input placeholder="alias" type="text" id="alias" value={alias} onChange={e => setHandle({ ...handle, alias: e.target.value })} />
+            </div>
           </div>
           <div className="input-group">
-            <label>Plateforme</label>
+            <h5>Plateforme</h5>
+            <div className="input-container">
             <select value={platform} onChange={p => setHandle({ ...handle, platform: p.target.value })}>
 
               {
@@ -50,9 +56,13 @@ function HandleEditor({
                 })
               }
             </select>
+            </div>
           </div>
         </div>
         <div className="card-actions">
+        <button className="important-button" disabled={JSON.stringify(inputHandle) === JSON.stringify(handle)} role="submit">
+            Valider
+          </button>
           <button onClick={e => {
             e.stopPropagation();
             e.preventDefault();
@@ -60,9 +70,7 @@ function HandleEditor({
           }}>
             Supprimer
           </button>
-          <button disabled={JSON.stringify(inputHandle) === JSON.stringify(handle)} role="submit">
-            Valider
-          </button>
+          
         </div>
 
 
@@ -98,7 +106,6 @@ function HandlesManager({
             onChange(newHandles);
           }
           const handleDelete = () => {
-            console.log('handle delete');
             const newHandles = handles.filter(h => {
               return h.internalId !== handle.internalId;
             });
@@ -110,7 +117,7 @@ function HandlesManager({
         })
       }
       <li>
-        <button onClick={handleCreate}>
+        <button className="important-button" onClick={handleCreate}>
           Ajouter
         </button>
       </li>
@@ -157,7 +164,7 @@ function Settings() {
       console.error(data);
     }
   })
-  console.log('settings', settings);
+  // console.log('settings', settings);
   return (
     <div className="contents-wrapper Settings scrollable">
       <div className="contents width-limited-contents">
@@ -208,8 +215,14 @@ function Settings() {
                           }
                           return (
                             <li style={{opacity: disabled ? .5 : 1, pointerEvents: disabled ? 'none' : 'all'}} onClick={handleClick} key={key}>
-                              <input type="radio" checked={!!settings[key] && !disabled} readOnly />
-                              <label>{label}</label>
+                              <button 
+                                className={`${key === 'recordActivity' ? 'important-button' : ''} ${!!settings[key] && !disabled ? 'active' : ''}`}
+                                disabled={key !== 'recordActivity' && !settings.recordActivity}
+                              >
+                                {label}
+                              </button>
+                              {/* <input type="radio" checked={!!settings[key] && !disabled} readOnly /> */}
+                              {/* <label>{label}</label> */}
                             </li>
                           )
                         })
@@ -233,8 +246,14 @@ function Settings() {
                         }
                         return (
                           <li style={{opacity: !settings.recordActivity ? .5 : 1, pointerEvents: !settings.recordActivity ? 'none' : 'all'}} onClick={handleChange} key={platform}>
-                            <input type="radio" checked={isIncluded && settings.recordActivity} readOnly />
-                            <label>{platform}</label>
+                            <button
+                              className={isIncluded && settings.recordActivity ? 'active' : ''}
+                              disabled={!settings.recordActivity}
+                            >
+                              {platform}
+                            </button>
+                            {/* <input type="radio" checked={isIncluded && settings.recordActivity} readOnly />
+                            <label>{platform}</label> */}
                           </li>
                         )
                       })
