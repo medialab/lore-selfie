@@ -259,7 +259,7 @@ function Settings() {
                 </h2>
                 <ul>
                   <li>Taille des données stockées par l'extension sur le disque dur : {sizeInMb === undefined ? 'chargement ...' : formatNumber(sizeInMb.toFixed(1)) + ' Mo'}</li>
-                  <li>
+                  {/* <li>
                     <button
                       onClick={() => {
                         chrome.tabs.create({
@@ -268,7 +268,7 @@ function Settings() {
                       }}>
                       Ouvrir le dashboard de développement
                     </button>
-                  </li>
+                  </li> */}
                 </ul>
               </div>
             </div>

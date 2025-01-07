@@ -228,6 +228,7 @@ function Home() {
               if (!displayedDayDate && Object.entries(formatted).length) {
                 const latestDayKey = Object.keys(formatted).pop();
                 const latestDay = formatted[latestDayKey].date;
+                latestDay.setHours(0);
                 // console.log('set displayed day date to latest day', latestDay)
                 setDisplayedDayDate(latestDay);
               }
@@ -290,7 +291,12 @@ function Home() {
 
   const isVisualizingToday = useMemo(() => {
     const today = buildDateKey(new Date());
-    return displayedDayDate && today === buildDateKey(displayedDayDate)
+    if (displayedDayDate) {
+      const temp = new Date(displayedDayDate);
+      temp.setHours(1);
+      return temp && today === buildDateKey(temp)
+    }
+    
   }, [displayedDayDate])
 
   useInterval(
@@ -383,21 +389,22 @@ function Home() {
       color: 'red',
       markType: 'regular',
       legendLabel: 'Le média est joué',
-      tooltipFn: ({ start, end }) => `Était actif sur l'onglet de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+      tooltipFn: ({ start, end }) => `j'étais active/actif sur l'onglet de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
     },
     playing: {
       color: 'green',
       markType: 'reverse',
       legendLabel: 'Activité de la souris',
-      tooltipFn: ({ start, end }) => `A joué le média de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+      tooltipFn: ({ start, end }) => `j'ai joué le média de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
     },
     focus: {
       color: 'blue',
       markType: 'points',
       legendLabel: 'Onglet visible',
-      tooltipFn: ({ start, end }) => `Avait l'onglet visible de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+      tooltipFn: ({ start, end }) => `j'avais l'onglet visible de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
     },
   }
+
 
   return (
     <div className="contents-wrapper Home">
@@ -443,7 +450,9 @@ function Home() {
                   value={activeTab === 'daily' ? displayedDayDate : habitsTimespan || [new Date(), new Date()]}
                   onChange={(val) => {
                     if (activeTab === 'daily') {
-                      const key = buildDateKey(val);
+                      const temp = new Date(val);
+                      temp.setHours(1);
+                      const key = buildDateKey(temp);
                       if (daysData[key]) {
                         setDisplayedDayDate(val);
                       }

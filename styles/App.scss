@@ -45,9 +45,9 @@
       max-width: constants.$max-content-width;
       align-items: end;
       box-sizing: border-box;
-    @media (max-width: constants.$max-content-width) {
-      padding: constants.$gutter;
-    }
+      @media (max-width: constants.$max-content-width) {
+        padding: constants.$gutter;
+      }
     }
     h1 {
       margin: 0;
@@ -75,13 +75,14 @@
         font-size: 1.8rem;
         &.secondary {
           font-size: 1rem;
-          margin-bottom: .4rem;
+          margin-bottom: 0.4rem;
         }
         a,
         a.active {
           text-decoration: none;
         }
-        a.active,a.is-active {
+        a.active,
+        a.is-active {
           @include fonts.kanit-semibold;
         }
         a:not(.active):not(.is-active):hover {
@@ -121,6 +122,30 @@
     box-sizing: border-box;
     @media (max-width: constants.$max-content-width) {
       padding: constants.$gutter;
+    }
+  }
+
+  .Settings {
+    button {
+      padding: constants.$gutter;
+    }
+    .InputToValidate {
+      padding-left: 0;
+      .value-placeholder {
+        padding: constants.$gutter;
+      }
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-flow: row nowrap;
+      li {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+      }
     }
   }
 }

@@ -16,6 +16,7 @@ function DiaryWrapper({
   visibleEvents,
   annotations,
   annotationColumnsNames,
+  editionTitle,
 }) {
   const previewerRef = useRef(null);
   const [format, setFormat] = useState('A4-landscape');
@@ -152,7 +153,7 @@ function DiaryWrapper({
                     renderPage={(index) => {
                       // console.log('render page', index, Object.entries(dataByDay).length);
                       if (index === 0) {
-                        return <Cover days={dataByDay} format={'A5'} imposed={true} />
+                        return <Cover editionTitle={editionTitle} days={dataByDay} format={'A5'} imposed={true} />
                       } else if (index >= (Object.entries(dataByDay).length + 1) * 2 - 1) {
                         return <div className="page A5 blank is-imposed" />
                       } else {
@@ -171,6 +172,7 @@ function DiaryWrapper({
                               ...day,
                               annotations,
                               annotationColumnsNames,
+                              editionTitle,
                               timeOfDaySpan,
                               previewScaleRatio,
                               type,
@@ -186,7 +188,7 @@ function DiaryWrapper({
                   :
                   format === 'A4-landscape' ?
                   <>
-                  <Cover days={dataByDay} format={'A4-landscape'} imposed={false} />
+                  <Cover editionTitle={editionTitle} days={dataByDay} format={'A4-landscape'} imposed={false} />
                     {
                       Object.entries(dataByDay).map(([id, day]: [string, object], index) => {
                         return (
@@ -199,6 +201,7 @@ function DiaryWrapper({
                                 ...day,
                                 annotations,
                                 annotationColumnsNames,
+                                editionTitle,
 
                                 timeOfDaySpan,
                                 previewScaleRatio,
@@ -217,6 +220,7 @@ function DiaryWrapper({
                                 ...day,
                                 annotations,
                                 annotationColumnsNames,
+                                editionTitle,
 
                                 timeOfDaySpan,
                                 previewScaleRatio,
@@ -233,7 +237,7 @@ function DiaryWrapper({
                     </>
                   :
                   <>
-                    <Cover days={dataByDay} format={format} imposed={false} />
+                    <Cover editionTitle={editionTitle} days={dataByDay} format={format} imposed={false} />
                     {
                       Object.entries(dataByDay).map(([id, day]: [string, object], index) => {
                         return (
@@ -246,6 +250,7 @@ function DiaryWrapper({
                                 ...day,
                                 annotations,
                                 annotationColumnsNames,
+                                editionTitle,
 
                                 timeOfDaySpan,
                                 previewScaleRatio,
@@ -263,6 +268,7 @@ function DiaryWrapper({
                                 ...day,
                                 annotations,
                                 annotationColumnsNames,
+                                editionTitle,
                                 timeOfDaySpan,
                                 previewScaleRatio,
                                 type: 'right',

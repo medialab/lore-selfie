@@ -74,7 +74,7 @@ export default function DatePicker({
         setTempValue([]);
       }
     } else {
-      if (value?.isValid && value.isValid()) {
+      if (value?.getTime && value.getTime()) {
         setTempValue(value);
         currentMonthDate = value;
       } else {

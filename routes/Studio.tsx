@@ -17,6 +17,7 @@ import { GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_
 
 import '../styles/Studio.scss';
 import { buildDateKey, downloadTextfile, JSONArrayToCSVStr } from "~helpers";
+import InputToValidate from "~components/FormComponents/InputToValidate";
 
 
 interface StudioSettings {
@@ -28,6 +29,7 @@ interface StudioSettings {
   channelsSettings: Array<Object>
   excludedTitlePatterns: Array<Object>
   annotationColumnsNames: Array<String>
+  editionTitle: string
 }
 const EDITION_MODES = [
   'diary',
@@ -59,7 +61,8 @@ function Studio({
       platforms: PLATFORMS,
       channelsSettings: {},
       excludedTitlePatterns: [],
-      annotationColumnsNames: ['moments', 'sentiments', 'projections']
+      annotationColumnsNames: ['moments', 'sentiments', 'projections'],
+      editionTitle: 'lore selfie'
     }
   }, []);
 
@@ -97,6 +100,7 @@ function Studio({
     channelsSettings,
     excludedTitlePatterns,
     annotationColumnsNames,
+    editionTitle = 'lore selfie'
   } = settings;
 
 
@@ -117,6 +121,7 @@ function Studio({
   const setChannelsSettings = value => onUpdateSettings('channelsSettings', value);
   const setExcludedTitlePatterns = value => onUpdateSettings('excludedTitlePatterns', value);
   const setAnnotationsColumnsNames = value => onUpdateSettings('annotationColumnsNames', value);
+  const setEditionTitle = value => onUpdateSettings('editionTitle', value);
 
   /**
   * Sendings activity cud requests
@@ -375,6 +380,16 @@ function Studio({
                 }}
               />
             </div>
+            <div className="form-group">
+              <h3>
+                Titre de l'édition
+              </h3>
+              <InputToValidate
+                value={settings.editionTitle}
+                onChange={setEditionTitle}
+                placeholderFn={() => settings.editionTitle}
+              />
+            </div>
           </div>
           <div className="footer">
             <ul>
@@ -415,6 +430,7 @@ function Studio({
                   visibleEvents,
                   annotations,
                   annotationColumnsNames,
+                  editionTitle,
                 }
                 }
               />

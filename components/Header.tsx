@@ -15,7 +15,9 @@ function Header() {
         <ul>
           <li>
             {/* @todo clean following className hack */}
-            <NavLink className={['daily', 'habits'].find(t => window.location.href.includes(t)) ? 'is-active' : ''} to="/">explorer</NavLink>
+            <NavLink 
+              // className={['daily', 'habits'].find(t => window.location.href.includes(t)) ? 'is-active' : ''} 
+              to="/">explorer</NavLink>
           </li>
           <li>
             <NavLink to="/annotations">organiser</NavLink>

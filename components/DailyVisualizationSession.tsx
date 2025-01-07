@@ -20,7 +20,8 @@ const Session = ({
   spansSettings,
 }) => {
   const x = xScale(columnIndex);
-  const height = yExtent[1] - yExtent[0];
+  let height = yExtent[1] - yExtent[0];
+  height = height > 0 ? height : 0;
   return (
     <g
       className={`DailyVisualizationSession`}
@@ -39,7 +40,7 @@ const Session = ({
       ]
         .map(({ spanData, spanId }, index) => {
           return (
-            <g className={`spans-layer ${spanId}-spans-layer`}>
+            <g key={index} className={`spans-layer ${spanId}-spans-layer`}>
               {
                 spanData.map(({
                   startY,
@@ -47,6 +48,9 @@ const Session = ({
                   start,
                   end
                 }) => {
+                  if (isNaN(Math.abs(endY - startY))) {
+                    return null;
+                  }
                   return (
                     <g
                       key={startY}
