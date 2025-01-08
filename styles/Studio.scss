@@ -30,6 +30,12 @@
     margin-left: 0;
     padding-left: 0;
   }
+  .FilterInputsList {
+    .InputToValidate {
+      margin-left: constants.$gutter;
+      padding-left: constants.$gutter;
+    }
+  }
 
   .ChannelsVisibilityEdition {
     .header {

@@ -61,7 +61,7 @@ function Studio({
       platforms: PLATFORMS,
       channelsSettings: {},
       excludedTitlePatterns: [],
-      annotationColumnsNames: ['moments', 'sentiments', 'projections'],
+      annotationColumnsNames: ['moments', 'ressentis', 'projections'],
       editionTitle: 'lore selfie'
     }
   }, []);

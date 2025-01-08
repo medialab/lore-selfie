@@ -141,7 +141,7 @@ export default function DayTimeline({
   const xScale = useMemo(() => scaleLinear().domain([0, numberOfVizColumns]).range(vizSpaceX), [numberOfVizColumns, vizSpaceX])
   
 
-  const marginsFields = annotationColumnsNames; // ['moments', 'sentiments', 'projections']
+  const marginsFields = annotationColumnsNames;
   const marginsData = marginsFields
     .map((label, index) => {
       const totalWidth = width - marginsStart;
