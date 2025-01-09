@@ -61,6 +61,7 @@ function DayVisualization({
 
     return [min, max]
   }, [date, sessions, roundDay, zoomLevel]);
+  
   const tickTimeSpan = useMemo(() => inferTickTimespan(datesDomain[1] - datesDomain[0], zoomLevel), [datesDomain, zoomLevel]);
   const visualizationHeight = useMemo(() => {
     return height * 2 * zoomLevel;
@@ -114,7 +115,7 @@ function DayVisualization({
       events.forEach(event => {
         switch (event.type) {
           case FOCUS_TAB:
-          case BROWSE_VIEW:
+          // case BROWSE_VIEW:
             if (!isFocused) {
               isFocused = true;
               focusSpans.push({ start: new Date(event.date) })
@@ -143,6 +144,8 @@ function DayVisualization({
               if (playingSpans.length) {
                 playingSpans[playingSpans.length - 1].end = new Date(event.date);
               }
+            } else if (event.isPlaying && isPlaying && playingSpans.length) {
+              playingSpans[playingSpans.length - 1].end = new Date(event.date);
             }
             if (event.hasFocus && !isFocused) {
               isFocused = true;

@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useMemo } from "react";
+import {version} from '../package.json';
 function Header() {
   const actualHref = useMemo(() => window.location.href, [window.location.href]);
   return (
@@ -9,7 +10,7 @@ function Header() {
         <h1>
           <NavLink to="/">
             <span>lore selfie</span>
-            <span className="alpha-mark">alpha</span>
+            <span className="alpha-mark">alpha {version}</span>
           </NavLink>
         </h1>
       </div>
