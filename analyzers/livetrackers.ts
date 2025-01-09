@@ -81,7 +81,12 @@ const trackers = {
         if (currentURL !== document.location.href) {
           console.log('url has changed, was it recorded ?')
         }
-        const messages = Array.from(document.querySelectorAll('.chat-line__message:not([data-lore-selfie-parsed])'))
+        const containerSelectors = ['.chat-line__message', '.vod-message']
+        const unparsedMessages = Array.from(document.querySelectorAll(containerSelectors.map(s => s + ':not([data-lore-selfie-parsed])').join(', ')));
+        // const parsedMessages = Array.from(document.querySelectorAll(containerSelectors.map(s => s + '[data-lore-selfie-parsed="1"]').join(', ')));
+        // const allMessages = Array.from(document.querySelectorAll(containerSelectors.join(', ')));
+        // console.log({parsedMessages, unparsedMessages, allMessages})
+        const messages = unparsedMessages
           .map(el => {
             el.setAttribute('data-lore-selfie-parsed', '1');
             return {
@@ -93,6 +98,7 @@ const trackers = {
               }
             }
           });
+
         const viewersCount = document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div')?.textContent?.replace(' ', '');
         const chatActivityRecordEvent: ChatActivityRecordEvent = {
           type: CHAT_ACTIVITY_RECORD,
