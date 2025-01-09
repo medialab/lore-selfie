@@ -396,13 +396,13 @@ function Home() {
     playing: {
       color: 'green',
       markType: 'reverse',
-      legendLabel: 'Activité de la souris',
+      legendLabel: `La souris est active`,
       tooltipFn: ({ start, end }) => `j'ai joué le média de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
     },
     focus: {
       color: 'blue',
       markType: 'points',
-      legendLabel: 'Onglet visible',
+      legendLabel: `L'onglet est visible`,
       tooltipFn: ({ start, end }) => `j'avais l'onglet visible de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
     },
   }
