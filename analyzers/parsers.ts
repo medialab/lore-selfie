@@ -115,13 +115,14 @@ const parsers = {
           channelImageSrc: document.querySelector('.ytd-watch-metadata .yt-img-shadow')?.getAttribute('src'),
           duration: document.querySelector('.ytp-time-duration')?.textContent,
 
-          recommendedVideos: Array.from(document.querySelectorAll('#related #dismissible'))
+          recommendedContents: Array.from(document.querySelectorAll('#related #dismissible'))
           .map(el => {
             return {
               title: el.querySelector('#video-title').innerText.trim(),
               channelName: el.querySelector('.ytd-channel-name').innerText.trim(),
               url: 'https:/youtube.com' + el.querySelector('#thumbnail').getAttribute('href'),
-              thumbnailImageSrc: el.querySelector('.ytd-thumbnail img').getAttribute('src')
+              thumbnailImageSrc: el.querySelector('.ytd-thumbnail img').getAttribute('src'),
+              type: 'video'
             }
           }),
           
