@@ -95,7 +95,7 @@ const parsers = {
           title: document.querySelector('yt-formatted-string.ytd-watch-metadata')?.textContent.trim(),
           // @todo retrieve only if it's the first video loaded in view (bc it's not uploaded in spa mode)
           ...[
-            "description",
+            // "description",
             "keywords",
             "interactionCount",
             "datePublished",
@@ -105,23 +105,24 @@ const parsers = {
             ...cur,
             [id]: document.querySelector(`meta[itemprop="${id}"],meta[name="${id}"]`)?.getAttribute('content')
           }), {}),
-
+          
+          description: document.querySelector('.ytd-watch-metadata #description')?.innerText.trim(),
           shortlinkUrl: document.querySelector('link[rel="shortlinkUrl"]')?.getAttribute('href'),
           videoimageSrc: document.querySelector('link[rel="image_src"]')?.getAttribute('href'),
 
-          channelName: document.querySelector('ytd-channel-name a')?.textContent.trim(),
-          channelId: decodeURI(document.querySelector('ytd-channel-name a')?.getAttribute('href'))?.split('@').pop(),
-          ownerSubcount: document.querySelector('#owner-sub-count')?.textContent,
+          channelName: document.querySelector('.ytd-watch-metadata ytd-channel-name a')?.textContent.trim(),
+          channelId: decodeURI(document.querySelector('.ytd-watch-metadata ytd-channel-name a')?.getAttribute('href'))?.split('@').pop(),
+          ownerSubcount: document.querySelector('.ytd-watch-metadata #owner-sub-count')?.textContent,
           channelImageSrc: document.querySelector('.ytd-watch-metadata .yt-img-shadow')?.getAttribute('src'),
           duration: document.querySelector('.ytp-time-duration')?.textContent,
 
           recommendedContents: Array.from(document.querySelectorAll('#related #dismissible'))
           .map(el => {
             return {
-              title: el.querySelector('#video-title').innerText.trim(),
-              channelName: el.querySelector('.ytd-channel-name').innerText.trim(),
-              url: 'https:/youtube.com' + el.querySelector('#thumbnail').getAttribute('href'),
-              thumbnailImageSrc: el.querySelector('.ytd-thumbnail img').getAttribute('src'),
+              title: el.querySelector('#video-title')?.innerText.trim(),
+              channelName: el.querySelector('.ytd-channel-name')?.innerText.trim(),
+              url: 'https:/youtube.com' + el.querySelector('#thumbnail')?.getAttribute('href'),
+              thumbnailImageSrc: el.querySelector('.ytd-thumbnail img')?.getAttribute('src'),
               type: 'video'
             }
           }),

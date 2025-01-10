@@ -478,7 +478,7 @@ function Home() {
                   <>
                     <div className="ui-group">
                       <h5>
-                        Taile des tranches horaires
+                        Taille des tranches horaires
                       </h5>
                       <ul className="buttons-row">
                         {[
