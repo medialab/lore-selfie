@@ -22,6 +22,7 @@
     "@plasmohq/storage": "^1.13.0",
     "@react-sigma/core": "^4.0.3",
     "@react-sigma/layout-forceatlas2": "^4.0.3",
+    "@uuid-ts/uuid": "^1.0.1",
     "@vaadin/time-picker": "^24.5.5",
     "d3-array": "^3.2.4",
     "d3-scale": "^4.0.2",

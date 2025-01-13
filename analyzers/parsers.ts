@@ -1,5 +1,8 @@
+import type { YoutubeVideoMetadata, RecommendedContent, TwitchLiveMetadata, YoutubeShortMetadata } from "~types/captureEventsTypes";
+
 const parsers = {
   twitch: {
+    // sniffs URL to determine view type
     sniffer: async url => {
       let match;
       if ((match = url.match(/https?:\/\/www.twitch.tv\/([^\/]+)/)) !== null) {
@@ -21,8 +24,8 @@ const parsers = {
     },
     scrapers: {
       live: {
-        test: () => document.querySelector('#live-channel-stream-information h1')?.textContent && document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1)')?.textContent,
-        scrape: () => ({
+        test: () : Boolean => !!document.querySelector('#live-channel-stream-information h1')?.textContent && document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1)')?.textContent.trim().length > 0,
+        scrape: () : TwitchLiveMetadata => ({
           channel: document.querySelector('#live-channel-stream-information h1')?.textContent,
           channelImageAvatarSrc: document.querySelector('#live-channel-stream-information .tw-image-avatar')?.getAttribute('src'),
           title: document.querySelector('#live-channel-stream-information h2')?.textContent,
@@ -63,8 +66,8 @@ const parsers = {
     },
     scrapers: {
       short: {
-        test: () => document.querySelector('.YtReelMetapanelViewModelHost,.YtShortsVideoTitleViewModelShortsVideoTitle,.ytReelMultiFormatLinkViewModelTitle,.ytShortsVideoTitleViewModelShortsVideoTitle')?.textContent.trim().length > 0,
-        scrape: () => ({
+        test: () : Boolean => !!document.querySelector('.YtReelMetapanelViewModelHost,.YtShortsVideoTitleViewModelShortsVideoTitle,.ytReelMultiFormatLinkViewModelTitle,.ytShortsVideoTitleViewModelShortsVideoTitle')?.textContent.trim().length,
+        scrape: () : YoutubeShortMetadata => ({
           title: document.querySelector('.YtShortsVideoTitleViewModelShortsVideoTitle, .ytd-shorts[is-active]  .ytReelMultiFormatLinkViewModelTitle, .ytd-shorts[is-active] .ytShortsVideoTitleViewModelShortsVideoTitle')?.textContent.trim(),
           // following commented bc it only works with the first short being watched
           // ...[
@@ -90,23 +93,23 @@ const parsers = {
         })
       },
       video: {
-        test: () => document.querySelector('yt-formatted-string.ytd-watch-metadata')?.textContent.trim(),
-        scrape: () => ({
+        test: () : Boolean => !!document.querySelector('yt-formatted-string.ytd-watch-metadata')?.textContent.trim().length,
+        scrape: () : YoutubeVideoMetadata => ({
           title: document.querySelector('yt-formatted-string.ytd-watch-metadata')?.textContent.trim(),
           // @todo retrieve only if it's the first video loaded in view (bc it's not uploaded in spa mode)
-          ...[
-            // "description",
-            "keywords",
-            "interactionCount",
-            "datePublished",
-            "uploadDate",
-            "genre"
-          ].reduce((cur, id) => ({
-            ...cur,
-            [id]: document.querySelector(`meta[itemprop="${id}"],meta[name="${id}"]`)?.getAttribute('content')
-          }), {}),
+          // ...[
+          //   // "description",
+          //   "keywords",
+          //   "interactionCount",
+          //   "datePublished",
+          //   "uploadDate",
+          //   "genre"
+          // ].reduce((cur, id) => ({
+          //   ...cur,
+          //   [id]: document.querySelector(`meta[itemprop="${id}"],meta[name="${id}"]`)?.getAttribute('content')
+          // }), {}),
           
-          description: document.querySelector('.ytd-watch-metadata #description')?.innerText.trim(),
+          description: (document.querySelector('.ytd-watch-metadata #description') as HTMLElement)?.innerText.trim(),
           shortlinkUrl: document.querySelector('link[rel="shortlinkUrl"]')?.getAttribute('href'),
           videoimageSrc: document.querySelector('link[rel="image_src"]')?.getAttribute('href'),
 
@@ -117,10 +120,10 @@ const parsers = {
           duration: document.querySelector('.ytp-time-duration')?.textContent,
 
           recommendedContents: Array.from(document.querySelectorAll('#related #dismissible'))
-          .map(el => {
+          .map((el: HTMLElement) : RecommendedContent => {
             return {
-              title: el.querySelector('#video-title')?.innerText.trim(),
-              channelName: el.querySelector('.ytd-channel-name')?.innerText.trim(),
+              title: (el.querySelector('#video-title') as HTMLElement)?.innerText.trim(),
+              channelName: (el.querySelector('.ytd-channel-name') as HTMLElement)?.innerText.trim(),
               url: 'https:/youtube.com' + el.querySelector('#thumbnail')?.getAttribute('href'),
               thumbnailImageSrc: el.querySelector('.ytd-thumbnail img')?.getAttribute('src'),
               type: 'video'

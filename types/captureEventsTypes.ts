@@ -1,3 +1,4 @@
+import { Uuid } from '@uuid-ts/uuid';
 
 export interface Browser {
   name: String,
@@ -6,7 +7,7 @@ export interface Browser {
 }
 
 export type GenericEvent = {
-  id: String,
+  id: Uuid,
   date: Date,
   tabId?: String,
   injectionId: String,
@@ -28,10 +29,52 @@ export interface FocusTabEvent extends GenericEvent {
   type: "FOCUS_TAB"
 }
 
+export interface RecommendedContent {
+  title: String,
+  channelName: string,
+  url: String,
+  thumbnailImageSrc: String,
+  type: String
+}
+
+export interface GenericViewEventMetadata {
+  title: String,
+}
+export interface YoutubeVideoMetadata extends GenericViewEventMetadata {
+  description: String,
+  shortlinkUrl: String,
+  videoimageSrc: String,
+  channelName: String,
+  channelId: String,
+  ownerSubcount: String,
+  channelImageSrc: String,
+  duration: String,
+  recommendedContents: Array<RecommendedContent>,
+  likesCount: String
+}
+
+export interface YoutubeShortMetadata extends GenericViewEventMetadata {
+  channelName: String,
+  channelId: String,
+  channelImageSrc: String,
+  commentsCount: String,
+  likesCount: String,
+}
+
+export interface TwitchLiveMetadata extends GenericViewEventMetadata {
+  channel: String,
+  channelImageAvatarSrc: String,
+  viewersCount: String,
+  liveTimeElapsed: String,
+  tags: String,
+  category: String,
+  categoryHref: String
+}
+
 export interface BrowseViewEvent extends GenericEvent {
   type: "BROWSE_VIEW",
   viewType: String,
-  metadata: Object,
+  metadata: YoutubeVideoMetadata|YoutubeShortMetadata|TwitchLiveMetadata|GenericViewEventMetadata,
 }
 
 export interface FocusOnReactionInputEvent extends GenericEvent {
@@ -46,41 +89,42 @@ interface EmoteFromChat {
   alt: String,
   src: String
 }
-interface ChatMessage {
-  author: String,
+export interface TwitchMessageRecord {
   message?: String,
-  emote?: EmoteFromChat
+  author: String,
+  emote: EmoteFromChat
 }
-
 export interface ChatActivityRecordEvent extends GenericEvent {
   type: "CHAT_ACTIVITY_RECORD",
-  messages?: Array<ChatMessage>,
+  messages?: Array<TwitchMessageRecord>,
   messagesCount: number,
   messagesAverageCharLength: number,
   viewersCount?: number,
   timeSpan: Number, // timespan of measure provided, in ms
 }
 
-export interface PointerActivityRecordEvent extends GenericEvent {
-  type: "POINTER_ACTIVITY_RECORD",
-  timeSpan: Number, // timespan of measure provided, in ms
-  activityScore: Number // number between 0 and 1
-}
-export interface IsPlayingActivityRecord extends GenericEvent {
-  type: "IS_PLAYING_ACTIVITY_RECORD"
-  isPlaying: Boolean
-  timeSpan: Number, // timespan of measure provided, in ms
-  currentTime?: string,
-  duration?: string
-}
+// export interface PointerActivityRecordEvent extends GenericEvent {
+//   type: "POINTER_ACTIVITY_RECORD",
+//   timeSpan: Number, // timespan of measure provided, in ms
+//   activityScore: Number // number between 0 and 1
+// }
+// export interface IsPlayingActivityRecord extends GenericEvent {
+//   type: "IS_PLAYING_ACTIVITY_RECORD"
+//   isPlaying: Boolean
+//   timeSpan: Number, // timespan of measure provided, in ms
+//   currentTime?: string,
+//   duration?: string
+// }
+
+
 
 export interface LiveUserActivityRecord extends GenericEvent {
   type: "LIVE_USER_ACTIVITY_RECORD"
-  isPlaying: Boolean
   timeSpan: Number, // timespan of measure provided, in ms
   currentMediaTime?: string,
   pointerActivityScore: Number,
   hasFocus: Boolean,
+  isPlaying: Boolean,
 }
 
 export type captureEventsList = Array<GenericEvent>

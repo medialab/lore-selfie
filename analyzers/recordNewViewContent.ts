@@ -22,7 +22,6 @@ function delay(t) {
   }, currentRetry = 0) => {
     console.debug('try scraping page metadata (%s) try n°%s', scrapingName, currentRetry + 1);
     const canScrape = testFn();
-
     if (canScrape) {
       console.debug('will scrape page metadata (%s) try n°%s', scrapingName, currentRetry + 1)
       return scrapeFn();

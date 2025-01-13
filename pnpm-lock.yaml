@@ -20,6 +20,9 @@ importers:
       '@react-sigma/layout-forceatlas2':
         specifier: ^4.0.3
         version: 4.0.3(graphology-layout-forceatlas2@0.10.1(graphology-types@0.24.8))(graphology@0.25.4(graphology-types@0.24.8))(react@18.2.0)(sigma@3.0.0(graphology-types@0.24.8))
+      '@uuid-ts/uuid':
+        specifier: ^1.0.1
+        version: 1.0.1
       '@vaadin/time-picker':
         specifier: ^24.5.5
         version: 24.5.5
@@ -1638,6 +1641,9 @@ packages:
 
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
+
+  '@uuid-ts/uuid@1.0.1':
+    resolution: {integrity: sha512-rt6cMnSSGCHaZ4B0QAvxrVTFCdA78Jrx75r3qfg/1poD2+vu/a7T+A6qX4hceHDYdt9RX5DiWPWdD1UWUeWknQ==}
 
   '@vaadin/a11y-base@24.5.5':
     resolution: {integrity: sha512-0+8jegJzRqwtvuu27nmWCCIHlmAPQea10CUu3jz/FkCewmHBsVUz0xi6BB/l2olk5WzvWkcZD+bpSypJrzQZ3Q==}
@@ -4558,12 +4564,20 @@ packages:
     resolution: {integrity: sha512-6Z7Ma2aVEWisaL6TvBCy7P8rm2LQoPv6dJ7ecIaIixHcwfbJ0x7mWdbcwlIM5IGQxPZSFYeqRCqlOOeKoJYMkw==}
     engines: {node: '>= 4'}
 
+  uuid@11.0.5:
+    resolution: {integrity: sha512-508e6IcKLrhxKdBbcA2b4KQZlLVp2+J5UwQ6F7Drckkc5N9ZJwFa4TgWtsww9UG8fGHbm6gbV19TdM5pQ4GaIA==}
+    hasBin: true
+
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    hasBin: true
+
+  uuidv7@1.0.2:
+    resolution: {integrity: sha512-8JQkH4ooXnm1JCIhqTMbtmdnYEn6oKukBxHn1Ic9878jMkL7daTI7anTExfY18VRCX7tcdn5quzvCb6EWrR8PA==}
     hasBin: true
 
   voynich-ipsum@1.2.0:
@@ -6546,6 +6560,11 @@ snapshots:
       '@types/node': 20.11.5
 
   '@ungap/structured-clone@1.2.0': {}
+
+  '@uuid-ts/uuid@1.0.1':
+    dependencies:
+      uuid: 11.0.5
+      uuidv7: 1.0.2
 
   '@vaadin/a11y-base@24.5.5':
     dependencies:
@@ -9719,9 +9738,13 @@ snapshots:
 
   utility-types@3.11.0: {}
 
+  uuid@11.0.5: {}
+
   uuid@8.3.2: {}
 
   uuid@9.0.1: {}
+
+  uuidv7@1.0.2: {}
 
   voynich-ipsum@1.2.0:
     dependencies:

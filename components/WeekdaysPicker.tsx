@@ -1,15 +1,6 @@
 
 
 
-// const DAYS_OF_WEEK_MAP = {
-//   'Lundi': 0,
-//   'Mardi': 1,
-//   'Mercredi': 2,
-//   'Jeudi': 3,
-//   'Vendredi': 4,
-//   'Samedi': 5,
-//   'Dimanche': 6,
-// }
 const DAYS_OF_WEEK_MAP_REVERSE = {
   0: 'Dimanche',
   1: 'Lundi',

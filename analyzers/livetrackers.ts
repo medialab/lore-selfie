@@ -1,14 +1,31 @@
 import { v4 as generateId } from 'uuid';
-import { BLUR_ON_REACTION_INPUT, CHAT_ACTIVITY_RECORD, DEFAULT_SETTINGS, FOCUS_ON_REACTION_INPUT, LIVE_USER_ACTIVITY_RECORD } from '~constants';
-import type { BlurOnReactionInputEvent, ChatActivityRecordEvent, FocusOnReactionInputEvent, IsPlayingActivityRecord, LiveUserActivityRecord } from "~types/captureEventsTypes";
+import { BLUR_ON_REACTION_INPUT, CHAT_ACTIVITY_RECORD, DEFAULT_SETTINGS, FOCUS_ON_REACTION_INPUT, LIVE_USER_ACTIVITY_RECORD, PLATFORMS } from '~constants';
+import type { BlurOnReactionInputEvent, ChatActivityRecordEvent, FocusOnReactionInputEvent, LiveUserActivityRecord, TwitchMessageRecord } from "~types/captureEventsTypes";
 import { Storage } from "@plasmohq/storage"
 import type { Settings } from '~types/settings';
 
 const storage = new Storage({
   area: "local",
   // copiedKeyList: ["shield-modulation"],
-})
-const trackers = {
+});
+
+const Platforms = [...PLATFORMS] as const;
+type Platform = (typeof Platforms)[number];
+interface LiveTrackerProps {
+  settings: Settings,
+  injectionId: String,
+  addEvent: Function,
+  platform: Platform,
+  currentURL: String,
+  onCurrentURLChange: Function,
+  activeViewType?: String,
+} 
+
+interface TrackersType {
+  twitch: any,
+  youtube: any,
+}
+const trackers:TrackersType = {
   twitch: {
     live: async ({
       settings,
@@ -17,7 +34,7 @@ const trackers = {
       platform,
       currentURL,
       onCurrentURLChange,
-    }) => {
+    }: LiveTrackerProps) => {
       const {
         liveRecordingInterval, 
         recordTabs,
@@ -87,7 +104,7 @@ const trackers = {
         // const allMessages = Array.from(document.querySelectorAll(containerSelectors.join(', ')));
         // console.log({parsedMessages, unparsedMessages, allMessages})
         const messages = unparsedMessages
-          .map(el => {
+          .map((el): TwitchMessageRecord => {
             el.setAttribute('data-lore-selfie-parsed', '1');
             return {
               message: el.querySelector('[data-a-target="chat-line-message-body"]')?.textContent,
@@ -166,7 +183,7 @@ const trackers = {
       platform,
       currentURL,
       onCurrentURLChange,
-    }) => {
+    }: LiveTrackerProps) => {
       const {
         liveRecordingInterval, 
         recordTabs,
@@ -249,10 +266,11 @@ export const updateLiveTracking = ({
   addEvent,
   currentURL,
   onCurrentURLChange,
-}) => {
+}: LiveTrackerProps) => {
   let routine;
   console.info('update live tracking', platform, activeViewType);
   if (trackers[platform] && trackers[platform][activeViewType]) {
+    // functions return a setInterval() id
     routine = trackers[platform][activeViewType]({
       settings,
       injectionId,
@@ -260,7 +278,7 @@ export const updateLiveTracking = ({
       platform,
       currentURL,
       onCurrentURLChange
-    })
+    });
   } else {
     clearInterval(routine);
   }
