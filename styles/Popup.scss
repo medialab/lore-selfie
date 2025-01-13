@@ -153,12 +153,13 @@
     display: flex;
     flex-flow: row nowrap;
     justify-content: stretch;
-    button {
+    button,.btn {
       text-align: left;
       padding: constants.$gutter;
       box-sizing: border-box;
       font-size: 1rem;
       flex: 2;
+      text-decoration: none;
       &.primary {
         background: constants.$color-app-main;
         padding-left: constants.$gutter * 2;
@@ -166,6 +167,7 @@
           background: constants.$color-app-main-accent;
         }
       }
+      
       &.special {
         flex: 1;
         background: none;

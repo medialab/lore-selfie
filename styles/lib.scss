@@ -20,6 +20,7 @@
     @include fonts.hammersmith-one-regular;
   }
   button,
+  .btn,
   select,
   option,
   input,
@@ -49,7 +50,7 @@
     font-size: 0.8em;
   }
 
-  button {
+  button,.btn {
     background: inherit;
     box-shadow: none;
     border: none;
@@ -59,6 +60,9 @@
     border: 1px solid constants.$color-app-bg;
     box-sizing: border-box;
     cursor: pointer;
+    &a{
+      text-decoration: none;
+    }
     &:hover:not(:disabled) {
       background: #807f7f;
     }
@@ -99,6 +103,7 @@
     flex-flow: row nowrap;
     justify-content: stretch;
     button,
+    .btn,
     input {
       flex: 1;
     }
@@ -148,7 +153,7 @@
       input {
         flex: 1;
       }
-      button {
+      button,.btn {
         margin: 0;
       }
     }
@@ -183,7 +188,7 @@
       color: white;
       margin-bottom: constants.$gutter;
 
-      button {
+      button,.btn {
         min-width: constants.$gutter * 3;
         max-width: constants.$gutter * 3;
         min-height: constants.$gutter * 3;
@@ -426,8 +431,7 @@
       align-items: center;
       margin-bottom: constants.$gutter;
 
-      button {
-      }
+      
       .current-month {
         flex: 1;
         display: flex;
@@ -508,5 +512,21 @@
         }
       }
     }
+  }
+
+
+  .VersionCheckBtn {
+    @keyframes flicker {
+      0% {
+        background: constants.$color-app-main;
+      }
+      50% {
+        background: #59D044;
+      }
+      100% {
+        background: constants.$color-app-main;
+      }
+    }
+    animation: flicker 2s infinite;
   }
 }

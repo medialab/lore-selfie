@@ -13,7 +13,7 @@
 }
 
 
-.lore-politics-witness-container {
+.lore-selfie-witness-container {
   border-radius: 50%;
   background: red;
   padding: 0;
@@ -41,12 +41,12 @@
 }
 
 
-.lore-politics-witness-container:hover {
+.lore-selfie-witness-container:hover {
   border-radius: 0;
   animation: none;
 }
 
-.lore-politics-witness-container:hover .witness-text {
+.lore-selfie-witness-container:hover .witness-text {
   opacity: 1;
   max-width: calc(100vw - 20px);
   max-height: 50px;

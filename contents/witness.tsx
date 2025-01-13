@@ -60,12 +60,12 @@ const Witness = () => {
 
   useInterval(() => {
     storage.get("lore-selfie-settings")
-    .then((settings = DEFAULT_SETTINGS) => {
-      const platform = getPlatform(window.location.href);
-      if (settings && settings.recordActivity && settings.recordOnPlatforms.includes(platform)) {
-        setIsActive(true);
-      }
-    })
+      .then((settings = DEFAULT_SETTINGS) => {
+        const platform = getPlatform(window.location.href);
+        if (settings && settings.recordActivity && settings.recordOnPlatforms.includes(platform)) {
+          setIsActive(true);
+        }
+      })
   }, 10 * 1000);
 
   if (!isActive) {
@@ -73,14 +73,14 @@ const Witness = () => {
   }
 
   return (
-  <span
-    className="lore-politics-witness-container"
-  >
-    <span className="witness-text">
-    Enregistrement en cours de votre activité par l'extension lore selfie (ces données ne sont jamais partagées automatiquement - retrouvez-les sur la page de l'extension)
+    <span
+      className="lore-selfie-witness-container"
+    >
+      <span className="witness-text">
+        Enregistrement en cours de votre activité par l'extension lore selfie (ces données ne sont jamais partagées automatiquement - retrouvez-les sur la page de l'extension)
+      </span>
     </span>
-  </span>
-)
+  )
 }
 
 export default Witness

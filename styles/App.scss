@@ -62,6 +62,15 @@
         @include fonts.kanit-light;
       }
       font-size: 2rem;
+
+      .VersionCheckBtn {
+        position: relative;
+        font-size: 1rem;
+        margin-left: constants.$gutter;
+        bottom: constants.$gutter-small;
+        padding: constants.$gutter-small;
+        border: none!important;
+      }
     }
     ul {
       list-style: none;

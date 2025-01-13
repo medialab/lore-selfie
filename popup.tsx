@@ -4,6 +4,7 @@ import "styles/Popup.scss"
 import { BROWSE_VIEW, GET_ACTIVITY_EVENTS, GET_SETTINGS, SERIALIZE_ALL_DATA, SET_SETTING } from "~constants";
 import { downloadTextfile } from "~helpers";
 import { v4 as generateId } from 'uuid';
+import VersionCheckBtn from "~components/VersionCheckBtn";
 
 function Popup() {
   // const [activity] = useStorage("lore-selfie-activity");
@@ -121,37 +122,37 @@ function Popup() {
       <div className="body">
         <h2>Contenus visionnés ces dernières 48 heures</h2>
         <div className="contents">
-        {
-            isLoadingActivity ? 
+          {
+            isLoadingActivity ?
               <div className="loading-activity-container"><div>Chargement ...</div></div>
               :
               <ul className="recent-contents-list">
                 {
                   recentContents
-                  .map(({
+                    .map(({
                       url,
                       title,
                       channel,
                       platform,
                     }) => {
-                    return (
-                      <li className="recent-contents-item" key={url}>
-                        <a 
-                          target="blank"
-                          href={url}
-                          className="recent-contents-item-contents"
-                        >
-                          <div className="platform-marker-container">
-                            <div className={`platform-marker ${platform}`} />
-                          </div>
-                          <div className="metadata-container">
-                            <h3 className={'title'}>{title}</h3>
-                            <h4 className="channel">{channel ? `${channel} - ${platform}` : platform}</h4>
-                          </div>
-                        </a>
-                      </li>
-                    )
-                  })
+                      return (
+                        <li className="recent-contents-item" key={url}>
+                          <a
+                            target="blank"
+                            href={url}
+                            className="recent-contents-item-contents"
+                          >
+                            <div className="platform-marker-container">
+                              <div className={`platform-marker ${platform}`} />
+                            </div>
+                            <div className="metadata-container">
+                              <h3 className={'title'}>{title}</h3>
+                              <h4 className="channel">{channel ? `${channel} - ${platform}` : platform}</h4>
+                            </div>
+                          </a>
+                        </li>
+                      )
+                    })
                 }
               </ul>
           }
@@ -167,6 +168,7 @@ function Popup() {
           }}>
           ouvrir l'application
         </button>
+        <VersionCheckBtn />
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -176,7 +178,6 @@ function Popup() {
           }}>
           sauvegarder les données
         </button>
-
 
         <button
           className="special"
@@ -194,7 +195,7 @@ function Popup() {
         </div>
       </div>
     </div>
-        )
+  )
 }
 
-        export default Popup
+export default Popup
