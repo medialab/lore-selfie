@@ -5,7 +5,9 @@ export interface Creator {
   channels: Array<String>
   name: String
   description: String
-  links: Object
+  links: {
+    tags: Array<string>
+  }
 }
 
 export interface Expression {
@@ -13,7 +15,10 @@ export interface Expression {
   name: String
   definition: String
   queries: Array<Query>
-  links: Object
+  links: {
+    tags: Array<string>
+    creators: Array<string>
+  }
 }
 
 export interface Tag {

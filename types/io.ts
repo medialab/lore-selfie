@@ -5,7 +5,7 @@ import {type Settings} from './settings'
 export interface AllData {
   annotations: Annotations,
   settings: Settings,
-  activity: CaptureEventsList,
+  activities: CaptureEventsList,
 }
 
 export interface DataRecord extends AllData {

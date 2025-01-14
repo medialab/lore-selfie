@@ -13,6 +13,8 @@ import AnnotationsNetwork from "~components/Annotations/AnnotationsNetwork";
 
 import "../styles/Annotations.scss";
 import { useInterval } from "usehooks-ts";
+import type { PlasmoMessaging } from "@plasmohq/messaging";
+import type { Annotations } from "~types/annotations";
 
 
 function Annotations() {
@@ -20,13 +22,18 @@ function Annotations() {
   const activityPort = usePort("activitycrud");
   const [availableChannels, setAvailableChannels] = useState();
   const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
-  const [annotations, setAnnotations] = useState();
+  const [annotations, setAnnotations]: [Annotations, Function] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [pendingRequestsIds, setPendingRequestsIds] = useState(new Set());
   /**
     * Sending cud requests
     */
-  const requestPort = useMemo(() => async (port: Object, actionType: string, payload: object) => {
+  interface PlasmoPortType {
+    data?: any
+    send: Function
+    listen: Function
+  }
+  const requestPort = useMemo(() => async (port: PlasmoPortType, actionType: string, payload: object) => {
     const requestId = generateId();
     pendingRequestsIds.add(requestId);
     // console.log('adding pending request', Array.from(pendingRequestsIds))
@@ -184,6 +191,7 @@ function Annotations() {
                                 }, {})
                                 requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { value: newCreators, id: 'creators' })
                               },
+                              onLinkExpressions: console.log,
                               // @todo finish this
                               // onLinkExpressions: (expressionId, ids) => {
                               //   const newExpressions = Object.entries(annotations?.expressions || {}).reduce((res, [key, obj]) => {

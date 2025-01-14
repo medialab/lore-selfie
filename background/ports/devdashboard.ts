@@ -1,5 +1,6 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
+import { EVENT_TYPES } from "~constants"
 import { type CaptureEventsList } from "~types/captureEventsTypes"
 
 const storage = new Storage({
@@ -7,8 +8,17 @@ const storage = new Storage({
   // copiedKeyList: ["shield-modulation"],
 })
 
+const availableEventTypes = [...EVENT_TYPES] as const;
+
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
-  const { types, page = 0, reverseOrder, itemsPerPage = 50 } = req.body
+
+  interface MessageBodyType {
+    types: typeof availableEventTypes[number]
+    page: number,
+    reverseOrder: Boolean,
+    itemsPerPage: number
+  }
+  const { types, page = 0, reverseOrder, itemsPerPage = 50 }: MessageBodyType = req.body
 
   // console.log('received request', req.body);
 
