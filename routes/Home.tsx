@@ -8,7 +8,7 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 import '../styles/Home.scss';
-import { BROWSE_VIEW, GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_HABITS_DATA, PLATFORMS_COLORS } from "~constants";
+import { BROWSE_VIEW, GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_HABITS_DATA, PLATFORMS_COLORS, DAY_IN_MS } from "~constants";
 import { useInterval } from "usehooks-ts";
 import DatePicker from "~components/FormComponents/DatePicker";
 import { prettyDate, buildDateKey } from "~helpers";
@@ -16,7 +16,6 @@ import Habits from "~components/Habits";
 
 const UPDATE_RATE = 10000;
 const MIN_ZOOM = .5;
-const DAY = 24 * 3600 * 1000;
 
 
 function DailyLegend({ spansSettings }) {
@@ -244,7 +243,7 @@ function Home() {
 
   useEffect(() => {
     requestFromActivityCrud(GET_BINNED_ACTIVITY_OUTLINE, {
-      bin: DAY,
+      bin: DAY_IN_MS,
       tag: 'daily'
     });
     requestFromAnnotationsCrud(GET_ANNOTATIONS, {});
@@ -257,7 +256,7 @@ function Home() {
       requestFromActivityCrud(GET_HABITS_DATA, {
         bin: habitsBinDuration,
         from: habitsTimespan[0].getTime(),
-        to: habitsTimespan[1].getTime() + DAY - 1,
+        to: habitsTimespan[1].getTime() + DAY_IN_MS - 1,
         tag: 'habits-data'
       });
     }
@@ -284,7 +283,7 @@ function Home() {
         d.setHours(0);
         return d.getTime();
       });
-      const extent = [Math.min(...dates), Math.max(...dates) + DAY - 1];
+      const extent = [Math.min(...dates), Math.max(...dates) + DAY_IN_MS - 1];
       setHabitsTimespan(extent.map(d => new Date(d)));
       // console.log('dates', dates);
     }

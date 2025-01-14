@@ -5,13 +5,9 @@ import { type BrowseViewEvent,
   type YoutubeVideoMetadata,type YoutubeShortMetadata,type TwitchLiveMetadata,type GenericViewEventMetadata,
   type CaptureEventsList
  } from "~types/captureEventsTypes"
-import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, GET_HABITS_DATA, LIVE_USER_ACTIVITY_RECORD, PLATFORMS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
+import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_IN_MS_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, GET_HABITS_DATA, LIVE_USER_ACTIVITY_RECORD, PLATFORMS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, DAY_IN_MS } from "~constants";
 import { buildDateKey, getDateBin } from "~helpers";
 import type { AllData } from "~types/io";
-
-
-
-const DAY = 24 * 3600 * 1000;
 
 const storage = new Storage({
   area: "local",
@@ -34,7 +30,7 @@ const checkTimeOfDaySpan = (date: number, [from, to]: [String, String]) : Boolea
   toDate.setMinutes(+toMinutes);
   // if to date is smaller than from date extend to next day
   if (+toHours < +fromHours) {
-    toDate = new Date(toDate.getTime() + DAY);
+    toDate = new Date(toDate.getTime() + DAY_IN_MS);
   }
   return date > fromDate.getTime() && date < toDate.getTime();
 }
@@ -308,7 +304,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     }
     case GET_BINNED_ACTIVITY_OUTLINE:
       const {
-        bin = DAY, // 'day',
+        bin = DAY_IN_MS, // 'day',
         ...settings
       } = payload as GetBinnedActivityPayload;
       filteredEvents = filterEvents(activity, settings as FilterEventsPayload)
@@ -537,7 +533,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     //     }
     //   })
     //   break;
-    case DUPLICATE_DAY_DATA:
+    case DUPLICATE_DAY_IN_MS_DATA:
       interface DuplicateDayDataPayload {
         daySlug: string,
         numberOfDays: number
@@ -562,11 +558,11 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
           injectionIds.forEach(id => {
             injectionIdMap.set(id, generateId());
           })
-          const DAY = 3600 * 24 * 1000;
+          const DAY_IN_MS = 3600 * 24 * 1000;
           const thatDayEvents = dayEvents.map(event => {
             return {
               ...event,
-              date: new Date(new Date(event.date).getTime() - DAY * i),
+              date: new Date(new Date(event.date).getTime() - DAY_IN_MS * i),
               injectionId: injectionIdMap.get(event.injectionId),
               id: generateId()
             }

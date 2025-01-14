@@ -5,6 +5,7 @@ import { prettyDate } from '~helpers';
 
 import 'react-tooltip/dist/react-tooltip.css'
 import {buildDateKey} from '~helpers';
+import { DAY_IN_MS } from '~constants';
 
 const formatDatepickerDate = d => {
   d.setHours(0);
@@ -13,8 +14,6 @@ const formatDatepickerDate = d => {
   d.setMilliseconds(0);
   return d;
 }
-
-const DAY = 3600 * 24 * 1000;
 
 export default function DatePicker({
   value,
@@ -113,7 +112,7 @@ export default function DatePicker({
       if (i === 0) {
         // const startDateDay = firstOfMonth.getDay();
         // add days before
-        let dayBefore = new Date(firstOfMonth.getTime() - DAY);
+        let dayBefore = new Date(firstOfMonth.getTime() - DAY_IN_MS);
         let dayCount = 0;
         while (dayBefore.getDay() >= +startOfWeekId) {
           const newDay = {
@@ -123,7 +122,7 @@ export default function DatePicker({
             weekId: dayBefore.getDay()
           }
           daysOfThisWeek = [newDay, ...daysOfThisWeek]
-          dayBefore = new Date(dayBefore.getTime() - DAY);
+          dayBefore = new Date(dayBefore.getTime() - DAY_IN_MS);
           dayCount++;
         }
         // add days
@@ -134,7 +133,7 @@ export default function DatePicker({
             dateNumber: currentDay.getDate(),
             weekId: currentDay.getDay()
           })
-          currentDay = new Date(currentDay.getTime() + DAY);
+          currentDay = new Date(currentDay.getTime() + DAY_IN_MS);
           dayCount++;
         }
       } else {
@@ -147,7 +146,7 @@ export default function DatePicker({
             dateNumber: currentDay.getDate(),
             date: currentDay,
           })
-          currentDay = new Date(currentDay.getTime() + DAY);
+          currentDay = new Date(currentDay.getTime() + DAY_IN_MS);
           dayCount++;
         }
       }
@@ -267,7 +266,7 @@ export default function DatePicker({
                         const isSelected = range ? tempValue ?
                           date >= tempValue[0] && date <= tempValue[1] : false
                           : date.getTime() === value?.getTime();
-                        const key = date ? buildDateKey(new Date(date.getTime() + DAY)) : '';
+                        const key = date ? buildDateKey(new Date(date.getTime() + DAY_IN_MS)) : '';
                         const data = daysData[key];
                         const isDisabled = disableDatalessDays && !data;
                         const count = data?.value || 0;
@@ -279,7 +278,7 @@ export default function DatePicker({
                           }
                           if (range) {
                             if (isSelecting) {
-                              const toDate = date.getTime() === tempValue[0].getTime() ? new Date(date.getTime() + DAY - 1) : date;
+                              const toDate = date.getTime() === tempValue[0].getTime() ? new Date(date.getTime() + DAY_IN_MS - 1) : date;
                               setTempValue([tempValue[0], toDate]);
                               onChange([tempValue[0], toDate]);
                               setIsSelecting(false);

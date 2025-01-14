@@ -2,10 +2,9 @@
 // Array.from(document.querySelectorAll('td:nth-child(odd) a')).map(el => el.getAttribute('href').slice(1)).join('\n')
 
 import { readFile } from 'fs/promises';
-import { writeFile, writeFileSync } from 'fs';
-import { csvFormat } from 'd3-dsv';
 import { Language } from 'voynich-ipsum';
 import { v4 as genId } from 'uuid';
+import {DAY_IN_MS} from './constants';
 
 import { PLATFORMS } from '~constants';
 
@@ -23,29 +22,28 @@ const buildMockData = ({
   numberOfPastDays
 }) => {
   let events = [];
-  const DAY = 24 * 3600 * 1000;
   let today = new Date();
   today.setHours(0)
   today.setMinutes(0)
   today = today.getTime();
-  today = today - today % DAY;
+  today = today - today % DAY_IN_MS;
 
   for (let i = 0; i < numberOfPastDays; i++) {
-    const day = today - DAY * i;
+    const day = today - DAY_IN_MS * i;
     // decide if it was an active day
     const wasActive = tossCoin(0.6);
     if (wasActive) {
       // set number of sessions
       const numberOfSessions = Math.round(Math.random() * (MAX_NUMBER_OF_SESSIONS - MIN_NUMBER_OF_SESSIONS) + MIN_NUMBER_OF_SESSIONS)
       // for each session create fake activity
-      let time = day + Math.random() * DAY;
+      let time = day + Math.random() * DAY_IN_MS;
       let sessionIndex = 0;
-      while (time < day + DAY && sessionIndex < numberOfSessions) {
+      while (time < day + DAY_IN_MS && sessionIndex < numberOfSessions) {
         const sessionDuration = Math.floor(Math.random() * 2 * 3600 * 1000);
         const sessionStart = time + Math.floor(Math.random() * 3 * 3600 * 1000);
         const sessionId = genId()
         time = sessionStart;
-        if (time < day + DAY) {
+        if (time < day + DAY_IN_MS) {
           const sessionEnd = sessionStart + sessionDuration;
 
           // choose platform

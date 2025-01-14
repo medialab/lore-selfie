@@ -85,3 +85,5 @@ export const PLATFORMS_COLORS = {
   twitch: '#aa43ff',
   youtube: '#ff0001'
 }
+
+export const DAY_IN_MS = 24 * 3600 * 1000;

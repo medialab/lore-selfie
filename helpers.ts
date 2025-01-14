@@ -1,4 +1,4 @@
-import { Browser } from "~types/captureEventsTypes";
+import { type Browser } from "~types/captureEventsTypes";
 
 export function getBrowser(): Browser {
   const ua = navigator.userAgent
@@ -85,7 +85,7 @@ export const getPlatform = (url: String): String => {
   }
 }
 
-export function downloadJSONData(data:Object, filename='selfie-data.json') {
+export function downloadJSONData(data:Object, filename='selfie-data.json'): void {
   
   let blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
   let dlURL = window.URL.createObjectURL(blob);
@@ -95,7 +95,7 @@ export function downloadJSONData(data:Object, filename='selfie-data.json') {
   document.body.appendChild(a);
   a.click();
 }
-export function downloadTextfile(data:Object, filename='selfie-data.json', mimetype = 'application/json') {
+export function downloadTextfile(data:string, filename:string='selfie-data.json', mimetype:string = 'application/json'): void {
   let blob = new Blob([data], { type: mimetype });
   let dlURL = window.URL.createObjectURL(blob);
   let a = document.createElement('a');
@@ -105,7 +105,7 @@ export function downloadTextfile(data:Object, filename='selfie-data.json', mimet
   a.click();
 }
 
-export function JSONArrayToCSVStr (items = []) {
+export function JSONArrayToCSVStr (items:Array<object> = []):string {
   const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
   let header = new Set(Object.keys(items[0]));
   const outputItems = items.map((item, i) => {
@@ -153,10 +153,10 @@ export function JSONArrayToCSVStr (items = []) {
     return outputItem;
   })
   // console.log('outputItems', outputItems);
-  header = Array.from(header).sort();
+  const headerArray:Array<string> = Array.from(header).sort();
   const csv = [
-    header.join(','), // header row first
-    ...outputItems.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+    headerArray.join(','), // header row first
+    ...outputItems.map(row => headerArray.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
   ].join('\r\n');
   return csv;
 }
@@ -168,7 +168,7 @@ export function JSONArrayToCSVStr (items = []) {
  * @param {string} style='fr'
  * @returns {string}
  */
-export const formatNumber = (n: Number, style: String  = 'fr'): String => {
+export const formatNumber = (n: number, style: string  = 'fr'): string => {
   if (+n === 0) {
     return '0';
   }
@@ -198,7 +198,7 @@ export const formatNumber = (n: Number, style: String  = 'fr'): String => {
     + (floatPart === undefined ? '' : style === 'fr' ? ',' + floatPart : '.' + floatPart)
 }
 
-export function lengthInUtf8Bytes(str) {
+export function lengthInUtf8Bytes(str:string):number {
   // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
   const m = encodeURIComponent(str).match(/%[89ABab]/g);
   return str.length + (m ? m.length : 0);
@@ -208,7 +208,7 @@ export function timeOfDayToMs (span) {
   return +hours * 3600 * 1000 + (+minutes) * 60 * 1000;
 }
 
-export  function inferTickTimespan(timeSpan, zoomLevel = 1) {
+export  function inferTickTimespan(timeSpan: number, zoomLevel:number = 1):number {
   const scale = timeSpan / zoomLevel;
   let span;
   if (scale < 150000) {
@@ -236,20 +236,20 @@ export  function inferTickTimespan(timeSpan, zoomLevel = 1) {
   return span;
 }
 
-export function buildDateKey (date) {
+export function buildDateKey (date:Date):string {
   return new Date(date).toJSON().split('T')[0];
 }
 
-export function prettyDate(date, daysMap, monthsMap) {
+export function prettyDate(date:Date, daysMap:object, monthsMap:object) {
   return date?.getTime ? `${daysMap[date.getDay()].toLowerCase()} ${date.getDate() === 1 ? '1<sup>er</sup>' : date.getDate()} ${monthsMap[date.getMonth()]} ${date.getFullYear()}` : ''
 };
 
-export function getDateBin(date, binInMs) {
+export function getDateBin(date:Date, binInMs:number):number {
   const timeInMs = date.getHours() * 3600 * 1000 + date.getMinutes() * 60 * 1000 + date.getSeconds() * 1000 + date.getMilliseconds();
   return timeInMs - timeInMs%binInMs;
 }
 
-export function msToNiceDuration (d) {
+export function msToNiceDuration (d:number):string {
   const hours = Math.floor(d / 3600000);
   const minutes = Math.floor((d - hours * 3600000) / 60000);
   return hours ? `${hours}h${minutes}mn` : minutes + 'mn'

@@ -2,9 +2,7 @@ import { useMemo } from "react"
 import { inferTickTimespan, timeOfDayToMs } from "~helpers"
 import { scaleLinear } from 'd3-scale';
 import Measure from 'react-measure';
-import { BROWSE_VIEW, LIVE_USER_ACTIVITY_RECORD, PLATFORMS_COLORS } from "~constants";
-
-const DAY = 24 * 3600 * 1000;
+import { BROWSE_VIEW, LIVE_USER_ACTIVITY_RECORD, PLATFORMS_COLORS, DAY_IN_MS } from "~constants";
 
 export default function DayTimeline({
   width: inputWidth,
@@ -34,7 +32,7 @@ export default function DayTimeline({
     // if end time is smaller than start time add a day
 
     if (toTimeInMs < fromTimeInMs) {
-      toTimeInMs += DAY;
+      toTimeInMs += DAY_IN_MS;
     }
     const realStartInMs = date + fromTimeInMs;
     const realEndInMs = date + toTimeInMs;

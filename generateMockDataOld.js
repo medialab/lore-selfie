@@ -6,6 +6,7 @@ import {writeFile, writeFileSync} from 'fs';
 import { csvFormat } from 'd3-dsv';
 import { Language } from 'voynich-ipsum';
 import { v4 as genId } from 'uuid';
+import {DAY_IN_MS} from './constants';
 
 const lang = new Language({ seed: 1 });
 
@@ -29,14 +30,13 @@ const buildMockData = ({
   const endOfUseReal = endOfUse || new Date().getTime();
   const startOfUseReal = startOfUse || endOfUseReal - (3 * 30 * 24 * 3600 * 1000) // 3 months;
 
-  const DAY = 24 * 3600 * 1000;
   const slices = [];
-  for (let i = startOfUseReal; i < endOfUseReal + DAY; i += DAY) {
+  for (let i = startOfUseReal; i < endOfUseReal + DAY_IN_MS; i += DAY_IN_MS) {
     const numberOfSlices = parseInt(Math.random() * 5);
-    let sliceStartRel = parseInt(Math.random() * (DAY * .2));
+    let sliceStartRel = parseInt(Math.random() * (DAY_IN_MS * .2));
     let currentSliceIndex = 0;
-    while (currentSliceIndex < numberOfSlices && sliceStartRel < DAY) {
-      const remainingTime = DAY - sliceStartRel;
+    while (currentSliceIndex < numberOfSlices && sliceStartRel < DAY_IN_MS) {
+      const remainingTime = DAY_IN_MS - sliceStartRel;
       const duration = parseInt(Math.random() * remainingTime * .8);
       const sliceStart = i + sliceStartRel;
       const sliceEnd = i + sliceStartRel + duration;

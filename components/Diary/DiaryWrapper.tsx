@@ -5,6 +5,7 @@ import Cover from './Cover';
 import DayPage from './DayPage';
 import A5Imposed from './A5Imposed';
 import { formatNumber, timeOfDayToMs } from '~helpers';
+import { DAY_IN_MS } from '~constants';
 
 function DiaryWrapper({
   timeSpan,
@@ -46,14 +47,13 @@ function DiaryWrapper({
   }
   // @todo compute that in a worker
   const dataByDay = useMemo(() => {
-    const DAY = 24 * 3600 * 1000;
     const fromDay = new Date(timeSpan[0]).getTime();
     const toDay = new Date(timeSpan[1]).getTime();
     
     let [fromTimeInMs, toTimeInMs] =  timeOfDaySpan.map(timeOfDayToMs);
     // if end time is smaller than start time add a day
     if (toTimeInMs < fromTimeInMs) {
-      toTimeInMs += DAY;
+      toTimeInMs += DAY_IN_MS;
     }
     let current = fromDay;
     const days = {}
@@ -75,7 +75,7 @@ function DiaryWrapper({
         }
       }
 
-      current += DAY;
+      current += DAY_IN_MS;
     }
     return days;
   }, [visibleEvents, timeSpan, daysOfWeek]);

@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo } from "react";
-import DatePicker from "react-multi-date-picker";
 import DatePickerCustom from "~components/FormComponents/DatePicker";
 // import { TimePicker } from '@vaadin/react-components/TimePicker.js';
 import { Storage } from "@plasmohq/storage";
@@ -13,7 +12,7 @@ import FilterInputsList from "~components/FormComponents/FilterInputsList";
 import WeekdaysPicker from "~components/WeekdaysPicker";
 import TimePicker from "~components/FormComponents/TimePicker";
 import Diary from "~components/Diary";
-import { GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PLATFORMS } from "~constants";
+import { GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PLATFORMS, DAY_IN_MS } from "~constants";
 
 import '../styles/Studio.scss';
 import { buildDateKey, downloadTextfile, JSONArrayToCSVStr } from "~helpers";
@@ -49,10 +48,9 @@ function Studio({
   const crudPort = usePort("activitycrud");
   const annotationsPort = usePort("annotationscrud");
   const defaultSettings = useMemo(() => {
-    const DAY = 24 * 3600 * 1000;
     const today = new Date().getTime();
-    const maxTime = today - today % DAY + DAY;
-    const minTime = maxTime - DAY * 15;
+    const maxTime = today - today % DAY_IN_MS + DAY_IN_MS;
+    const minTime = maxTime - DAY_IN_MS * 15;
     return {
       editionMode: EDITION_MODES[0],
       timeSpan: [new Date(minTime), new Date(maxTime)],
@@ -148,11 +146,11 @@ function Studio({
   }, [pendingRequestsIds, annotationsPort]);
 
   const requestBinnedData = useMemo(() => () => {
-    const DAY = 3600 * 24 * 1000;
+    const DAY_IN_MS = 3600 * 24 * 1000;
     if (timeSpan && timeSpan?.length === 2 && daysOfWeek.length > 0 && timeSpan.map(d => d).length) {
       const [fromSpan, toSpan] = timeSpan;
       const from = new Date(fromSpan).getTime();
-      const to = new Date(new Date(toSpan).getTime() + DAY - 1).getTime();
+      const to = new Date(new Date(toSpan).getTime() + DAY_IN_MS - 1).getTime();
       requestFromActivityCrud(GET_ACTIVITY_EVENTS, {
         from,
         to,
@@ -161,7 +159,7 @@ function Studio({
     }
     // @todo also query filtered events according to other settings
     requestFromActivityCrud(GET_BINNED_ACTIVITY_OUTLINE, {
-      bin: DAY
+      bin: DAY_IN_MS
     })
   }, [settings, timeSpan, daysOfWeek, requestFromActivityCrud])
 
