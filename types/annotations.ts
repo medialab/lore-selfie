@@ -7,16 +7,6 @@ export interface Creator {
   description: String
   links: Object
 }
-export interface Annotations {
-  creators: Object
-  tags: Object
-  expressions: Object
-}
-
-export interface Query {
-  id: String
-  query: String
-}
 
 export interface Expression {
   id: String
@@ -31,4 +21,20 @@ export interface Tag {
   color: String
   name: String
   description: String
+}
+export interface Annotations {
+  creators: {
+    [key: string]: Creator
+  }
+  tags: {
+    [key: string]: Tag
+  }
+  expressions: {
+    [key: string]: Expression
+  }
+}
+
+export interface Query {
+  id: String
+  query: String
 }

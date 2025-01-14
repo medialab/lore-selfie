@@ -149,7 +149,7 @@ function Annotations() {
                               // creators: annotations.creators,
                               ...annotations,
                               onChange: (data) => {
-                                requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data, id: 'creators' })
+                                requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { value: data, id: 'creators' })
                               },
                               onDeleteItem: id => {
                                 requestPort(annotationsPort, DELETE_ANNOTATION, { collection: 'creators', id })
@@ -182,7 +182,7 @@ function Annotations() {
                                     }
                                   }
                                 }, {})
-                                requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data: newCreators, id: 'creators' })
+                                requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { value: newCreators, id: 'creators' })
                               },
                               // @todo finish this
                               // onLinkExpressions: (expressionId, ids) => {
@@ -204,11 +204,11 @@ function Annotations() {
                               //       }
                               //     }
                               //   }, {})
-                              //   requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data: newExpressions, id: 'creators' })
+                              //   requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { value: newExpressions, id: 'creators' })
                               // },
                               // tags: annotations.tags,
                               onChange: (data) => {
-                                requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data, id: 'tags' })
+                                requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { value: data, id: 'tags' })
                               },
                               onDeleteItem: id => {
                                 requestPort(annotationsPort, DELETE_ANNOTATION, { collection: 'tags', id })
@@ -228,7 +228,7 @@ function Annotations() {
                               // tags: annotations.tags,
                               // creators: annotations.creators,
                               onChange: (data) => {
-                                requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { data, id: 'expressions' })
+                                requestPort(annotationsPort, UPDATE_ANNOTATION_COLLECTION, { value: data, id: 'expressions' })
                               },
                               onDeleteItem: id => {
                                 requestPort(annotationsPort, DELETE_ANNOTATION, { collection: 'expressions', id })

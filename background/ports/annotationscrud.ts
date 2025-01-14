@@ -1,7 +1,5 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
-import { v4 as generateId } from 'uuid';
-import { type CaptureEventsList } from "~types/captureEventsTypes"
 import {
   ACTION_END,
   GET_ANNOTATIONS,
@@ -14,18 +12,32 @@ import {
   DELETE_ALL_DATA,
   SET_ANNOTATIONS,
 } from "~constants";
+import type { Annotations, Creator, Expression, Tag } from "~types/annotations";
 
 const storage = new Storage({
   area: "local",
   // copiedKeyList: ["shield-modulation"],
 })
 
+
+
+interface MessagePayload {
+  actionType: String,
+  payload: object,
+  requestId: String
+}
+
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
-  const { actionType, payload = {}, requestId } = req.body
+  const { actionType, payload, requestId }: MessagePayload = req.body
   // console.log('req body in annotations crud', req.body);
   const baseAnnotations: Annotations = await storage.get('lore-selfie-annotations');
-  let annotations = baseAnnotations || DEFAULT_ANNOTATIONS;
-  const { collection, id, value } = payload;
+  let annotations: Annotations = baseAnnotations || DEFAULT_ANNOTATIONS;
+  interface AnnotationPayload {
+    collection: string,
+    id: string,
+    value: any
+  }
+  const { collection, id, value } = payload as AnnotationPayload;
   let newCollection, newAnnotations;
   switch (actionType) {
     case DELETE_ALL_DATA:
@@ -54,7 +66,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       break;
     case SET_ANNOTATIONS:
       // @todo add proper schema validation
-      await storage.set('lore-selfie-annotations', payload.value);
+      await storage.set('lore-selfie-annotations', value);
       res.send({
         responseType: ACTION_END,
         actionType,
@@ -62,11 +74,12 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         requestId,
         result: {
           status: 'success',
-          data: payload.value
+          data: value
         }
       })
       break;
     case GET_ANNOTATIONS_COLLECTION:
+      const collectionToGet = payload as unknown;
       res.send({
         responseType: ACTION_END,
         actionType,
@@ -74,16 +87,16 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         requestId,
         result: {
           status: 'success',
-          data: annotations[payload]
+          data: annotations[collectionToGet as string]
         }
       })
       break;
     case UPDATE_ANNOTATION_COLLECTION:
       // console.log('payload', payload, ['data', 'id'].every(k => k in payload))
-      if (['data', 'id'].every(k => k in payload)) {
+      if (['value', 'id'].every(k => k in payload)) {
         const newAnnotations = {
           ...annotations,
-          [payload.id]: payload.data
+          [id]: value
         }
         await storage.set('lore-selfie-annotations', newAnnotations);
         res.send({
@@ -159,19 +172,19 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
           return [
             collectionId,
             Object.entries(collectionItems)
-              .map(([itemId, item]: [String, Object]) => {
-                if (item.links && item.links[collection]) {
+              .map(([itemId, item]: [string, Tag|Expression|Creator]) => {
+                if ((item as Creator).links && (item as Creator).links[collection]) {
                   return [itemId, {
                     ...item,
                     links: {
-                      ...item.links,
-                      [collection]: item.links[collection].filter(linkId => linkId !== id)
+                      ...(item as Creator).links,
+                      [collection]: (item as Creator).links[collection].filter(linkId => linkId !== id)
                     }
                   }]
                 }
                 return [itemId, item];
               })
-              .reduce((res, [itemId, item]) => ({ ...res, [itemId]: item }), {})
+              .reduce((res, [itemId, item]: [string, Tag|Expression|Creator]) => ({ ...res, [itemId]: item }), {})
           ]
         })
           .reduce((res, [collectionId, collectionItems]) => ({
