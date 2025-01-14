@@ -4,7 +4,6 @@ import { usePort } from "@plasmohq/messaging/hook"
 // import { Storage } from "@plasmohq/storage"
 import { FileDrop } from 'react-file-drop'
 import { CodeBlock, dracula } from "react-code-blocks";
-import { v4 as generateId } from 'uuid';
 
 import { downloadTextfile, formatNumber, buildDateKey } from "~helpers";
 

@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
 import { v4 as generateId } from 'uuid';
-import { type captureEventsList } from "~types/captureEventsTypes"
+import { type CaptureEventsList } from "~types/captureEventsTypes"
 import {
   ACTION_END,
   GET_ANNOTATIONS,

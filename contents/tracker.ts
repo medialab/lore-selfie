@@ -2,7 +2,7 @@ export { }
 import type { PlasmoCSConfig } from "plasmo"
 import { v4 as generateId } from 'uuid';
 import { Storage } from "@plasmohq/storage"
-import { Browser, OpenPlatformInTabEvent, type captureEventsList, type ClosePlatformInTabEvent, type EventGeneric, type FocusTabEvent, type PointerActivityRecordEvent, type BlurTabEvent } from "~types/captureEventsTypes"
+import { Browser, OpenPlatformInTabEvent, type CaptureEventsList, type ClosePlatformInTabEvent, type EventGeneric, type FocusTabEvent, type PointerActivityRecordEvent, type BlurTabEvent } from "~types/captureEventsTypes"
 import { recordNewViewContent } from "~analyzers/recordNewViewContent";
 import { getPlatform, getBrowser } from "~helpers";
 import { updateLiveTracking } from "~analyzers/livetrackers";
@@ -36,7 +36,7 @@ let routine; // interval used in live tracking
  * @param evt event to add to local storage activity history
  */
 const addEvent = async (evt: EventGeneric) => {
-  const data: captureEventsList = await storage.get("lore-selfie-activity");
+  const data: CaptureEventsList = await storage.get("lore-selfie-activity");
   let updatedData;
   if (data) {
     updatedData = [...data, evt]

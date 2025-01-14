@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
-import { type captureEventsList } from "~types/captureEventsTypes"
+import { type CaptureEventsList } from "~types/captureEventsTypes"
 
 const storage = new Storage({
   area: "local",
@@ -12,7 +12,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
 
   // console.log('received request', req.body);
 
-  const activity: captureEventsList = await storage.get("lore-selfie-activity");
+  const activity: CaptureEventsList = await storage.get("lore-selfie-activity");
   if (!activity || !activity.length) {
     res.send({
       types,

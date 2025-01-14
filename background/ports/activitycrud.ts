@@ -1,9 +1,14 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
 import { v4 as generateId } from 'uuid';
-import { type captureEventsList } from "~types/captureEventsTypes"
+import { type BrowseViewEvent,
+  type YoutubeVideoMetadata,type YoutubeShortMetadata,type TwitchLiveMetadata,type GenericViewEventMetadata,
+  type CaptureEventsList
+ } from "~types/captureEventsTypes"
 import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, GET_HABITS_DATA, LIVE_USER_ACTIVITY_RECORD, PLATFORMS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA } from "~constants";
 import { buildDateKey, getDateBin } from "~helpers";
+import type { AllData } from "~types/io";
+
 
 
 const DAY = 24 * 3600 * 1000;
@@ -13,7 +18,7 @@ const storage = new Storage({
   // copiedKeyList: ["shield-modulation"],
 })
 
-const checkTimeOfDaySpan = (date, [from, to]) => {
+const checkTimeOfDaySpan = (date: number, [from, to]: [String, String]) : Boolean => {
   const referenceDate = new Date(new Date(date).getTime())
   referenceDate.setHours(0);
   referenceDate.setMilliseconds(0);
@@ -33,19 +38,19 @@ const checkTimeOfDaySpan = (date, [from, to]) => {
   }
   return date > fromDate.getTime() && date < toDate.getTime();
 }
-const checkDaysOfWeek = (date, days = []) => {
+const checkDaysOfWeek = (date: number, days : Array<number> = []) : Boolean => {
   const dayOfWeek = new Date(date).getDay();
   return days.includes(dayOfWeek);
 }
 
-const applyExcludedTitlePatterns = (events: any[], inputPatterns: any[]) => {
+const applyExcludedTitlePatterns = (events: Array<BrowseViewEvent>, inputPatterns: any[]) => {
   const patterns = inputPatterns.filter(p => p && p.trim().length);
   if (!patterns.length) {
     return events;
   }
   const droppedURLs = new Set();
   return events.filter((event) => {
-    const { url, metadata = {} } = event;
+    const { url, metadata = {title: ''} } : {url: String, metadata: YoutubeVideoMetadata|YoutubeShortMetadata|TwitchLiveMetadata|GenericViewEventMetadata} = event;
     const { title } = metadata;
     let passes = true;
     if (title) {
@@ -68,7 +73,7 @@ const applyExcludedTitlePatterns = (events: any[], inputPatterns: any[]) => {
   })
 }
 
-const applyChannelSettings = (events, channelsSettings) => {
+const applyChannelSettings = (events: CaptureEventsList, channelsSettings: object) => {
   const transformedEvents = [];
   let anonIndex = 1;
   let anonURLSIndex = 0;
@@ -80,10 +85,10 @@ const applyChannelSettings = (events, channelsSettings) => {
   let passing = true;
   for (let i = 0; i < events.length; i++) {
     const event = events[i];
-    const outputEvent = { ...event };
+    let outputEvent = { ...event };
     // changing view
     if (event.type === 'BROWSE_VIEW') {
-      const channelId = event.metadata?.channelId;
+      const channelId = (event as BrowseViewEvent).metadata?.channelId;
       const { platform } = event;
       const id = `${channelId}-${platform}`;
       // matching channel settings = handle
@@ -115,7 +120,9 @@ const applyChannelSettings = (events, channelsSettings) => {
             });
             anonIndex++;
           }
+          outputEvent = outputEvent as BrowseViewEvent;
           outputEvent.metadata = {
+            ...event.metadata,
             title: "Contenu anonymisé",
             channelId: anonMap.get(id).channelId,
             channelName: anonMap.get(id).channelName,
@@ -160,7 +167,27 @@ const applyChannelSettings = (events, channelsSettings) => {
   // console.log('hiddenURLs', hiddenURLs);
   return transformedEvents;
 }
-const filterEvents = (events, payload, tag) => {
+
+
+const AvailablePlatforms = [...PLATFORMS] as const;
+
+interface MessagePayload {
+  actionType: String,
+  payload: object,
+  requestId: String
+}
+interface FilterEventsPayload {
+  from: number,
+  to: number,
+  timeSpan: [number, number],
+  timeOfDaySpan: [string, string]
+  daysOfWeek: Array<number>,
+  platforms: Array<typeof AvailablePlatforms>,
+  channelsSettings: object,
+  excludedTitlePatterns: Array<string>
+}
+
+const filterEvents = (events: CaptureEventsList, payload: FilterEventsPayload) : CaptureEventsList => {
   const {
     from: initialFrom,
     to: initialTo,
@@ -191,7 +218,7 @@ const filterEvents = (events, payload, tag) => {
     const matchesTimespan = date > from && date < to;
     const matchesTimeOfDaySpan = timeOfDaySpan === undefined ? true : checkTimeOfDaySpan(date, timeOfDaySpan);
     const matchesDaysOfWeek = daysOfWeek === undefined ? true : checkDaysOfWeek(date, daysOfWeek);
-    const matchesPlatforms = platforms === undefined ? true : platforms.includes(event.platform);
+    const matchesPlatforms = platforms === undefined ? true : platforms.includes(event.platform.split(''));
     // console.log('matches platforms', matchesPlatforms, event.platform)
     // if (tag === GET_CHANNELS) {      
     //   console.log('test for event in filters', matchesTimespan && matchesTimeOfDaySpan && matchesDaysOfWeek && matchesPlatforms, {matchesTimespan, matchesTimeOfDaySpan, matchesDaysOfWeek, matchesPlatforms}, event, {timeOfDaySpan, date: new Date(event.date), from: new Date(from), to: new Date(to)})
@@ -203,15 +230,17 @@ const filterEvents = (events, payload, tag) => {
 }
 
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
-  const { actionType, payload = {}, requestId } = req.body
+  let { actionType, payload = {}, requestId } : MessagePayload = req.body
   // console.log('req body', req.body);
-  const baseActivity = await storage.get('lore-selfie-activity');
+  const baseActivity : CaptureEventsList = await storage.get('lore-selfie-activity');
   const activity = baseActivity || [];
-  let filteredEvents, units, loadedUnits;
+  let filteredEvents : CaptureEventsList, 
+    units: any, 
+    loadedUnits: any;
   switch (actionType) {
     case GET_CHANNELS:
       // console.debug('filter events in get channels', payload, filterEvents(activity, payload, GET_CHANNELS))
-      filteredEvents = filterEvents(activity, payload)
+      filteredEvents = filterEvents(activity, payload as FilterEventsPayload)
         .filter(event => {
           if (event.type === BROWSE_VIEW) {
             return event.metadata && event.metadata.channelId;
@@ -219,7 +248,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         });
       // console.log('filtered events for get channels', filteredEvents, activity.length, payload);
       const channelsList = new Map();
-      filteredEvents.forEach(event => {
+      filteredEvents.forEach((event: BrowseViewEvent) => {
         const { channelId, channelName } = event.metadata;
         const { platform, url } = event;
         const id = `${channelId}-${platform}`
@@ -254,13 +283,12 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       break;
 
     case GET_ACTIVITY_EVENTS:
-      filteredEvents = filterEvents(activity, payload);
-
-      if (payload.channelsSettings && Object.keys(payload.channelsSettings).length) {
-        filteredEvents = applyChannelSettings(filteredEvents, payload.channelsSettings)
+      filteredEvents = filterEvents(activity, payload as FilterEventsPayload);
+      if ((payload as FilterEventsPayload).channelsSettings && Object.keys((payload as FilterEventsPayload).channelsSettings).length) {
+        filteredEvents = applyChannelSettings(filteredEvents, (payload as FilterEventsPayload).channelsSettings)
       }
-      if (payload.excludedTitlePatterns?.length) {
-        filteredEvents = applyExcludedTitlePatterns(filteredEvents, payload.excludedTitlePatterns)
+      if ((payload as FilterEventsPayload).excludedTitlePatterns?.length) {
+        filteredEvents = applyExcludedTitlePatterns(filteredEvents as Array<BrowseViewEvent>, (payload as FilterEventsPayload).excludedTitlePatterns)
       }
 
       res.send({
@@ -275,12 +303,15 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       })
       break;
 
+    interface GetBinnedActivityPayload extends FilterEventsPayload {
+      bin: number
+    }
     case GET_BINNED_ACTIVITY_OUTLINE:
       const {
         bin = DAY, // 'day',
         ...settings
-      } = payload;
-      filteredEvents = filterEvents(activity, settings)
+      } = payload as GetBinnedActivityPayload;
+      filteredEvents = filterEvents(activity, settings as FilterEventsPayload)
       units = filteredEvents.reduce((cur, event) => {
         const time = new Date(event.date).getTime();
         const key = time - time % bin;
@@ -290,9 +321,9 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
           cur.set(key, [...cur.get(key), event])
         }
         return cur;
-      }, new Map());
+      }, new Map<number, CaptureEventsList>()) as Map<number, CaptureEventsList>;
       loadedUnits = []
-      for ([dateTime, events] of units.entries()) {
+      for (const [dateTime, events] of (units as Map<number, CaptureEventsList>).entries()) {
         loadedUnits.push({
           date: dateTime,
           eventsCount: events.length
@@ -313,7 +344,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       const {
         bin: binsDuration, // 'day',
         ...otherSettings
-      } = payload;
+      } = payload as GetBinnedActivityPayload;
 
       const bins = [];
       for (let h = 0; h < 24 * 3600 * 1000; h += binsDuration) {
@@ -407,8 +438,11 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       })
       break;
     case REPLACE_ACTIVITY_EVENTS:
-      if (payload.data) {
-        await storage.set('lore-selfie-activity', payload.data);
+      interface ReplaceActivityPayload extends MessagePayload {
+        data: AllData
+      }
+      if ((payload as ReplaceActivityPayload).data) {
+        await storage.set('lore-selfie-activity', (payload as ReplaceActivityPayload).data);
         res.send({
           responseType: ACTION_END,
           requestId,
@@ -432,8 +466,8 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       }
       break;
     case PREPEND_ACTIVITY_EVENTS:
-      if (payload.data) {
-        await storage.set('lore-selfie-activity', [...payload.data, ...activity]);
+      if ((payload as ReplaceActivityPayload).data) {
+        await storage.set('lore-selfie-activity', [...(payload as ReplaceActivityPayload).data.activity, ...activity]);
         res.send({
           responseType: ACTION_END,
           requestId,
@@ -457,8 +491,8 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       }
       break;
     case APPEND_ACTIVITY_EVENTS:
-      if (payload.data) {
-        await storage.set('lore-selfie-activity', [...payload.data, ...activity]);
+      if ((payload as ReplaceActivityPayload).data) {
+        await storage.set('lore-selfie-activity', [...(payload as ReplaceActivityPayload).data.activity, ...activity]);
         res.send({
           responseType: ACTION_END,
           requestId,
@@ -504,21 +538,25 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     //   })
     //   break;
     case DUPLICATE_DAY_DATA:
-      if (payload.daySlug && payload.numberOfDays) {
+      interface DuplicateDayDataPayload {
+        daySlug: string,
+        numberOfDays: number
+      }
+      if ((payload as DuplicateDayDataPayload).daySlug && (payload as DuplicateDayDataPayload).numberOfDays) {
         const dayEvents = activity.filter(event => {
           const daySlug = buildDateKey(event.date);
           return daySlug === daySlug;
         });
         const injectionIds = Array.from(new Set(dayEvents.map(e => e.injectionId)));
         let newEvents = [...dayEvents];
-        for (let i = 1; i < payload.numberOfDays; i++) {
+        for (let i = 1; i < (payload as DuplicateDayDataPayload).numberOfDays; i++) {
           res.send({
             responseType: ACTION_PROGRESS,
             requestId,
             actionType,
             payload,
             current: i,
-            total: payload.numberOfDays
+            total: (payload as DuplicateDayDataPayload).numberOfDays
           });
           const injectionIdMap = new Map();
           injectionIds.forEach(id => {

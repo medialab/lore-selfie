@@ -62,7 +62,10 @@ export interface YoutubeShortMetadata extends GenericViewEventMetadata {
 }
 
 export interface TwitchLiveMetadata extends GenericViewEventMetadata {
-  channel: String,
+  // @todo channel should be deprecated
+  channel?: String,
+  channelId: String,
+  channelName?: String,
   channelImageAvatarSrc: String,
   viewersCount: String,
   liveTimeElapsed: String,
@@ -74,7 +77,7 @@ export interface TwitchLiveMetadata extends GenericViewEventMetadata {
 export interface BrowseViewEvent extends GenericEvent {
   type: "BROWSE_VIEW",
   viewType: String,
-  metadata: YoutubeVideoMetadata|YoutubeShortMetadata|TwitchLiveMetadata|GenericViewEventMetadata,
+  metadata: YoutubeVideoMetadata|YoutubeShortMetadata|TwitchLiveMetadata,
 }
 
 export interface FocusOnReactionInputEvent extends GenericEvent {
@@ -118,7 +121,7 @@ export interface ChatActivityRecordEvent extends GenericEvent {
 
 
 
-export interface LiveUserActivityRecord extends GenericEvent {
+export interface LiveUserActivityRecordEvent extends GenericEvent {
   type: "LIVE_USER_ACTIVITY_RECORD"
   timeSpan: Number, // timespan of measure provided, in ms
   currentMediaTime?: string,
@@ -127,4 +130,14 @@ export interface LiveUserActivityRecord extends GenericEvent {
   isPlaying: Boolean,
 }
 
-export type captureEventsList = Array<GenericEvent>
+export type CaptureEventsList = Array<
+OpenPlatformInTabEvent|
+ClosePlatformInTabEvent|
+BlurTabEvent|
+FocusTabEvent|
+BrowseViewEvent|
+FocusOnReactionInputEvent|
+BlurOnReactionInputEvent|
+ChatActivityRecordEvent|
+LiveUserActivityRecordEvent
+>

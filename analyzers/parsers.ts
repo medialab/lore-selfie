@@ -26,7 +26,10 @@ const parsers = {
       live: {
         test: () : Boolean => !!document.querySelector('#live-channel-stream-information h1')?.textContent && document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1)')?.textContent.trim().length > 0,
         scrape: () : TwitchLiveMetadata => ({
+          // @todo channel should be deprecated
           channel: document.querySelector('#live-channel-stream-information h1')?.textContent,
+          channelId: document.querySelector('#live-channel-stream-information h1')?.textContent,
+          channelName: document.querySelector('#live-channel-stream-information h1')?.textContent,
           channelImageAvatarSrc: document.querySelector('#live-channel-stream-information .tw-image-avatar')?.getAttribute('src'),
           title: document.querySelector('#live-channel-stream-information h2')?.textContent,
           viewersCount: document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div')?.textContent,

@@ -1,6 +1,6 @@
 import { v4 as generateId } from 'uuid';
 import { BLUR_ON_REACTION_INPUT, CHAT_ACTIVITY_RECORD, DEFAULT_SETTINGS, FOCUS_ON_REACTION_INPUT, LIVE_USER_ACTIVITY_RECORD, PLATFORMS } from '~constants';
-import type { BlurOnReactionInputEvent, ChatActivityRecordEvent, FocusOnReactionInputEvent, LiveUserActivityRecord, TwitchMessageRecord } from "~types/captureEventsTypes";
+import type { BlurOnReactionInputEvent, ChatActivityRecordEvent, FocusOnReactionInputEvent, LiveUserActivityRecordEvent, TwitchMessageRecord } from "~types/captureEventsTypes";
 import { Storage } from "@plasmohq/storage"
 import type { Settings } from '~types/settings';
 
@@ -144,7 +144,7 @@ const trackers:TrackersType = {
         if (prevMousePosition && mousePosition && (prevMousePosition.posX !== mousePosition.posX || prevMousePosition.posY !== mousePosition.posY)) {
           mouseHasMoved = true;
         }
-        const liveUserActivityRecord:LiveUserActivityRecord = {
+        const LiveUserActivityRecordEvent:LiveUserActivityRecordEvent = {
           type: LIVE_USER_ACTIVITY_RECORD,
           id: generateId(),
           date: new Date(),
@@ -157,7 +157,7 @@ const trackers:TrackersType = {
           isPlaying
         }
         prevMousePosition = mousePosition;
-        await addEvent(liveUserActivityRecord)
+        await addEvent(LiveUserActivityRecordEvent)
 
         // const IsPlayingActivityRecord: IsPlayingActivityRecord = {
         //   type: "IS_PLAYING_ACTIVITY_RECORD",
@@ -223,7 +223,7 @@ const trackers:TrackersType = {
         if (prevMousePosition && mousePosition && (prevMousePosition.posX !== mousePosition.posX || prevMousePosition.posY !== mousePosition.posY)) {
           mouseHasMoved = true;
         }
-        const liveUserActivityRecord:LiveUserActivityRecord = {
+        const LiveUserActivityRecordEvent:LiveUserActivityRecordEvent = {
           type: LIVE_USER_ACTIVITY_RECORD,
           id: generateId(),
           date: new Date(),
@@ -237,7 +237,7 @@ const trackers:TrackersType = {
           isPlaying
         }
         prevMousePosition = mousePosition;
-        await addEvent(liveUserActivityRecord)
+        await addEvent(LiveUserActivityRecordEvent)
 
         // const IsPlayingActivityRecord: IsPlayingActivityRecord = {
         //   type: "IS_PLAYING_ACTIVITY_RECORD",
