@@ -1,18 +1,18 @@
 
 
 export interface Handle {
-  platform: String
-  internalId: String
-  id: String
-  alias: String
+  platform: string
+  internalId: string
+  id: string
+  alias: string
 }
 
 export interface Settings {
   handles: Array<Handle>,
-  recordOnPlatforms: Array<String>,
+  recordOnPlatforms: Array<string>,
   liveRecordingInterval: number,
-  recordActivity: Boolean,
-  recordTabs: Boolean,
-  recordMouse: Boolean,
-  recordChat: Boolean
+  recordActivity: boolean,
+  recordTabs: boolean,
+  recordMouse: boolean,
+  recordChat: boolean
 }

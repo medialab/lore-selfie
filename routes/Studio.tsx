@@ -14,9 +14,13 @@ import TimePicker from "~components/FormComponents/TimePicker";
 import Diary from "~components/Diary";
 import { GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, PLATFORMS, DAY_IN_MS } from "~constants";
 
-import '../styles/Studio.scss';
+import '~/styles/Studio.scss';
 import { buildDateKey, downloadTextfile, JSONArrayToCSVStr } from "~helpers";
 import InputToValidate from "~components/FormComponents/InputToValidate";
+import type { CaptureEventsList } from "~types/captureEventsTypes";
+import type { Annotations } from "~types/annotations";
+import type { AvailableChannels, DaysData } from "~types/common";
+import type { Settings } from "~types/settings";
 
 
 interface StudioSettings {
@@ -27,7 +31,7 @@ interface StudioSettings {
   platforms: Array<string>
   channelsSettings: object
   excludedTitlePatterns: Array<Object>
-  annotationColumnsNames: Array<String>
+  annotationColumnsNames: Array<string>
   editionTitle: string
 }
 const EDITION_MODES = [
@@ -41,13 +45,14 @@ const storage = new Storage({
 
 function Studio({
 }) {
-  const [visibleEvents, setVisibleEvents] = useState([]);
-  const [pendingRequestsIds, setPendingRequestsIds] = useState(new Set());
-  const [annotations, setAnnotations] = useState();
-  const [daysData, setDaysData] = useState();
+  const [visibleEvents, setVisibleEvents] = useState<CaptureEventsList>([]);
+  const [pendingRequestsIds, setPendingRequestsIds] = useState<Set<string>>(new Set());
+  const [annotations, setAnnotations] = useState<Annotations>();
+  const [daysData, setDaysData] = useState<DaysData>();
   const crudPort = usePort("activitycrud");
   const annotationsPort = usePort("annotationscrud");
-  const defaultSettings = useMemo(() => {
+
+  const defaultSettings = useMemo((): StudioSettings => {
     const today = new Date().getTime();
     const maxTime = today - today % DAY_IN_MS + DAY_IN_MS;
     const minTime = maxTime - DAY_IN_MS * 15;
@@ -65,8 +70,8 @@ function Studio({
   }, []);
 
   const [settings, setSettings] = useState<StudioSettings>(defaultSettings);
-  const [availableChannels, setAvailableChannels] = useState([]);
-  const settingsWithoutChannelsStringified = useMemo(() => {
+  const [availableChannels, setAvailableChannels] = useState<AvailableChannels>([]);
+  const settingsWithoutChannelsstringified = useMemo((): string => {
     console.log('update settings without channels')
     return JSON.stringify({
       ...settings,
@@ -175,14 +180,14 @@ function Studio({
   useInterval(() => {
     requestBinnedData();
     requestFromAnnotationsCrud(GET_ANNOTATIONS, {});
-    // console.debug('request get channels in interval', JSON.parse(settingsWithoutChannelsStringified))
-    requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
+    // console.debug('request get channels in interval', JSON.parse(settingsWithoutChannelsstringified))
+    requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsstringified));
   }, 10000);
 
   useEffect(() => {
-    // console.debug('request get channels', JSON.parse(settingsWithoutChannelsStringified))
-    requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsStringified));
-  }, [settingsWithoutChannelsStringified]);
+    // console.debug('request get channels', JSON.parse(settingsWithoutChannelsstringified))
+    requestFromActivityCrud(GET_CHANNELS, JSON.parse(settingsWithoutChannelsstringified));
+  }, [settingsWithoutChannelsstringified]);
 
   useEffect(() => {
     [annotationsPort, crudPort]

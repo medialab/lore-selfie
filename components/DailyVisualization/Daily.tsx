@@ -6,7 +6,7 @@ import { useRef } from 'react';
 
 import DayVisualization from "./DayVisualization"
 
-import "../styles/Daily.scss";
+import "~/styles/Daily.scss";
 
 function Daily({
   displayedDayDate,

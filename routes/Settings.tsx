@@ -5,137 +5,21 @@ import { v4 as generateId } from 'uuid';
 import { usePort } from "~node_modules/@plasmohq/messaging/dist/hook";
 import { useEffect, useMemo, useState } from "react";
 import InputToValidate from "~components/FormComponents/InputToValidate";
-import { Handle } from "~types/settings";
+import type { Handle } from "~types/settings";
+import type { Settings } from "~types/settings";
+import HandlesManager from "~components/HandlesManager";
 
-function HandleEditor({
-  handle: inputHandle,
-  onChange,
-  onDelete,
-}) {
-  const [handle, setHandle] = useState(inputHandle);
-  useEffect(() => {
-    setHandle(inputHandle);
-  }, [inputHandle]);
-
-  const {
-    platform,
-    internalId,
-    id,
-    alias
-  } = handle;
-
-  return (
-    <li className="Handle card">
-      <form className="card-content" onSubmit={(e) => {
-        e.preventDefault();
-        onChange(handle);
-      }}>
-        <div className="card-body fields">
-          <div className="input-group">
-            <h5>Identifiant sur la plateforme (utilisé pour repérer vos commentaires et messages de chat)</h5>
-            <div className="input-container">
-            <input placeholder="identifiant" type="text" id="id" value={id} onChange={e => setHandle({ ...handle, id: e.target.value })} />
-            </div>
-          </div>
-          <div className="input-group">
-            <h5>Alias pour les visualisations du plugin (optionnel)</h5>
-            <div className="input-container">
-            <input placeholder="alias" type="text" id="alias" value={alias} onChange={e => setHandle({ ...handle, alias: e.target.value })} />
-            </div>
-          </div>
-          <div className="input-group">
-            <h5>Plateforme</h5>
-            <div className="input-container">
-            <select value={platform} onChange={p => setHandle({ ...handle, platform: p.target.value })}>
-
-              {
-                PLATFORMS.map(p => {
-                  return (
-                    <option key={p} value={p}>{p}</option>
-                  )
-                })
-              }
-            </select>
-            </div>
-          </div>
-        </div>
-        <div className="card-actions">
-        <button className="important-button" disabled={JSON.stringify(inputHandle) === JSON.stringify(handle)} role="submit">
-            Valider
-          </button>
-          <button onClick={e => {
-            e.stopPropagation();
-            e.preventDefault();
-            onDelete();
-          }}>
-            Supprimer
-          </button>
-          
-        </div>
-
-
-      </form>
-    </li>
-  )
-}
-function HandlesManager({
-  handles = [],
-  onChange
-}) {
-  const handleCreate = () => {
-    const newHandle = {
-      platform: PLATFORMS[0],
-      id: '',
-      internalId: generateId(),
-      alias: ''
-    }
-    const newHandles = [...handles, newHandle];
-    onChange(newHandles);
-  }
-  return (
-    <ul className="HandlesManager cards-list">
-      {
-        handles.map((handle) => {
-          const handleChange = (newHandle) => {
-            const newHandles = handles.map(h => {
-              if (h.internalId === handle.internalId) {
-                return newHandle;
-              }
-              return h;
-            });
-            onChange(newHandles);
-          }
-          const handleDelete = () => {
-            const newHandles = handles.filter(h => {
-              return h.internalId !== handle.internalId;
-            });
-            onChange(newHandles);
-          }
-          return (
-            <HandleEditor onDelete={handleDelete} handle={handle} onChange={handleChange} key={handle.internalId} />
-          )
-        })
-      }
-      <li>
-        <button className="important-button" onClick={handleCreate}>
-          Ajouter
-        </button>
-      </li>
-    </ul>
-  )
-}
 function Settings() {
-  const [sizeInMb, setSizeInMb]: [number | undefined, Function] = useState(undefined);
-  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
-  const [settings, setSettings] = useState(undefined);
-  // const crudPort = usePort("activitycrud")
-  const settingsPort = usePort("settingscrud")
-  const ioPort = usePort("io")
+  const [sizeInMb, setSizeInMb] = useState<number>(undefined);
+  const [isLoadingSettings, setIsLoadingSettings] = useState<boolean>(true);
+  const [settings, setSettings] = useState<Settings>(undefined);
+  const settingsPort = usePort("settingscrud");
+  const ioPort = usePort("io");
 
 
   useEffect(() => {
-    ioPort.send({ actionType: SERIALIZE_ALL_DATA })
-    settingsPort.send({ actionType: GET_SETTINGS })
+    ioPort.send({ actionType: SERIALIZE_ALL_DATA });
+    settingsPort.send({ actionType: GET_SETTINGS });
   }, []);
 
   ioPort.listen(data => {
@@ -277,7 +161,7 @@ function Settings() {
                   Informations
                 </h2>
                 <ul>
-                  <li>Taille des données stockées par l'extension sur le disque dur : {sizeInMb === undefined ? 'chargement ...' : formatNumber(sizeInMb.toFixed(1)) + ' Mo'}</li>
+                  <li>Taille des données stockées par l'extension sur le disque dur : {sizeInMb === undefined ? 'chargement ...' : formatNumber(+sizeInMb.toFixed(1)) + ' Mo'}</li>
                   {/* <li>
                     <button
                       onClick={() => {

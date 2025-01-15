@@ -55,7 +55,7 @@ function Popup() {
 
   ioPort.listen(data => {
     if (data.actionType === SERIALIZE_ALL_DATA && data.result.status === 'success' && isDownloading) {
-      downloadTextfile(data.result.data, `lore-selfie-activity-${new Date().toUTCString()}.json`, 'application/json')
+      downloadTextfile(data.result.data, `lore-selfie-activity-${new Date().toUTCstring()}.json`, 'application/json')
       setIsDownloading(false);
     }
   })

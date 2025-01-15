@@ -11,20 +11,21 @@ import TagsEdition from "~components/Annotations/TagsEdition";
 import AnnotationsNetwork from "~components/Annotations/AnnotationsNetwork";
 
 
-import "../styles/Annotations.scss";
+import "~/styles/Annotations.scss";
 import { useInterval } from "usehooks-ts";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
 import type { Annotations } from "~types/annotations";
+import type { Dimensions, AvailableChannels } from "~types/common";
 
 
 function Annotations() {
   const annotationsPort = usePort('annotationscrud')
   const activityPort = usePort("activitycrud");
-  const [availableChannels, setAvailableChannels] = useState();
-  const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
-  const [annotations, setAnnotations]: [Annotations, Function] = useState();
-  const [isLoading, setIsLoading] = useState(true);
-  const [pendingRequestsIds, setPendingRequestsIds] = useState(new Set());
+  const [availableChannels, setAvailableChannels] = useState<AvailableChannels>();
+  const [dimensions, setDimensions] = useState<Dimensions>({ width: 1000, height: 1000 });
+  const [annotations, setAnnotations] = useState<Annotations>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [pendingRequestsIds, setPendingRequestsIds] = useState<Set<string>>(new Set());
   /**
     * Sending cud requests
     */
@@ -33,7 +34,7 @@ function Annotations() {
     send: Function
     listen: Function
   }
-  const requestPort = useMemo(() => async (port: PlasmoPortType, actionType: string, payload: object) => {
+  const requestPort: Function = useMemo(() => async (port: PlasmoPortType, actionType: string, payload: object) => {
     const requestId = generateId();
     pendingRequestsIds.add(requestId);
     // console.log('adding pending request', Array.from(pendingRequestsIds))

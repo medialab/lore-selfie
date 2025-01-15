@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
 import { v4 as generateId } from 'uuid';
-import {version, homepage} from '../../package.json';
+import {version, homepage} from '~/package.json';
 import { ACTION_END, ACTION_PROGRESS, DEFAULT_ANNOTATIONS, DEFAULT_SETTINGS, DELETE_ALL_DATA, SERIALIZE_ALL_DATA } from "~constants";
 import type { CaptureEventsList } from "~types/captureEventsTypes";
 import type { Settings } from "~types/settings";

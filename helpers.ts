@@ -5,12 +5,12 @@ export function getBrowser(): Browser {
   let browser;
 
   // helper functions to deal with common regex
-  function getFirstMatch(regex) {
+  function getFirstMatch(regex): string {
     const match = ua.match(regex);
     return (match && match.length > 1 && match[1]) || '';
   }
 
-  function getSecondMatch(regex) {
+  function getSecondMatch(regex): string {
     const match = ua.match(regex);
     return (match && match.length > 1 && match[2]) || '';
   }
@@ -68,7 +68,7 @@ export function getBrowser(): Browser {
   return browser;
 }
 
-export const getPlatform = (url: String): String => {
+export const getPlatform = (url: string): string => {
   const youtubeURLS = [
     "https://www.youtube.com",
     "http://www.youtube.com",

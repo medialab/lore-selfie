@@ -1,4 +1,4 @@
-import Daily from "~components/Daily";
+import Daily from "~components/DailyVisualization/Daily";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import Measure from 'react-measure';
 import { useMemo, useState, useEffect } from "react";
@@ -7,107 +7,25 @@ import { v4 as generateId } from 'uuid';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
-import '../styles/Home.scss';
+import '~/styles/Home.scss';
 import { BROWSE_VIEW, GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_OUTLINE, GET_HABITS_DATA, PLATFORMS_COLORS, DAY_IN_MS } from "~constants";
 import { useInterval } from "usehooks-ts";
 import DatePicker from "~components/FormComponents/DatePicker";
 import { prettyDate, buildDateKey } from "~helpers";
 import Habits from "~components/Habits";
+import DailyLegend from "~components/DailyVisualization/DailyLegend";
+import HabitsLegend from "~components/HabitsVisualization/HabitsLegend";
+import type { HabitsData, Dimensions, DaysData } from "~types/common";
+import type { BrowseViewEvent, CaptureEventsList } from "~types/captureEventsTypes";
+import type { Annotations } from "~types/annotations";
 
 const UPDATE_RATE = 10000;
 const MIN_ZOOM = .5;
 
 
-function DailyLegend({ spansSettings }) {
-  return (
-    <ul className="legend-container">
-      {
-        Object.entries(spansSettings)
-          .map(([id, { legendLabel }]) => {
-            const markerDimension = 10;
-            return (
-              <li key={id}>
-                <svg width={markerDimension} height={markerDimension}>
-                  <rect
-                    x={0}
-                    y={0}
-                    width={markerDimension}
-                    height={markerDimension}
-                    fill={`url(#diagonalHatch-for-${id})`}
-                  />
-                  {
-                    Object.entries(spansSettings).map(([value, { color, markType }], index) => (
-                      <pattern key={index} id={`diagonalHatch-for-${value}`} patternUnits="userSpaceOnUse" width="4" height="4">
-                        {
-                          markType === 'regular' || markType === 'reverse' ?
-                            <path
-                              d={
-                                markType === 'regular' ?
-                                  `M-1,1 l2,-2
-                      M0,4 l4,-4
-                      M3,5 l2,-2`
-                                  : `M1,1 l2,-2
-                      M0,4 l4,-4
-                      M3,5 l2,-2`}
-                              style={{ stroke: color, opacity: 1, strokeWidth: 1, transform: markType === 'regular' ? '' : 'scale(1)' }} />
-                            :
-                            <circle cx={0} cy={0} r={1} fill="transparent"
-                              style={{ stroke: color, opacity: 1, strokeWidth: 1 }} />
-                        }
-
-                      </pattern>
-                    ))
-                  }
-                </svg>
-                <div className={'legend-label'}>
-                  {legendLabel}
-                </div>
-
-              </li>
-
-            )
-          })
-      }
-    </ul>
-  )
-}
-
-
-function HabitsLegend({ }) {
-  return (
-    <ul className="legend-container">
-      {
-
-        Object.entries(PLATFORMS_COLORS)
-          .map(([id, color]) => {
-            const markerDimension = 10;
-            return (
-              <li key={id}>
-                <svg width={markerDimension} height={markerDimension}>
-                  <rect
-                    x={0}
-                    y={0}
-                    width={markerDimension}
-                    height={markerDimension}
-                    fill={color}
-                  />
-
-                </svg>
-                <div className={'legend-label'}>
-                  {id}
-                </div>
-
-              </li>
-
-            )
-          })
-      }
-    </ul>
-  )
-}
-
 function Home() {
 
+  // @todo handle with internationalization
   const daysMap = {
     1: 'Lundi',
     2: 'Mardi',
@@ -133,17 +51,18 @@ function Home() {
     11: 'Décembre',
   }
 
-  const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
-  const [pendingRequestsIds, setPendingRequestsIds] = useState(new Set())
-  const [displayedDayDate, setDisplayedDayDate] = useState();
-  const [habitsTimespan, setHabitsTimespan] = useState();
-  const [habitsBinDuration, setHabitsBinDuration] = useState(3600 * 3 * 1000);
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [roundDay, setRoundDay] = useState(false);
-  const [daysData, setDaysData] = useState([]);
-  const [visibleEvents, setVisibleEvents] = useState([]);
-  const [habitsData, setHabitsData] = useState();
-  const [annotations, setAnnotations] = useState([]);
+  const [dimensions, setDimensions] = useState<Dimensions>({ width: 1000, height: 1000 });
+  const [pendingRequestsIds, setPendingRequestsIds] = useState<Set<string>>(new Set())
+  const [displayedDayDate, setDisplayedDayDate] = useState<Date>();
+  const [habitsTimespan, setHabitsTimespan] = useState<[Date, Date]>();
+  const [habitsBinDuration, setHabitsBinDuration] = useState<number>(3600 * 3 * 1000);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [roundDay, setRoundDay] = useState<boolean>(false);
+  
+  const [daysData, setDaysData] = useState<DaysData>({});
+  const [visibleEvents, setVisibleEvents] = useState<CaptureEventsList>([]);
+  const [habitsData, setHabitsData] = useState<HabitsData>();
+  const [annotations, setAnnotations] = useState<Annotations>();
   const crudPort = usePort("activitycrud");
   const annotationsPort = usePort("annotationscrud");
 
@@ -284,7 +203,7 @@ function Home() {
         return d.getTime();
       });
       const extent = [Math.min(...dates), Math.max(...dates) + DAY_IN_MS - 1];
-      setHabitsTimespan(extent.map(d => new Date(d)));
+      setHabitsTimespan([new Date(extent[0]), new Date(extent[1])]);
       // console.log('dates', dates);
     }
   }, [daysData])
@@ -340,14 +259,13 @@ function Home() {
     const events = visibleEvents;
     const validEvents = events
       .filter(event => event.type === BROWSE_VIEW && event.url && event.metadata.title
-
         && ['live', 'video', 'short'].includes(event.viewType)
       );
     const contents = new Map();
     const channels = new Map();
     let index = 0;
     let rCount = 0;
-    validEvents.forEach(event => {
+    validEvents.forEach((event: BrowseViewEvent) => {
       let channel = event.metadata.channelName || event.metadata.channelId;
       const channelSlug = `${event.metadata.channelId}-${event.platform}`;
       const creator = Object.values(creators).find(c => c.channels.includes(channelSlug));
@@ -390,19 +308,19 @@ function Home() {
       color: 'red',
       markType: 'regular',
       legendLabel: 'Le média est joué',
-      tooltipFn: ({ start, end }) => `j'étais active/actif sur l'onglet de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+      tooltipFn: ({ start, end }) => `j'étais active/actif sur l'onglet de ${new Date(start). toLocaleTimeString()} à ${new Date(end). toLocaleTimeString()}`
     },
     playing: {
       color: 'green',
       markType: 'reverse',
       legendLabel: `La souris est active`,
-      tooltipFn: ({ start, end }) => `j'ai joué le média de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+      tooltipFn: ({ start, end }) => `j'ai joué le média de ${new Date(start). toLocaleTimeString()} à ${new Date(end). toLocaleTimeString()}`
     },
     focus: {
       color: 'blue',
       markType: 'points',
       legendLabel: `L'onglet est visible`,
-      tooltipFn: ({ start, end }) => `j'avais l'onglet visible de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`
+      tooltipFn: ({ start, end }) => `j'avais l'onglet visible de ${new Date(start). toLocaleTimeString()} à ${new Date(end). toLocaleTimeString()}`
     },
   }
 

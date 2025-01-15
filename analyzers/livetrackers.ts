@@ -13,12 +13,12 @@ const Platforms = [...PLATFORMS] as const;
 type Platform = (typeof Platforms)[number];
 interface LiveTrackerProps {
   settings: Settings,
-  injectionId: String,
+  injectionId: string,
   addEvent: Function,
   platform: Platform,
-  currentURL: String,
+  currentURL: string,
   onCurrentURLChange: Function,
-  activeViewType?: String,
+  activeViewType?: string,
 } 
 
 interface TrackersType {

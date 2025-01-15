@@ -22,9 +22,9 @@ const storage = new Storage({
 
 
 interface MessagePayload {
-  actionType: String,
+  actionType: string,
   payload: object,
-  requestId: String
+  requestId: string
 }
 
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {

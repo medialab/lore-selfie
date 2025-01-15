@@ -15,7 +15,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   interface MessageBodyType {
     types: typeof availableEventTypes[number]
     page: number,
-    reverseOrder: Boolean,
+    reverseOrder: boolean,
     itemsPerPage: number
   }
   const { types, page = 0, reverseOrder, itemsPerPage = 50 }: MessageBodyType = req.body

@@ -24,7 +24,7 @@ const parsers = {
     },
     scrapers: {
       live: {
-        test: () : Boolean => !!document.querySelector('#live-channel-stream-information h1')?.textContent && document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1)')?.textContent.trim().length > 0,
+        test: () : boolean => !!document.querySelector('#live-channel-stream-information h1')?.textContent && document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(1n) > div > div:nth-child(2) > div > div > div:nth-child(1)')?.textContent.trim().length > 0,
         scrape: () : TwitchLiveMetadata => ({
           // @todo channel should be deprecated
           channel: document.querySelector('#live-channel-stream-information h1')?.textContent,
@@ -69,7 +69,7 @@ const parsers = {
     },
     scrapers: {
       short: {
-        test: () : Boolean => !!document.querySelector('.YtReelMetapanelViewModelHost,.YtShortsVideoTitleViewModelShortsVideoTitle,.ytReelMultiFormatLinkViewModelTitle,.ytShortsVideoTitleViewModelShortsVideoTitle')?.textContent.trim().length,
+        test: () : boolean => !!document.querySelector('.YtReelMetapanelViewModelHost,.YtShortsVideoTitleViewModelShortsVideoTitle,.ytReelMultiFormatLinkViewModelTitle,.ytShortsVideoTitleViewModelShortsVideoTitle')?.textContent.trim().length,
         scrape: () : YoutubeShortMetadata => ({
           title: document.querySelector('.YtShortsVideoTitleViewModelShortsVideoTitle, .ytd-shorts[is-active]  .ytReelMultiFormatLinkViewModelTitle, .ytd-shorts[is-active] .ytShortsVideoTitleViewModelShortsVideoTitle')?.textContent.trim(),
           // following commented bc it only works with the first short being watched
@@ -96,7 +96,7 @@ const parsers = {
         })
       },
       video: {
-        test: () : Boolean => !!document.querySelector('yt-formatted-string.ytd-watch-metadata')?.textContent.trim().length,
+        test: () : boolean => !!document.querySelector('yt-formatted-string.ytd-watch-metadata')?.textContent.trim().length,
         scrape: () : YoutubeVideoMetadata => ({
           title: document.querySelector('yt-formatted-string.ytd-watch-metadata')?.textContent.trim(),
           // @todo retrieve only if it's the first video loaded in view (bc it's not uploaded in spa mode)

@@ -8,13 +8,14 @@ import { type BrowseViewEvent,
 import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, GET_HABITS_DATA, LIVE_USER_ACTIVITY_RECORD, PLATFORMS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, DAY_IN_MS } from "~constants";
 import { buildDateKey, getDateBin } from "~helpers";
 import type { AllData } from "~types/io";
+import type { AvailableChannel, AvailableChannels, HabitsData } from "~types/common";
 
 const storage = new Storage({
   area: "local",
   // copiedKeyList: ["shield-modulation"],
 })
 
-const checkTimeOfDaySpan = (date: number, [from, to]: [String, String]) : Boolean => {
+const checkTimeOfDaySpan = (date: number, [from, to]: [string, string]) : boolean => {
   const referenceDate = new Date(new Date(date).getTime())
   referenceDate.setHours(0);
   referenceDate.setMilliseconds(0);
@@ -34,7 +35,7 @@ const checkTimeOfDaySpan = (date: number, [from, to]: [String, String]) : Boolea
   }
   return date > fromDate.getTime() && date < toDate.getTime();
 }
-const checkDaysOfWeek = (date: number, days : Array<number> = []) : Boolean => {
+const checkDaysOfWeek = (date: number, days : Array<number> = []) : boolean => {
   const dayOfWeek = new Date(date).getDay();
   return days.includes(dayOfWeek);
 }
@@ -46,7 +47,7 @@ const applyExcludedTitlePatterns = (events: Array<BrowseViewEvent>, inputPattern
   }
   const droppedURLs = new Set();
   return events.filter((event) => {
-    const { url, metadata = {title: ''} } : {url: String, metadata: YoutubeVideoMetadata|YoutubeShortMetadata|TwitchLiveMetadata|GenericViewEventMetadata} = event;
+    const { url, metadata = {title: ''} } : {url: string, metadata: YoutubeVideoMetadata|YoutubeShortMetadata|TwitchLiveMetadata|GenericViewEventMetadata} = event;
     const { title } = metadata;
     let passes = true;
     if (title) {
@@ -168,9 +169,9 @@ const applyChannelSettings = (events: CaptureEventsList, channelsSettings: objec
 const AvailablePlatforms = [...PLATFORMS] as const;
 
 interface MessagePayload {
-  actionType: String,
+  actionType: string,
   payload: object,
-  requestId: String
+  requestId: string
 }
 interface FilterEventsPayload {
   from: number,
@@ -250,7 +251,14 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         const id = `${channelId}-${platform}`
         // console.log('channel', { channelId, channelName, id, platform })
         if (!channelsList.has(id)) {
-          channelsList.set(id, { id, channelId, channelName, platform, urls: new Set([url]) });
+          const newChannel : AvailableChannel = { 
+            id, 
+            channelId, 
+            channelName, 
+            platform, 
+            urls: new Set([url])
+          }
+          channelsList.set(id, newChannel);
         } else {
           const existing = channelsList.get(id);
           const newUrls = new Set(Array.from(existing.urls));
@@ -270,10 +278,10 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         requestId,
         result: {
           status: 'success',
-          data: Array.from(channelsList.values().map(channel => ({
+          data: Array.from(channelsList.values().map((channel): AvailableChannel => ({
             ...channel,
             urlsCount: Array.from(channel.urls).length
-          })))
+          }))) as AvailableChannels
         }
       })
       break;
@@ -350,7 +358,8 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
           label: `${h / 3600000}h-${(h + binsDuration) / 3600000}h`
         })
       }
-      const output = [0, 1, 2, 3, 4, 5, 6]
+      
+      const output: HabitsData = [0, 1, 2, 3, 4, 5, 6]
         .reduce((res1, dayId) => ({
           ...res1,
           [dayId]: bins.reduce((res2, bin) => {

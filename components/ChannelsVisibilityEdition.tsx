@@ -4,10 +4,10 @@ function ChannelsVisibilityEdition({
   channels,
   onChange
 }) {
-  const [searchString, setSearchString] = useState('');
+  const [searchstring, setSearchstring] = useState('');
   const visibleChannels = useMemo(() => {
-    if (searchString.length > 2 && Object.entries(channels).length) {
-      const str = searchString.toLowerCase();
+    if (searchstring.length > 2 && Object.entries(channels).length) {
+      const str = searchstring.toLowerCase();
       return Object.entries(channels).filter(([id, {label, platform}]) => {
         const mark = `${label} (${platform})`.toLowerCase();
         return mark.includes(str);
@@ -15,7 +15,7 @@ function ChannelsVisibilityEdition({
       .reduce((res, [id, obj]) => ({...res, [id]: obj}), {})
     }
     return channels;
-  }, [searchString, channels]);
+  }, [searchstring, channels]);
 
   const handleChangeAll = (status) => {
       const newChannels = Object.entries(channels).reduce((cur, [id, obj]: [string, object]) => ({
@@ -35,8 +35,8 @@ function ChannelsVisibilityEdition({
       <div className="header">
         <input
           placeholder="rechercher"
-          value={searchString}
-          onChange={e => setSearchString(e.target.value)}
+          value={searchstring}
+          onChange={e => setSearchstring(e.target.value)}
         />
         <button onClick={() => handleShowAll()}>
           tout montrer

@@ -1,19 +1,19 @@
 
 
 export interface Creator {
-  id: String
-  channels: Array<String>
-  name: String
-  description: String
+  id: string
+  channels: Array<string>
+  name: string
+  description: string
   links: {
     tags: Array<string>
   }
 }
 
 export interface Expression {
-  id: String
-  name: String
-  definition: String
+  id: string
+  name: string
+  definition: string
   queries: Array<Query>
   links: {
     tags: Array<string>
@@ -22,10 +22,10 @@ export interface Expression {
 }
 
 export interface Tag {
-  id: String
-  color: String
-  name: String
-  description: String
+  id: string
+  color: string
+  name: string
+  description: string
 }
 export interface Annotations {
   creators: {
@@ -40,6 +40,6 @@ export interface Annotations {
 }
 
 export interface Query {
-  id: String
-  query: String
+  id: string
+  query: string
 }

@@ -9,6 +9,9 @@ import { downloadTextfile, formatNumber, buildDateKey } from "~helpers";
 
 import '~styles/DevDashboard.scss';
 import { EVENT_TYPES, ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA, SET_SETTINGS, SET_ANNOTATIONS, GET_SETTINGS, GET_ANNOTATIONS } from "~constants";
+import type { CaptureEvent, CaptureEventsList } from "~types/captureEventsTypes";
+import { Settings } from "http2";
+import { Annotations } from "~types/annotations";
 // import { useInterval } from "usehooks-ts";
 
 const PAGINATION_COUNT = 25;
@@ -28,14 +31,14 @@ const PAGINATION_COUNT = 25;
 // ]
 
 type DashboardRequestBody = {
-  types: Array<String>
-  reverseOrder: Boolean
+  types: Array<string>
+  reverseOrder: boolean
   page: number
   itemsPerPage: number
 }
 
 type DashboardResponseBody = {
-  types: Array<String>
+  types: Array<string>
   items: Array<Object>
   page: number
   filteredCount: number
@@ -60,22 +63,26 @@ function DevDashboard() {
   const [visibleTypes, setVisibleTypes] = useState(
     ['BROWSE_VIEW']
   );
-  const [reverseOrder, setReverseOrder] = useState(false);
+  const [reverseOrder, setReverseOrder] = useState<boolean>(false);
   // const [uploadMode, setUploadMode] = useState('prepend');
-  const [currentPreviewPage, setCurrentPreviewPage] = useState(0);
-  const [isLoadingPreview, setIsLoadingPreview] = useState();
-  const [numberOfPages, setNumberOfPages] = useState();
-  const [totalCount, setTotalCount] = useState();
-  const [filteredCount, setFilteredCount] = useState();
-  const [previewedItems, setPreviewedItems] = useState();
-  const [appSettings, setAppSettings] = useState();
-  const [appAnnotations, setAppAnnotations] = useState();
+  const [currentPreviewPage, setCurrentPreviewPage] = useState<number>(0);
+  const [isLoadingPreview, setIsLoadingPreview] = useState<boolean>(false);
+  const [numberOfPages, setNumberOfPages] = useState<number>();
+  const [totalCount, setTotalCount] = useState<number>();
+  const [filteredCount, setFilteredCount] = useState<number>();
+  const [previewedItems, setPreviewedItems] = useState<Array<CaptureEvent>>();
+  const [appSettings, setAppSettings] = useState<Settings>();
+  const [appAnnotations, setAppAnnotations] = useState<Annotations>();
 
-  const [isWorking, setIsWorking] = useState(false);
-  const [isWorkingShareStatus, setIsWorkingShareStatus] = useState({current: 0, total: 0});
-  const [pendingForDownload, setPendingForDownload] = useState(false);
+  const [isWorking, setIsWorking] = useState<boolean>(false);
+  interface ShareStatusType {
+    current: number,
+    total: number
+  }
+  const [isWorkingShareStatus, setIsWorkingShareStatus] = useState<ShareStatusType>({current: 0, total: 0});
+  const [pendingForDownload, setPendingForDownload] = useState<boolean>(false);
 
-  const requestPreviewUpdate = () => {
+  const requestPreviewUpdate = () : void => {
     const payload = {
       types: visibleTypes,
       reverseOrder,
@@ -90,13 +97,13 @@ function DevDashboard() {
   useEffect(() => {
     settingsPort.send({ actionType: GET_SETTINGS })
     annotationsPort.send({ actionType: GET_ANNOTATIONS })
-  }, [])
+  }, []);
 
   // useInterval(() => requestPreviewUpdate(), 2000);
 
   useEffect(() => {
     requestPreviewUpdate();
-  }, [reverseOrder, currentPreviewPage, visibleTypes])
+  }, [reverseOrder, currentPreviewPage, visibleTypes]); 
 
   settingsPort.listen(data => {
     if (data.actionType === GET_SETTINGS && data.result.status === 'success') {
@@ -111,7 +118,7 @@ function DevDashboard() {
 
   ioPort.listen(data => {
     if (data.actionType === SERIALIZE_ALL_DATA && data.result.status === 'success' && pendingForDownload) {
-      downloadTextfile(data.result.data, `lore-selfie-activity-${new Date().toUTCString()}.json`, 'application/json')
+      downloadTextfile(data.result.data, `lore-selfie-activity-${new Date().toUTCstring()}.json`, 'application/json')
       setPendingForDownload(false);
     }
     if (data.actionType === DELETE_ALL_DATA && data.result.status === 'success') {
@@ -143,7 +150,7 @@ function DevDashboard() {
         filteredCount,
         // types
       } = data;
-      setPreviewedItems(items);
+      setPreviewedItems(items as CaptureEventsList);
       setTotalCount(totalCount);
       setNumberOfPages(pagesCount);
       setFilteredCount(filteredCount);
@@ -160,7 +167,7 @@ function DevDashboard() {
     reader.addEventListener(
       "load",
       () => {
-        const str = reader.result.toString();
+        const str = reader.result.tostring();
         try {
           const data = JSON.parse(str);
           // @todo improve that with proper schema-like validation
@@ -262,10 +269,10 @@ function DevDashboard() {
     }
   }
   const onTargetClick = () => {
-    fileInputRef.current.click()
+    fileInputRef.current.click();
   }
 
-  const paginations = useMemo(() => {
+  const paginations : Array<number> = useMemo(() => {
     if (!numberOfPages) {
       return [];
     }
@@ -452,7 +459,7 @@ function DevDashboard() {
               </div>
               <div >
                 {paginations.length > 1 ?
-                  (paginations < 10 ? paginations :
+                  (paginations.length < 10 ? paginations :
                     [
                       ...(currentPreviewPage > 6 ? [...paginations.slice(0, 5), '...'] : paginations.slice(0, currentPreviewPage > 0 ? currentPreviewPage - 1 : 1)),
                       ...paginations.slice(currentPreviewPage > 0 ? currentPreviewPage - 1 : 1, currentPreviewPage < 4 ? 5 : currentPreviewPage + 2),
@@ -461,10 +468,10 @@ function DevDashboard() {
                     ]).map((pageNumber, index) => {
                       return (
                         <button
-                          disabled={pageNumber === '...'} onClick={() => pageNumber !== '...' ? setCurrentPreviewPage(pageNumber) : undefined}
+                          disabled={pageNumber === '...'} onClick={() => pageNumber !== '...' ? setCurrentPreviewPage(pageNumber as number) : undefined}
                           key={index}
                           className={`important-button pagination ${currentPreviewPage === pageNumber ? 'active' : ''}`}>
-                          {pageNumber === '...' ? pageNumber : reverseOrder ? paginations.length - pageNumber : pageNumber + 1}
+                          {pageNumber === '...' ? pageNumber : reverseOrder ? paginations.length - (pageNumber as number) : (pageNumber as number) + 1}
                         </button>
                       )
                     })

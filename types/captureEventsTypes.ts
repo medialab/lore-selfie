@@ -1,18 +1,18 @@
 import { Uuid } from '@uuid-ts/uuid';
 
 export interface Browser {
-  name: String,
-  type: String,
-  version: String
+  name: string,
+  type: string,
+  version: string
 }
 
 export type GenericEvent = {
   id: Uuid,
   date: Date,
-  tabId?: String,
-  injectionId: String,
-  platform: String,
-  url: String
+  tabId?: string,
+  injectionId: string,
+  platform: string,
+  url: string
 }
 
 export interface OpenPlatformInTabEvent extends GenericEvent {
@@ -30,53 +30,53 @@ export interface FocusTabEvent extends GenericEvent {
 }
 
 export interface RecommendedContent {
-  title: String,
+  title: string,
   channelName: string,
-  url: String,
-  thumbnailImageSrc: String,
-  type: String
+  url: string,
+  thumbnailImageSrc: string,
+  type: string
 }
 
 export interface GenericViewEventMetadata {
-  title: String,
+  title: string,
 }
 export interface YoutubeVideoMetadata extends GenericViewEventMetadata {
-  description: String,
-  shortlinkUrl: String,
-  videoimageSrc: String,
-  channelName: String,
-  channelId: String,
-  ownerSubcount: String,
-  channelImageSrc: String,
-  duration: String,
+  description: string,
+  shortlinkUrl: string,
+  videoimageSrc: string,
+  channelName: string,
+  channelId: string,
+  ownerSubcount: string,
+  channelImageSrc: string,
+  duration: string,
   recommendedContents: Array<RecommendedContent>,
-  likesCount: String
+  likesCount: string
 }
 
 export interface YoutubeShortMetadata extends GenericViewEventMetadata {
-  channelName: String,
-  channelId: String,
-  channelImageSrc: String,
-  commentsCount: String,
-  likesCount: String,
+  channelName: string,
+  channelId: string,
+  channelImageSrc: string,
+  commentsCount: string,
+  likesCount: string,
 }
 
 export interface TwitchLiveMetadata extends GenericViewEventMetadata {
   // @todo channel should be deprecated
-  channel?: String,
-  channelId: String,
-  channelName?: String,
-  channelImageAvatarSrc: String,
-  viewersCount: String,
-  liveTimeElapsed: String,
-  tags: String,
-  category: String,
-  categoryHref: String
+  channel?: string,
+  channelId: string,
+  channelName?: string,
+  channelImageAvatarSrc: string,
+  viewersCount: string,
+  liveTimeElapsed: string,
+  tags: string,
+  category: string,
+  categoryHref: string
 }
 
 export interface BrowseViewEvent extends GenericEvent {
   type: "BROWSE_VIEW",
-  viewType: String,
+  viewType: string,
   metadata: YoutubeVideoMetadata|YoutubeShortMetadata|TwitchLiveMetadata,
 }
 
@@ -89,12 +89,12 @@ export interface BlurOnReactionInputEvent extends GenericEvent {
 
 
 interface EmoteFromChat {
-  alt: String,
-  src: String
+  alt: string,
+  src: string
 }
 export interface TwitchMessageRecord {
-  message?: String,
-  author: String,
+  message?: string,
+  author: string,
   emote: EmoteFromChat
 }
 export interface ChatActivityRecordEvent extends GenericEvent {
@@ -113,7 +113,7 @@ export interface ChatActivityRecordEvent extends GenericEvent {
 // }
 // export interface IsPlayingActivityRecord extends GenericEvent {
 //   type: "IS_PLAYING_ACTIVITY_RECORD"
-//   isPlaying: Boolean
+//   isPlaying: boolean
 //   timeSpan: number, // timespan of measure provided, in ms
 //   currentTime?: string,
 //   duration?: string
@@ -126,12 +126,11 @@ export interface LiveUserActivityRecordEvent extends GenericEvent {
   timeSpan: number, // timespan of measure provided, in ms
   currentMediaTime?: string,
   pointerActivityScore: number,
-  hasFocus: Boolean,
-  isPlaying: Boolean,
+  hasFocus: boolean,
+  isPlaying: boolean,
 }
 
-export type CaptureEventsList = Array<
-OpenPlatformInTabEvent|
+export type CaptureEvent = OpenPlatformInTabEvent|
 ClosePlatformInTabEvent|
 BlurTabEvent|
 FocusTabEvent|
@@ -140,4 +139,5 @@ FocusOnReactionInputEvent|
 BlurOnReactionInputEvent|
 ChatActivityRecordEvent|
 LiveUserActivityRecordEvent
->
+
+export type CaptureEventsList = Array<CaptureEvent>
