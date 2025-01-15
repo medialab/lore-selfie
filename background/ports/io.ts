@@ -20,7 +20,7 @@ interface BodyType {
 }
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   const { actionType, payload, requestId }: BodyType = req.body
-  const activities = await storage.get('lore-selfie-activity') || [] as CaptureEventsList;
+  const activity = await storage.get('lore-selfie-activity') || [] as CaptureEventsList;
   const settings = await storage.get('lore-selfie-settings') || DEFAULT_SETTINGS as Settings;
   const annotations = await storage.get('lore-selfie-annotations') || DEFAULT_ANNOTATIONS as Annotations;
 
@@ -38,7 +38,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
             date: new Date().toJSON(),
             pluginVersion: version,
             learnMoreURL: homepage,
-            activities, 
+            activity, 
             settings, 
             annotations
           } as DataRecord))

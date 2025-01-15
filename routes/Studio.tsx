@@ -25,7 +25,7 @@ interface StudioSettings {
   timeOfDaySpan: Array<string>
   daysOfWeek: Array<number>
   platforms: Array<string>
-  channelsSettings: Array<Object>
+  channelsSettings: object
   excludedTitlePatterns: Array<Object>
   annotationColumnsNames: Array<String>
   editionTitle: string
@@ -74,8 +74,8 @@ function Studio({
     })
   }, [settings])
   useEffect(() => {
-    storage.get('lore-selfie-studio-settings')
-      .then((storedSettings) => {
+    storage.get<object>('lore-selfie-studio-settings')
+      .then((storedSettings: StudioSettings) => {
         console.debug('got stored settings', storedSettings);
         if (storedSettings) {
           setSettings(storedSettings);

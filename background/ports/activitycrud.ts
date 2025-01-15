@@ -5,7 +5,7 @@ import { type BrowseViewEvent,
   type YoutubeVideoMetadata,type YoutubeShortMetadata,type TwitchLiveMetadata,type GenericViewEventMetadata,
   type CaptureEventsList
  } from "~types/captureEventsTypes"
-import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_IN_MS_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, GET_HABITS_DATA, LIVE_USER_ACTIVITY_RECORD, PLATFORMS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, DAY_IN_MS } from "~constants";
+import { ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, BROWSE_VIEW, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, GET_ACTIVITY_EVENTS, GET_BINNED_ACTIVITY_OUTLINE, GET_CHANNELS, GET_HABITS_DATA, LIVE_USER_ACTIVITY_RECORD, PLATFORMS, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, DAY_IN_MS } from "~constants";
 import { buildDateKey, getDateBin } from "~helpers";
 import type { AllData } from "~types/io";
 
@@ -463,7 +463,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       break;
     case PREPEND_ACTIVITY_EVENTS:
       if ((payload as ReplaceActivityPayload).data) {
-        await storage.set('lore-selfie-activity', [...(payload as ReplaceActivityPayload).data.activity, ...activity]);
+        await storage.set('lore-selfie-activity', [...(payload as ReplaceActivityPayload).data.activities, ...activity]);
         res.send({
           responseType: ACTION_END,
           requestId,
@@ -488,7 +488,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       break;
     case APPEND_ACTIVITY_EVENTS:
       if ((payload as ReplaceActivityPayload).data) {
-        await storage.set('lore-selfie-activity', [...(payload as ReplaceActivityPayload).data.activity, ...activity]);
+        await storage.set('lore-selfie-activity', [...(payload as ReplaceActivityPayload).data.activities, ...activity]);
         res.send({
           responseType: ACTION_END,
           requestId,
@@ -533,7 +533,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     //     }
     //   })
     //   break;
-    case DUPLICATE_DAY_IN_MS_DATA:
+    case DUPLICATE_DAY_DATA:
       interface DuplicateDayDataPayload {
         daySlug: string,
         numberOfDays: number

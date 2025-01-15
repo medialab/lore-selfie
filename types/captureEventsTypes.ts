@@ -103,18 +103,18 @@ export interface ChatActivityRecordEvent extends GenericEvent {
   messagesCount: number,
   messagesAverageCharLength: number,
   viewersCount?: number,
-  timeSpan: Number, // timespan of measure provided, in ms
+  timeSpan: number, // timespan of measure provided, in ms
 }
 
 // export interface PointerActivityRecordEvent extends GenericEvent {
 //   type: "POINTER_ACTIVITY_RECORD",
-//   timeSpan: Number, // timespan of measure provided, in ms
-//   activityScore: Number // number between 0 and 1
+//   timeSpan: number, // timespan of measure provided, in ms
+//   activityScore: number // number between 0 and 1
 // }
 // export interface IsPlayingActivityRecord extends GenericEvent {
 //   type: "IS_PLAYING_ACTIVITY_RECORD"
 //   isPlaying: Boolean
-//   timeSpan: Number, // timespan of measure provided, in ms
+//   timeSpan: number, // timespan of measure provided, in ms
 //   currentTime?: string,
 //   duration?: string
 // }
@@ -123,9 +123,9 @@ export interface ChatActivityRecordEvent extends GenericEvent {
 
 export interface LiveUserActivityRecordEvent extends GenericEvent {
   type: "LIVE_USER_ACTIVITY_RECORD"
-  timeSpan: Number, // timespan of measure provided, in ms
+  timeSpan: number, // timespan of measure provided, in ms
   currentMediaTime?: string,
-  pointerActivityScore: Number,
+  pointerActivityScore: number,
   hasFocus: Boolean,
   isPlaying: Boolean,
 }

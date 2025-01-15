@@ -30,17 +30,17 @@ const PAGINATION_COUNT = 25;
 type DashboardRequestBody = {
   types: Array<String>
   reverseOrder: Boolean
-  page: Number
-  itemsPerPage: Number
+  page: number
+  itemsPerPage: number
 }
 
 type DashboardResponseBody = {
   types: Array<String>
   items: Array<Object>
-  page: Number
-  filteredCount: Number
-  totalCount: Number
-  pagesCount: Number
+  page: number
+  filteredCount: number
+  totalCount: number
+  pagesCount: number
 }
 
 function DevDashboard() {
@@ -72,7 +72,7 @@ function DevDashboard() {
   const [appAnnotations, setAppAnnotations] = useState();
 
   const [isWorking, setIsWorking] = useState(false);
-  const [isWorkingShareStatus, setIsWorkingShareStatus] = useState(0);
+  const [isWorkingShareStatus, setIsWorkingShareStatus] = useState({current: 0, total: 0});
   const [pendingForDownload, setPendingForDownload] = useState(false);
 
   const requestPreviewUpdate = () => {

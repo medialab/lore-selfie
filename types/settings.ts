@@ -10,7 +10,7 @@ export interface Handle {
 export interface Settings {
   handles: Array<Handle>,
   recordOnPlatforms: Array<String>,
-  liveRecordingInterval: Number,
+  liveRecordingInterval: number,
   recordActivity: Boolean,
   recordTabs: Boolean,
   recordMouse: Boolean,
