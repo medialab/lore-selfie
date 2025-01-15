@@ -69,7 +69,7 @@
         margin-left: constants.$gutter;
         bottom: constants.$gutter-small;
         padding: constants.$gutter-small;
-        border: none!important;
+        border: none !important;
       }
     }
     ul {
@@ -150,12 +150,12 @@
         .input-container {
           flex: 1;
           // padding-left: constants.$gutter;
-          input, select {
+          input,
+          select {
             width: 100%;
           }
         }
       }
-      
     }
     button {
       padding: constants.$gutter;
@@ -177,6 +177,27 @@
         flex-flow: row nowrap;
         align-items: center;
       }
+    }
+  }
+
+  .About.contents-wrapper {
+    overflow: auto;
+    
+    a {
+      color: constants.$color-app-main;
+      text-decoration: none;
+    }
+    .warning {
+      background: constants.$color-app-main;
+        color: white;
+        padding: constants.$gutter;
+    }
+
+    ul {
+      margin: 0;
+    }
+    .contents section:last-of-type{
+      padding-bottom: 10rem;
     }
   }
 }
