@@ -24,6 +24,7 @@ import {
   type BrowseViewEvent,
   type CaptureEventsList,
   type GenericViewEventMetadata,
+  type LiveUserActivityRecordEvent,
   type TwitchLiveMetadata,
   type YoutubeShortMetadata,
   type YoutubeVideoMetadata
@@ -84,10 +85,10 @@ const applyExcludedTitlePatterns = (
     }: {
       url: string
       metadata:
-        | YoutubeVideoMetadata
-        | YoutubeShortMetadata
-        | TwitchLiveMetadata
-        | GenericViewEventMetadata
+      | YoutubeVideoMetadata
+      | YoutubeShortMetadata
+      | TwitchLiveMetadata
+      | GenericViewEventMetadata
     } = event
     const { title } = metadata
     let passes = true
@@ -442,7 +443,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       }
 
       // eslint-disable-next-line
-      const output: HabitsData = [0, 1, 2, 3, 4, 5, 6].reduce(
+      const initOutput: HabitsData = [0, 1, 2, 3, 4, 5, 6].reduce(
         (res1, dayId) => ({
           ...res1,
           [dayId]: bins.reduce((res2, bin) => {
@@ -455,7 +456,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
               [start]: {
                 count: 0,
                 duration: 0,
-                channels: [],
+                channels: {},
                 breakdown: {
                   ...PLATFORMS.reduce((res3, platformId) => {
                     return {
@@ -476,29 +477,68 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
 
       filteredEvents = filterEvents(activity, otherSettings)
 
-      filteredEvents.forEach((event) => {
+      // eslint-disable-next-line
+      const urlToChannelSlug = new Map();
+      // eslint-disable-next-line
+      const output: HabitsData = filteredEvents.reduce((tempOutput, event) => {
         const date = new Date(event.date)
         const day = date.getDay()
-        const { platform, type } = event
+        const { platform, type, url } = event
         const thatBin = getDateBin(date, binsDuration)
-        output[day][thatBin].count += 1
-        output[day][thatBin].breakdown[platform].count += 1
+        tempOutput[day][thatBin].count += 1
+        tempOutput[day][thatBin].breakdown[platform].count += 1
         if (type === LIVE_USER_ACTIVITY_RECORD) {
-          //   if (
-          //     // event.hasFocus
-          //   ) {
-          //     const thatSpan = event.timeSpan
-          //     output[day][thatBin].duration += thatSpan
-          //     output[day][thatBin].breakdown[platform].duration += thatSpan
-          //   }
+
+          if (
+            platform === 'twitch' || (event as LiveUserActivityRecordEvent).isPlaying
+          ) {
+            const thatSpan = event.timeSpan;
+            tempOutput[day][thatBin].count += 1;
+            tempOutput[day][thatBin].duration += thatSpan;
+
+            tempOutput[day][thatBin].breakdown[platform].count += 1;
+            tempOutput[day][thatBin].breakdown[platform].duration += thatSpan;
+            const channelSlug = urlToChannelSlug.get(url);
+            // console.log('test', channelSlug, tempOutput[day][thatBin].channels, tempOutput[day][thatBin].channels[channelSlug])
+            if (channelSlug && tempOutput[day][thatBin].channels[channelSlug]) {
+              // console.log('obj', tempOutput[day][thatBin].channels[channelSlug])
+              tempOutput[day][thatBin].channels[channelSlug].count += 1;
+              tempOutput[day][thatBin].channels[channelSlug].duration += thatSpan;
+              // video was browsed before bin start
+            } else if (channelSlug && !tempOutput[day][thatBin].channels[channelSlug]) {
+              tempOutput[day][thatBin].channels[channelSlug] = {
+                channel: channelSlug,
+                platform,
+                duration: thatSpan,
+                count: 1
+              }
+
+            } else {
+              console.warn('did not count event for url:', event.url)
+            }
+          }
         } else if (type === BROWSE_VIEW) {
           const channel = event.metadata.channelName || event.metadata.channelId
-          const channelSlug = `${channel} (${event.platform})`
-          if (!output[day][thatBin].channels.includes(channelSlug)) {
-            output[day][thatBin].channels.push(channelSlug)
+          if (channel) {
+            const channelSlug = `${channel} (${event.platform})`;
+            if (!tempOutput[day][thatBin].channels[channelSlug]) {
+              tempOutput[day][thatBin].channels[channelSlug] = {
+                channel,
+                platform,
+                duration: 0,
+                count: 0
+              }
+
+            }
+            if (!urlToChannelSlug.has(url)) {
+              urlToChannelSlug.set(url, channelSlug)
+            }
           }
         }
-      })
+        return tempOutput;
+      }, initOutput);
+
+      
 
       // units = filteredEvents.reduce((cur, event) => {
       //   const time = new Date(event.date).getTime();
@@ -517,6 +557,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       //     eventsCount: events.length
       //   })
       // }
+
       res.send({
         responseType: ACTION_END,
         requestId,

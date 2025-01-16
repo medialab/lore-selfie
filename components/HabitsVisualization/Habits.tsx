@@ -7,7 +7,7 @@ import partialCircle from "svg-partial-circle"
 import "~/styles/Habits.scss"
 
 import { PLATFORMS_COLORS } from "~constants"
-import { msToNiceDuration } from "~helpers"
+import { msToNiceDuration, numberToDoubleDigit } from "~helpers"
 import type { Dimensions, HabitsData } from "~types/common"
 
 interface HabitsProps {
@@ -94,6 +94,7 @@ export default function Habits({
     [days, dimensions.height]
   )
   const areaScale = useMemo(() => {
+
     const minDimension = Math.min(rowHeight, columnWidth)
     const radius = minDimension / 2
     let maxValue = 1
@@ -210,15 +211,12 @@ export default function Habits({
                             ([key, dat]) => {
                               const val = dat[valueField]
                               const portion = val / breakDownTotal
-                              const position = portionDisplacement + portion
+                              const position = portionDisplacement// + portion
                               portionDisplacement += portion
                               return {
                                 key,
                                 portion,
                                 position,
-                                deg: position * 360,
-                                // Math.PI / 2 + (toflitPct - 50) / 100 * Math.PI
-                                radians: (position * 360 * Math.PI) / 180
                               }
                             }
                           )
@@ -232,25 +230,42 @@ export default function Habits({
                                 r={generalRadius}
                               />
                               {breakdown
+                                
                                 // .filter(({portion}) => portion)
-                                .map(({ key, radians, portion }, index) => {
-                                  let tooltipContent = `<div>Environ ${msToNiceDuration(datum[valueField])} cumulées enregistrées sur ${key} pour ce créneau (attention : peut inclure les onglets avec des contenus en pause).</div>`
-                                  if (datum.channels?.length) {
-                                    tooltipContent += `<div>Chaînes regardées : ${datum.channels.join(", ")}.</div>`
+                                .map(({ key, position, portion }) => {
+                                  let tooltipContent = `<div>Environ ${msToNiceDuration(datum[valueField])} cumulées (${Math.round(portion * 100)}%) enregistrées sur ${key} pour ce créneau.</div>`
+                                  if (Object.values(datum.channels).length) {
+                                    const channelsTotalDuration = Object.values(datum.channels)
+                                    .reduce((sum, c) => sum + c.duration, 0);
+                                    tooltipContent += `<div>Chaînes regardées : 
+                                    <ol>
+                                    ${
+                                      Object.values(datum.channels)
+                                      .sort((a, b) => {
+                                        if (a.duration > b.duration) {
+                                          return -1;
+                                        }
+                                        return 1;
+                                      })
+                                      .map(({channel, duration}) => {
+                                        return `
+                                        <li>
+                                      ${numberToDoubleDigit(Math.round(duration / channelsTotalDuration * 100))}% - ${channel} (${msToNiceDuration(duration)})
+                                        </li>
+                                        `
+                                      })
+                                      .join('\n')
+                                    }
+                                    </ol>
+                                    </div>`
                                   }
-                                  const prev =
-                                    index > 0 ? breakdown[index - 1] : undefined
-                                  const prevAngle = prev
-                                    ? prev.radians
-                                    : -Math.PI / 2
-                                  // console.log(key, prev, radians, prevAngle)
                                   const d = [
                                     ...partialCircle(
                                       0,
                                       0, // center X and Y
                                       generalRadius, // radius
-                                      radians, // start angle
-                                      prevAngle // end angle
+                                     (position * 360 * Math.PI) / 180  - Math.PI / 2, // start angle
+                                      ((position + portion) * 360 * Math.PI) / 180 - Math.PI / 2 // end angle
                                     ),
                                     [`L ${0} ${0} Z`]
                                   ]

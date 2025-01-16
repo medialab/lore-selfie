@@ -274,9 +274,18 @@ export function getDateBin(date: Date, binInMs: number): number {
   return timeInMs - (timeInMs % binInMs)
 }
 
+export function numberToDoubleDigit (n: number): string {
+  const str = n + '';
+  if (str.length === 1) {
+    return `0${str}`
+  }
+  return str;
+}
+
 export function msToNiceDuration(d: number): string {
   const hours = Math.floor(d / 3600000)
   const minutes = Math.floor((d - hours * 3600000) / 60000)
-  return hours ? `${hours}h${minutes}mn` : minutes + "mn"
+  return hours ? `${(hours)} heures ${numberToDoubleDigit(minutes)} minutes` : (minutes) + " minutes"
 }
+
 export default function helpers() {}

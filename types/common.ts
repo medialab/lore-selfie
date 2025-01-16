@@ -39,7 +39,14 @@ export interface HabitsData {
     [key: number]: {
       count: number
       duration: number
-      channels: Array<string>
+      channels: {
+        [keys: string]: {
+          channel: string
+          platform: Platform
+          duration: number
+          count: number
+        }
+      }
       breakdown: {
         [key: Platform]: {
           count: number
