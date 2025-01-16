@@ -79,8 +79,8 @@ const trackers:TrackersType = {
       }
       let mousePosition: MousePosition;
       window.onmousemove = event => {
-        var posX = event.clientX;
-        var posY = event.clientY;
+        const posX = event.clientX;
+        const posY = event.clientY;
         mousePosition = { posX, posY }
       }
       let prevMousePosition = mousePosition;
@@ -200,8 +200,8 @@ const trackers:TrackersType = {
       }
       let mousePosition: MousePosition;
       window.onmousemove = event => {
-        var posX = event.clientX;
-        var posY = event.clientY;
+        const posX = event.clientX;
+        const posY = event.clientY;
         mousePosition = { posX, posY }
       }
       let prevMousePosition = mousePosition;

@@ -30,7 +30,7 @@ interface StudioSettings {
   daysOfWeek: Array<number>
   platforms: Array<string>
   channelsSettings: object
-  excludedTitlePatterns: Array<Object>
+  excludedTitlePatterns: Array<object>
   annotationColumnsNames: Array<string>
   editionTitle: string
 }

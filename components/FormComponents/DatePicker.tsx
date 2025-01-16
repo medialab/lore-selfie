@@ -121,7 +121,7 @@ export default function DatePicker({
 
     const used = firstOfMonth.getDay() + lastOfMonth.getDate();
     const numberOfWeeks = Math.ceil(used / 7);
-    let result = [];
+    const result = [];
     let currentDay = firstOfMonth;
     for (let i = 0; i < numberOfWeeks; i++) {
       let daysOfThisWeek = [];

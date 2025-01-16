@@ -28,7 +28,7 @@ function Daily({
   channelsMap,
   spansSettings,
 }: DailyProps) {
-  let dailyRef = useRef(null);
+  const dailyRef = useRef(null);
   const [offset, setOffset] = useState<number>(0);
   const [scrollHeight, setScrollHeight] = useState<number>(100);
   const [dimensions, setDimensions] = useState<Dimensions>({ width: 100, height: 100 });

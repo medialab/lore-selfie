@@ -39,7 +39,7 @@ type DashboardRequestBody = {
 
 type DashboardResponseBody = {
   types: Array<string>
-  items: Array<Object>
+  items: Array<object>
   page: number
   filteredCount: number
   totalCount: number
@@ -276,7 +276,7 @@ function DevDashboard() {
     if (!numberOfPages) {
       return [];
     }
-    let pages = [];
+    const pages = [];
     for (let i = 0; i < numberOfPages; i++) {
       pages.push(i);
     }

@@ -85,20 +85,20 @@ export const getPlatform = (url: string): string => {
   }
 }
 
-export function downloadJSONData(data:Object, filename='selfie-data.json'): void {
+export function downloadJSONData(data:object, filename='selfie-data.json'): void {
   
-  let blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-  let dlURL = window.URL.createObjectURL(blob);
-  let a = document.createElement('a');
+  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  const dlURL = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
   a.href = dlURL;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
 }
 export function downloadTextfile(data:string, filename:string='selfie-data.json', mimetype:string = 'application/json'): void {
-  let blob = new Blob([data], { type: mimetype });
-  let dlURL = window.URL.createObjectURL(blob);
-  let a = document.createElement('a');
+  const blob = new Blob([data], { type: mimetype });
+  const dlURL = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
   a.href = dlURL;
   a.download = filename;
   document.body.appendChild(a);
@@ -107,9 +107,9 @@ export function downloadTextfile(data:string, filename:string='selfie-data.json'
 
 export function JSONArrayToCSVStr (items:Array<object> = []):string {
   const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
-  let header = new Set(Object.keys(items[0]));
+  const header = new Set(Object.keys(items[0]));
   const outputItems = items.map((item, i) => {
-    let outputItem = {};
+    const outputItem = {};
     Object.entries(item)
     .forEach(([key, value]) => {
       let outputValue = value;

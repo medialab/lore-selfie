@@ -15,7 +15,7 @@ export default function TimePicker({
   minutesSpan = 15
 }: TimePickerProps) {
   const hoursValues = useMemo(() => {
-    let hours = {
+    const hours = {
       0: {
         label: 'minuit',
         value: 0
@@ -30,7 +30,7 @@ export default function TimePicker({
     return hours;
   }, []);
   const minutesValues = useMemo(() => {
-    let minutes = {}
+    const minutes = {}
     for (let i = 0 ; i < 60 ; i += minutesSpan) {
       minutes[i] = {
         label: i + 'm',

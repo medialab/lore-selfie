@@ -209,7 +209,7 @@ const filterEvents = (events: CaptureEventsList, payload: FilterEventsPayload) :
   // console.log('filter events from %s to %s', from, to);
   // console.log('will apply filters to', events)
   // const events = activity.filter(e => true);
-  let filtered = events.filter((event) => {
+  const filtered = events.filter((event) => {
     const date = new Date(event.date).getTime();
 
     const matchesTimespan = date > from && date < to;
@@ -227,7 +227,7 @@ const filterEvents = (events: CaptureEventsList, payload: FilterEventsPayload) :
 }
 
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
-  let { actionType, payload = {}, requestId } : MessagePayload = req.body
+  const { actionType, payload = {}, requestId } : MessagePayload = req.body
   // console.log('req body', req.body);
   const baseActivity : CaptureEventsList = await storage.get('lore-selfie-activity');
   const activity = baseActivity || [];
@@ -406,7 +406,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
             output[day][thatBin].breakdown[platform].duration += thatSpan;
           }
         } else if (type === BROWSE_VIEW) {
-          let channel = event.metadata.channelName || event.metadata.channelId;
+          const channel = event.metadata.channelName || event.metadata.channelId;
           const channelSlug = `${channel} (${event.platform})`;
           if (!output[day][thatBin].channels.includes(channelSlug)) {
             output[day][thatBin].channels.push(channelSlug);

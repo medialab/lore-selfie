@@ -51,7 +51,7 @@ function DayVisualization({
       nextDay = nextDay + 23 * 3600 * 1000;
       // let max = min;
       max = nextDay;
-      for (let events of sessions.values()) {
+      for (const events of sessions.values()) {
         events.forEach(({ date }) => {
           const dateTime = new Date(date).getTime();
           if (dateTime > max) {
@@ -62,7 +62,7 @@ function DayVisualization({
     } else {
       min = Infinity;
       max = -Infinity;
-      for (let events of sessions.values()) {
+      for (const events of sessions.values()) {
         events.forEach(({ date }) => {
           const dateTime = new Date(date).getTime();
           if (dateTime > max) {
@@ -109,7 +109,7 @@ function DayVisualization({
 
   const computedSessions: Array<DailyComputedSession> = useMemo(() => {
     const computed = [];
-    for (let [sessionId, events] of sessions.entries()) {
+    for (const [sessionId, events] of sessions.entries()) {
       const dateExtent = extent(events.map(e => new Date(e.date).getTime()));
       // set column
       let columnIndex = 0;

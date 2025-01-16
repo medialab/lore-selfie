@@ -31,7 +31,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   const { actionType, payload, requestId }: MessagePayload = req.body
   // console.log('req body in annotations crud', req.body);
   const baseAnnotations: Annotations = await storage.get('lore-selfie-annotations');
-  let annotations: Annotations = baseAnnotations || DEFAULT_ANNOTATIONS;
+  const annotations: Annotations = baseAnnotations || DEFAULT_ANNOTATIONS;
   interface AnnotationPayload {
     collection: string,
     id: string,

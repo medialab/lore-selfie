@@ -48,7 +48,7 @@ export default function DayTimeline({
     const realEndInMs = date + toTimeInMs;
     const niceStartInMs = realStartInMs - realStartInMs % tickTimespan;
     const niceEndInMs = realEndInMs % tickTimespan === 0 ? realEndInMs : realEndInMs - realEndInMs % tickTimespan + tickTimespan;
-    let ticks = [];
+    const ticks = [];
     for (let t = niceStartInMs; t <= niceEndInMs + 1; t += tickTimespan) {
       ticks.push(t);
     }
@@ -109,7 +109,7 @@ export default function DayTimeline({
         dateExtent: [sequence.start, end],
       }
     });
-    let computed = [];
+    const computed = [];
     for (let i = 0 ; i < sequences.length ; i++) {
       let columnIndex = 0;
       const thatSequence = sequences[i];
