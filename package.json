@@ -19,7 +19,7 @@
     "package:firefox": "plasmo package --target=firefox-mv2",
     "start": "web-ext run --source-dir ./build/chrome-mv3-dev -t chromium --start-url chrome://newtab",
     "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev",
-    "prepare": "husky"
+    "prepare": "husky && husky install"
   },
   "dependencies": {
     "@plasmohq/messaging": "^0.6.2",
@@ -67,6 +67,7 @@
     "git-format-staged": "^3.1.1",
     "globals": "^15.14.0",
     "husky": "^9.1.7",
+    "lint-staged": ">=10",
     "prettier": "3.2.4",
     "prettier-eslint-cli": "^8.0.1",
     "typescript": "5.3.3",
@@ -101,5 +102,13 @@
         "id": "test@example.com"
       }
     }
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.{js,css,md}": "prettier --write",
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --cache --fix"
+    ]
   }
 }
