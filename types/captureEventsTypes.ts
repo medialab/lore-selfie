@@ -1,4 +1,3 @@
-import { Uuid } from "@uuid-ts/uuid"
 
 export interface Browser {
   name: string
@@ -7,7 +6,7 @@ export interface Browser {
 }
 
 export type GenericEvent = {
-  id: Uuid
+  id: string
   date: Date
   tabId?: string
   injectionId: string
@@ -119,7 +118,7 @@ export interface ChatActivityRecordEvent extends GenericEvent {
 // }
 
 export interface LiveUserActivityRecordEvent extends GenericEvent {
-  type: "LIVE_USER_ACTIVITY_RECORD"
+  type: 'LIVE_USER_ACTIVITY_RECORD',
   timeSpan: number // timespan of measure provided, in ms
   currentMediaTime?: string
   pointerActivityScore: number

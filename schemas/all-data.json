@@ -1,0 +1,681 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Annotations": {
+      "properties": {
+        "creators": {
+          "additionalProperties": {
+            "$ref": "#/definitions/Creator"
+          },
+          "type": "object"
+        },
+        "expressions": {
+          "additionalProperties": {
+            "$ref": "#/definitions/Expression"
+          },
+          "type": "object"
+        },
+        "tags": {
+          "additionalProperties": {
+            "$ref": "#/definitions/Tag"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "BlurOnReactionInputEvent": {
+      "properties": {
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "injectionId": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "type": {
+          "const": "BLUR_ON_REACTION_INPUT",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "BlurTabEvent": {
+      "properties": {
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "injectionId": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "type": {
+          "const": "BLUR_TAB",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "BrowseViewEvent": {
+      "properties": {
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "injectionId": {
+          "type": "string"
+        },
+        "metadata": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/YoutubeVideoMetadata"
+            },
+            {
+              "$ref": "#/definitions/YoutubeShortMetadata"
+            },
+            {
+              "$ref": "#/definitions/TwitchLiveMetadata"
+            }
+          ]
+        },
+        "platform": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "type": {
+          "const": "BROWSE_VIEW",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "viewType": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Browser": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CaptureEvent": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/OpenPlatformInTabEvent"
+        },
+        {
+          "$ref": "#/definitions/ClosePlatformInTabEvent"
+        },
+        {
+          "$ref": "#/definitions/BlurTabEvent"
+        },
+        {
+          "$ref": "#/definitions/FocusTabEvent"
+        },
+        {
+          "$ref": "#/definitions/BrowseViewEvent"
+        },
+        {
+          "$ref": "#/definitions/FocusOnReactionInputEvent"
+        },
+        {
+          "$ref": "#/definitions/BlurOnReactionInputEvent"
+        },
+        {
+          "$ref": "#/definitions/ChatActivityRecordEvent"
+        },
+        {
+          "$ref": "#/definitions/LiveUserActivityRecordEvent"
+        }
+      ]
+    },
+    "ChatActivityRecordEvent": {
+      "properties": {
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "injectionId": {
+          "type": "string"
+        },
+        "messages": {
+          "items": {
+            "$ref": "#/definitions/TwitchMessageRecord"
+          },
+          "type": "array"
+        },
+        "messagesAverageCharLength": {
+          "type": "number"
+        },
+        "messagesCount": {
+          "type": "number"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "timeSpan": {
+          "type": "number"
+        },
+        "type": {
+          "const": "CHAT_ACTIVITY_RECORD",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "viewersCount": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "ClosePlatformInTabEvent": {
+      "properties": {
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "injectionId": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "type": {
+          "const": "CLOSE_PLATFORM_IN_TAB",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Creator": {
+      "properties": {
+        "channels": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "links": {
+          "properties": {
+            "tags": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "EmoteFromChat": {
+      "properties": {
+        "alt": {
+          "type": "string"
+        },
+        "src": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Expression": {
+      "properties": {
+        "definition": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "links": {
+          "properties": {
+            "creators": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "tags": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        },
+        "queries": {
+          "items": {
+            "$ref": "#/definitions/Query"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "FocusOnReactionInputEvent": {
+      "properties": {
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "injectionId": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "type": {
+          "const": "FOCUS_ON_REACTION_INPUT",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "FocusTabEvent": {
+      "properties": {
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "injectionId": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "type": {
+          "const": "FOCUS_TAB",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Handle": {
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "internalId": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "LiveUserActivityRecordEvent": {
+      "properties": {
+        "currentMediaTime": {
+          "type": "string"
+        },
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "hasFocus": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "injectionId": {
+          "type": "string"
+        },
+        "isPlaying": {
+          "type": "boolean"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "pointerActivityScore": {
+          "type": "number"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "timeSpan": {
+          "type": "number"
+        },
+        "type": {
+          "const": "LIVE_USER_ACTIVITY_RECORD",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "OpenPlatformInTabEvent": {
+      "properties": {
+        "browser": {
+          "$ref": "#/definitions/Browser"
+        },
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "injectionId": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "type": {
+          "const": "OPEN_PLATFORM_IN_TAB",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Query": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "query": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RecommendedContent": {
+      "properties": {
+        "channelName": {
+          "type": "string"
+        },
+        "thumbnailImageSrc": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Settings": {
+      "properties": {
+        "handles": {
+          "items": {
+            "$ref": "#/definitions/Handle"
+          },
+          "type": "array"
+        },
+        "liveRecordingInterval": {
+          "type": "number"
+        },
+        "recordActivity": {
+          "type": "boolean"
+        },
+        "recordChat": {
+          "type": "boolean"
+        },
+        "recordMouse": {
+          "type": "boolean"
+        },
+        "recordOnPlatforms": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "recordTabs": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "Tag": {
+      "properties": {
+        "color": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "TwitchLiveMetadata": {
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "categoryHref": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "channelId": {
+          "type": "string"
+        },
+        "channelImageAvatarSrc": {
+          "type": "string"
+        },
+        "channelName": {
+          "type": "string"
+        },
+        "liveTimeElapsed": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "viewersCount": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "TwitchMessageRecord": {
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "emote": {
+          "$ref": "#/definitions/EmoteFromChat"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "YoutubeShortMetadata": {
+      "properties": {
+        "channelId": {
+          "type": "string"
+        },
+        "channelImageSrc": {
+          "type": "string"
+        },
+        "channelName": {
+          "type": "string"
+        },
+        "commentsCount": {
+          "type": "string"
+        },
+        "likesCount": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "YoutubeVideoMetadata": {
+      "properties": {
+        "channelId": {
+          "type": "string"
+        },
+        "channelImageSrc": {
+          "type": "string"
+        },
+        "channelName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "likesCount": {
+          "type": "string"
+        },
+        "ownerSubcount": {
+          "type": "string"
+        },
+        "recommendedContents": {
+          "items": {
+            "$ref": "#/definitions/RecommendedContent"
+          },
+          "type": "array"
+        },
+        "shortlinkUrl": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "videoimageSrc": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "activities": {
+      "items": {
+        "$ref": "#/definitions/CaptureEvent"
+      },
+      "type": "array"
+    },
+    "annotations": {
+      "$ref": "#/definitions/Annotations"
+    },
+    "settings": {
+      "$ref": "#/definitions/Settings"
+    }
+  },
+  "type": "object"
+}

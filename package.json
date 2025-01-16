@@ -19,7 +19,8 @@
     "package:firefox": "plasmo package --target=firefox-mv2",
     "start": "web-ext run --source-dir ./build/chrome-mv3-dev -t chromium --start-url chrome://newtab",
     "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev",
-    "prepare": "husky && husky install"
+    "prepare": "husky && husky install",
+    "generate-json-schemas": "typescript-json-schema types/io.ts AllData -o schemas/all-data.json --refs; prettier schemas/all-data.json --write;ajv compile -s schemas/all-data.json -o schemas/validateDataDump.js --all-errors  -c ajv-formats"
   },
   "dependencies": {
     "@plasmohq/messaging": "^0.6.2",
@@ -29,6 +30,7 @@
     "@types/d3-scale": "^4.0.8",
     "@uuid-ts/uuid": "^1.0.1",
     "@vaadin/time-picker": "^24.5.5",
+    "ajv-formats": "^3.0.1",
     "d3-array": "^3.2.4",
     "d3-scale": "^4.0.2",
     "graphology": "^0.25.4",
@@ -47,6 +49,7 @@
     "react-select": "^5.9.0",
     "react-textarea-autosize": "^8.5.6",
     "react-tooltip": "^5.28.0",
+    "scheduler": "^0.25.0",
     "sigma": "^3.0.0",
     "svg-partial-circle": "^1.0.0",
     "talisman": "^1.1.4",
@@ -57,8 +60,10 @@
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
     "@types/chrome": "0.0.258",
     "@types/node": "20.11.5",
-    "@types/react": "18.2.48",
+    "@types/react": "19.0.7",
     "@types/react-dom": "18.2.18",
+    "ajv": "^8.17.1",
+    "ajv-cli": "^5.0.0",
     "d3-dsv": "^3.0.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
@@ -72,9 +77,13 @@
     "prettier-eslint-cli": "^8.0.1",
     "typescript": "5.3.3",
     "typescript-eslint": "^8.20.0",
+    "typescript-json-schema": "^0.65.1",
     "uuid": "^9.0.1",
     "voynich-ipsum": "^1.2.0",
     "web-ext": "^8.3.0"
+  },
+  "overrides": {
+    "@types/scheduler": "< 0.23.0"
   },
   "manifest": {
     "host_permissions": [
