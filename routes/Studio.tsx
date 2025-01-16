@@ -31,7 +31,8 @@ import type { CaptureEventsList } from "~types/captureEventsTypes"
 import type {
   AvailableChannels,
   ChannelsSettings,
-  DaysData
+  DaysData,
+  FilterEventsPayload
 } from "~types/common"
 
 // import type { Settings } from "~types/settings"
@@ -85,12 +86,12 @@ function Studio() {
     []
   )
   const settingsWithoutChannelsstringified = useMemo((): string => {
-    console.log("update settings without channels")
+    // console.log("update settings without channels", settings)
     return JSON.stringify({
       ...settings,
       channelsSettings: undefined
     })
-  }, [settings])
+  }, [settings]);
   useEffect(() => {
     storage
       .get<object>("lore-selfie-studio-settings")
@@ -139,7 +140,7 @@ function Studio() {
     onUpdateSettings("excludedTitlePatterns", value)
   const setAnnotationsColumnsNames = (value) =>
     onUpdateSettings("annotationColumnsNames", value)
-  const setEditionTitle = (value) => onUpdateSettings("editionTitle", value)
+  const setEditionTitle = (value: string) => onUpdateSettings("editionTitle", value)
 
   /**
    * Sendings activity cud requests
@@ -212,17 +213,21 @@ function Studio() {
     requestBinnedData()
     requestFromAnnotationsCrud(GET_ANNOTATIONS, {})
     // console.debug('request get channels in interval', JSON.parse(settingsWithoutChannelsstringified))
+    const cleanSettings: FilterEventsPayload = JSON.parse(settingsWithoutChannelsstringified);
+    cleanSettings.timeSpan = cleanSettings.timeSpan.map(d => new Date(d)) as [Date, Date];
     requestFromActivityCrud(
       GET_CHANNELS,
-      JSON.parse(settingsWithoutChannelsstringified)
+      cleanSettings
     )
   }, 10000)
 
   useEffect(() => {
     // console.debug('request get channels', JSON.parse(settingsWithoutChannelsstringified))
+    const cleanSettings: FilterEventsPayload = JSON.parse(settingsWithoutChannelsstringified);
+    cleanSettings.timeSpan = cleanSettings.timeSpan.map(d => new Date(d)) as [Date, Date];
     requestFromActivityCrud(
       GET_CHANNELS,
-      JSON.parse(settingsWithoutChannelsstringified)
+      cleanSettings
     )
   }, [settingsWithoutChannelsstringified])
 

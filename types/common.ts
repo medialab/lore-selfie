@@ -148,3 +148,15 @@ export interface DiaryDay {
 export interface DiaryDataByDayType {
   [key: number]: DiaryDay
 }
+
+
+export interface FilterEventsPayload {
+  from: number
+  to: number
+  timeSpan: [Date, Date]
+  timeOfDaySpan: [string, string]
+  daysOfWeek: Array<number>
+  platforms: Array<Platform>
+  channelsSettings: object
+  excludedTitlePatterns: Array<string>
+}

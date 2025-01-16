@@ -32,7 +32,8 @@ import {
 import type {
   AvailableChannel,
   AvailableChannels,
-  HabitsData
+  HabitsData,
+  FilterEventsPayload
 } from "~types/common"
 import type { AllData } from "~types/io"
 
@@ -220,16 +221,7 @@ interface MessagePayload {
   payload: object
   requestId: string
 }
-interface FilterEventsPayload {
-  from: number
-  to: number
-  timeSpan: [number, number]
-  timeOfDaySpan: [string, string]
-  daysOfWeek: Array<number>
-  platforms: Array<typeof AvailablePlatforms>
-  channelsSettings: object
-  excludedTitlePatterns: Array<string>
-}
+
 
 const filterEvents = (
   events: CaptureEventsList,
@@ -272,7 +264,7 @@ const filterEvents = (
     const matchesPlatforms =
       platforms === undefined
         ? true
-        : platforms.includes(event.platform.split(""))
+        : platforms.includes(event.platform)
     // console.log('matches platforms', matchesPlatforms, event.platform)
     // if (tag === GET_CHANNELS) {
     //   console.log('test for event in filters', matchesTimespan && matchesTimeOfDaySpan && matchesDaysOfWeek && matchesPlatforms, {matchesTimespan, matchesTimeOfDaySpan, matchesDaysOfWeek, matchesPlatforms}, event, {timeOfDaySpan, date: new Date(event.date), from: new Date(from), to: new Date(to)})
@@ -307,7 +299,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
           return event.metadata && event.metadata.channelId
         }
       })
-      // console.log('filtered events for get channels', filteredEvents, activity.length, payload);
+      console.log('filtered events for get channels', filteredEvents, activity.length, payload);
       // eslint-disable-next-line
       const channelsList = new Map()
       filteredEvents.forEach((event: BrowseViewEvent) => {
@@ -335,7 +327,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
           channelsList.set(id, updated)
         }
       })
-      // console.log('channels list map values', Array.from(channelsList.values()))
+      console.log('channels list map values', Array.from(channelsList.values()))
       res.send({
         responseType: ACTION_END,
         actionType,
