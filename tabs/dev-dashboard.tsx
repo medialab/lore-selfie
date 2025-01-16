@@ -8,6 +8,8 @@ import { usePort } from "@plasmohq/messaging/hook"
 
 import { buildDateKey, downloadTextfile, formatNumber } from "~helpers"
 
+// import validateDataDump from '~/schemas/validateDataDump'
+
 import "~styles/DevDashboard.scss"
 
 import {
@@ -191,6 +193,7 @@ function DevDashboard() {
     }
   })
 
+
   const onFileInputChange = (event) => {
     const { files } = event.target
     const [file] = files
@@ -201,7 +204,11 @@ function DevDashboard() {
       () => {
         const str = reader.result.toString()
         try {
-          const data = JSON.parse(str)
+          const data = JSON.parse(str);
+          // @todo following is commented because currently event types are too strict
+          // console.debug('validate data', data)
+          // const valid = validateDataDump(data);
+          // console.log('valid', valid, validateDataDump.errors);
           // @todo improve that with proper schema-like validation
           const recordKeys = [
             "type",

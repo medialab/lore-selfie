@@ -27,7 +27,7 @@ interface MessagePayload {
 }
 
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
-  const { actionType, payload, requestId }: MessagePayload = req.body
+  const { actionType, payload = {}, requestId }: MessagePayload = req.body
   // console.log('req body in annotations crud', req.body);
   const baseAnnotations: Annotations = await storage.get(
     "lore-selfie-annotations"
@@ -38,7 +38,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     id: string
     value: any
   }
-  const { collection, id, value } = payload as AnnotationPayload
+  const { collection, id, value } = payload as AnnotationPayload || {}
   let newCollection, newAnnotations
   switch (actionType) {
     case DELETE_ALL_DATA:

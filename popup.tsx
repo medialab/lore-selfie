@@ -15,17 +15,24 @@ import {
   SET_SETTING
 } from "~constants"
 import { downloadTextfile } from "~helpers"
+import type { Settings } from "~types/settings"
 
 function Popup() {
   // const [activity] = useStorage("lore-selfie-activity");
   const ioPort = usePort("io")
   const settingsPort = usePort("settingscrud")
   const activityPort = usePort("activitycrud")
-  const [isDownloading, setIsDownloading] = useState(false)
-  const [isLoadingActivity, setIsLoadingActivity] = useState(true)
-  const [isLoadingSettings, setIsLoadingSettings] = useState(true)
-  const [recentContents, setRecentContents] = useState([])
-  const [settings, setSettings] = useState()
+  const [isDownloading, setIsDownloading] = useState<boolean>(false)
+  const [isLoadingActivity, setIsLoadingActivity] = useState<boolean>(true)
+  const [isLoadingSettings, setIsLoadingSettings] = useState<boolean>(true)
+  interface RecentContentItem {
+    url: string
+    title: string
+    channel: string
+    platform: string
+  }
+  const [recentContents, setRecentContents] = useState<Array<RecentContentItem>>([])
+  const [settings, setSettings] = useState<Settings>()
 
   useEffect(() => {
     settingsPort.send({ actionType: GET_SETTINGS })
@@ -73,7 +80,7 @@ function Popup() {
     ) {
       downloadTextfile(
         data.result.data,
-        `lore-selfie-activity-${new Date().toUTCstring()}.json`,
+        `lore-selfie-activity-${new Date().toUTCString()}.json`,
         "application/json"
       )
       setIsDownloading(false)
