@@ -1,4 +1,3 @@
-
 @use "fonts";
 @use "constants";
 
@@ -16,7 +15,6 @@
       display: flex;
       flex-flow: column nowrap;
       justify-content: stretch;
-      
 
       .annotation-form {
         display: flex;
@@ -54,7 +52,7 @@
     }
     .viz-column {
       box-sizing: border-box;
-        padding: constants.$gutter;
+      padding: constants.$gutter;
       .AnnotationsNetwork {
         width: 100%;
         height: 100%;
@@ -63,7 +61,7 @@
           position: absolute;
           left: constants.$gutter;
           bottom: constants.$gutter;
-          h4{
+          h4 {
             margin: 0;
             margin-bottom: constants.$gutter-small;
           }
@@ -88,7 +86,7 @@
             align-items: center;
             justify-content: center;
             &:hover {
-              color :white;
+              color: white;
             }
           }
         }

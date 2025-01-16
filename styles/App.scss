@@ -182,21 +182,21 @@
 
   .About.contents-wrapper {
     overflow: auto;
-    
+
     a {
       color: constants.$color-app-main;
       text-decoration: none;
     }
     .warning {
       background: constants.$color-app-main;
-        color: white;
-        padding: constants.$gutter;
+      color: white;
+      padding: constants.$gutter;
     }
 
     ul {
       margin: 0;
     }
-    .contents section:last-of-type{
+    .contents section:last-of-type {
       padding-bottom: 10rem;
     }
   }

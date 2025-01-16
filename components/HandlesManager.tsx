@@ -1,51 +1,52 @@
-import { PLATFORMS } from "~constants";
-import HandleEditor from "./HandleEditor";
-import {v4 as generateId} from 'uuid';
-import type { Handle } from "~types/settings";
+import { v4 as generateId } from "uuid"
 
+import { PLATFORMS } from "~constants"
+import type { Handle } from "~types/settings"
+
+import HandleEditor from "./HandleEditor"
 
 interface HandlesManagerProps {
   handles: Array<Handle>
-  onChange: ((h: Array<Handle>) => void)
+  onChange: (h: Array<Handle>) => void
 }
-function HandlesManager({
-  handles = [],
-  onChange
-}: HandlesManagerProps) {
+function HandlesManager({ handles = [], onChange }: HandlesManagerProps) {
   const handleCreate = () => {
     const newHandle = {
       platform: PLATFORMS[0],
-      id: '',
+      id: "",
       internalId: generateId(),
-      alias: ''
+      alias: ""
     }
-    const newHandles = [...handles, newHandle];
-    onChange(newHandles);
+    const newHandles = [...handles, newHandle]
+    onChange(newHandles)
   }
   return (
     <ul className="HandlesManager cards-list">
-      {
-        handles.map((handle) => {
-          const handleChange = (newHandle) => {
-            const newHandles = handles.map(h => {
-              if (h.internalId === handle.internalId) {
-                return newHandle;
-              }
-              return h;
-            });
-            onChange(newHandles);
-          }
-          const handleDelete = () => {
-            const newHandles = handles.filter(h => {
-              return h.internalId !== handle.internalId;
-            });
-            onChange(newHandles);
-          }
-          return (
-            <HandleEditor onDelete={handleDelete} handle={handle} onChange={handleChange} key={handle.internalId} />
-          )
-        })
-      }
+      {handles.map((handle) => {
+        const handleChange = (newHandle) => {
+          const newHandles = handles.map((h) => {
+            if (h.internalId === handle.internalId) {
+              return newHandle
+            }
+            return h
+          })
+          onChange(newHandles)
+        }
+        const handleDelete = () => {
+          const newHandles = handles.filter((h) => {
+            return h.internalId !== handle.internalId
+          })
+          onChange(newHandles)
+        }
+        return (
+          <HandleEditor
+            onDelete={handleDelete}
+            handle={handle}
+            onChange={handleChange}
+            key={handle.internalId}
+          />
+        )
+      })}
       <li>
         <button className="important-button" onClick={handleCreate}>
           Ajouter
@@ -55,4 +56,4 @@ function HandlesManager({
   )
 }
 
-export default HandlesManager;
+export default HandlesManager

@@ -1,12 +1,14 @@
-import Measure from 'react-measure';
-import { useState, useMemo } from 'react';
-import DayTimeline from './DayTimeline';
-import DaySummary from './DaySummary';
-import { BROWSE_VIEW } from '~constants';
-import type { CaptureEventsList } from '~types/captureEventsTypes';
-import type { Annotations } from '~types/annotations';
-import { Dimensions } from '~types/common';
-import { useBuildStructuredContentsList } from '~hooks';
+import { useMemo, useState } from "react"
+import Measure from "react-measure"
+
+import { BROWSE_VIEW } from "~constants"
+import { useBuildStructuredContentsList } from "~hooks"
+import type { Annotations } from "~types/annotations"
+import type { CaptureEventsList } from "~types/captureEventsTypes"
+import { Dimensions } from "~types/common"
+
+import DaySummary from "./DaySummary"
+import DayTimeline from "./DayTimeline"
 
 interface DayPageProps {
   date: Date
@@ -33,69 +35,70 @@ function DayPage({
   annotations,
   pageNumber,
   annotationColumnsNames,
-  type = 'left'
+  type = "left"
 }: DayPageProps) {
-  const {creators = {}, tags = {}, expressions = {}} = annotations;
-  const [vizSpaceDimensions, setVizSpaceDimensions] = useState<Dimensions>({ width: 100, height: 100 });
+  const { creators = {}, tags = {}, expressions = {} } = annotations
+  const [vizSpaceDimensions, setVizSpaceDimensions] = useState<Dimensions>({
+    width: 100,
+    height: 100
+  })
 
-  const {channelsMap, contentsMap, rowsCount} = useBuildStructuredContentsList(events, creators)
+  const { channelsMap, contentsMap, rowsCount } =
+    useBuildStructuredContentsList(events, creators)
   return (
-    <section className={`page DayPage ${format}  ${imposed ? 'is-imposed' : ''} ${type}`}>
+    <section
+      className={`page DayPage ${format}  ${imposed ? "is-imposed" : ""} ${type}`}>
       <div className="page-content">
-
         <div className="page-header">
-          {
-          type !== 'right' ?
+          {type !== "right" ? (
             <h2
               dangerouslySetInnerHTML={{
                 __html: label
               }}
             />
-            : <h3>Contenus consultés</h3>
-            }
+          ) : (
+            <h3>Contenus consultés</h3>
+          )}
         </div>
         <Measure
           bounds
-          onResize={contentRect => {
+          onResize={(contentRect) => {
             setVizSpaceDimensions(contentRect.bounds)
-          }}
-        >
+          }}>
           {({ measureRef }) => (
             <div className="viz-space-container" ref={measureRef}>
-              {
-                type === 'left' ?
-                  <DayTimeline
-                    {...vizSpaceDimensions}
-                    {...{
-                      date, 
-                      timeOfDaySpan, 
-                      format, 
-                      imposed,
-                      channelsMap, 
-                      contentsMap,
-                      events,
-                      annotationColumnsNames,
-                    }}
-                  />
-                  :
-                  <DaySummary
-                    {...vizSpaceDimensions}
-                    {...{date, timeOfDaySpan, channelsMap, rowsCount, annotationColumnsNames}}
-                  
-                  />
-              }
+              {type === "left" ? (
+                <DayTimeline
+                  {...vizSpaceDimensions}
+                  {...{
+                    date,
+                    timeOfDaySpan,
+                    format,
+                    imposed,
+                    channelsMap,
+                    contentsMap,
+                    events,
+                    annotationColumnsNames
+                  }}
+                />
+              ) : (
+                <DaySummary
+                  {...vizSpaceDimensions}
+                  {...{
+                    date,
+                    timeOfDaySpan,
+                    channelsMap,
+                    rowsCount,
+                    annotationColumnsNames
+                  }}
+                />
+              )}
             </div>
           )}
         </Measure>
       </div>
-        {
-          pageNumber ?
-          <div className="page-number">
-            {pageNumber}
-          </div>
-          : null
-        }
+      {pageNumber ? <div className="page-number">{pageNumber}</div> : null}
     </section>
   )
 }
-export default DayPage;
+export default DayPage

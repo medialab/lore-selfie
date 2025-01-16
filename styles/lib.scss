@@ -50,7 +50,8 @@
     font-size: 0.8em;
   }
 
-  button,.btn {
+  button,
+  .btn {
     background: inherit;
     box-shadow: none;
     border: none;
@@ -60,7 +61,7 @@
     border: 1px solid constants.$color-app-bg;
     box-sizing: border-box;
     cursor: pointer;
-    &a{
+    &a {
       text-decoration: none;
     }
     &:hover:not(:disabled) {
@@ -153,7 +154,8 @@
       input {
         flex: 1;
       }
-      button,.btn {
+      button,
+      .btn {
         margin: 0;
       }
     }
@@ -188,7 +190,8 @@
       color: white;
       margin-bottom: constants.$gutter;
 
-      button,.btn {
+      button,
+      .btn {
         min-width: constants.$gutter * 3;
         max-width: constants.$gutter * 3;
         min-height: constants.$gutter * 3;
@@ -431,7 +434,6 @@
       align-items: center;
       margin-bottom: constants.$gutter;
 
-      
       .current-month {
         flex: 1;
         display: flex;
@@ -514,14 +516,13 @@
     }
   }
 
-
   .VersionCheckBtn {
     @keyframes flicker {
       0% {
         background: constants.$color-app-main;
       }
       50% {
-        background: #59D044;
+        background: #59d044;
       }
       100% {
         background: constants.$color-app-main;

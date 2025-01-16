@@ -1,6 +1,3 @@
-
-
-
 @use "constants";
 @use "fonts";
 
@@ -18,10 +15,10 @@
 
     .bg-line {
       stroke: black;
-      stroke-dasharray: 5,5;
+      stroke-dasharray: 5, 5;
     }
     .bg-label {
-      font-size: .8rem;
+      font-size: 0.8rem;
       &.x-label {
         text-anchor: middle;
       }
@@ -32,10 +29,10 @@
 
     .main-objects-container {
       .bin-object-count-bg-circle {
-        fill: rgba(0,0,0,0.5);
+        fill: rgba(0, 0, 0, 0.5);
       }
       .breakdown-object {
-        opacity: .8;
+        opacity: 0.8;
       }
     }
   }

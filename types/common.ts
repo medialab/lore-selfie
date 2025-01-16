@@ -1,16 +1,17 @@
 import { PLATFORMS } from "~constants"
-import type { BrowseViewEvent, CaptureEventsList } from "./captureEventsTypes";
-import type { ReactNode } from "~node_modules/@types/react";
+import type { ReactNode } from "~node_modules/@types/react"
 
-const Platforms = [...PLATFORMS] as const;
-type Platform = (typeof Platforms)[number];
+import type { BrowseViewEvent, CaptureEventsList } from "./captureEventsTypes"
+
+const Platforms = [...PLATFORMS] as const
+type Platform = (typeof Platforms)[number]
 
 export interface AvailableChannel {
   id: string
   label?: string
   channelId: string
   channelName: string
-  platform: Platform,
+  platform: Platform
   urls: Set<string>
   urlsCount?: number
   status?: string
@@ -31,12 +32,12 @@ export interface Dimensions {
 export interface HabitsData {
   [key: string]: {
     [key: number]: {
-      count: number,
-      duration: number,
-      channels: Array<string>,
+      count: number
+      duration: number
+      channels: Array<string>
       breakdown: {
         [key: Platform]: {
-          count: number,
+          count: number
           duration: number
         }
       }
@@ -59,14 +60,14 @@ export interface DaysData {
 }
 
 export interface SuggestionSubItem {
-  id: string,
-  title: string,
+  id: string
+  title: string
   token: string
 }
 export interface ActionSuggestion {
-  type: 'creation' | 'addition',
-  id: string,
-  title: string,
+  type: "creation" | "addition"
+  id: string
+  title: string
   items: Array<SuggestionSubItem>
 }
 
@@ -87,7 +88,6 @@ export interface SpansSettings {
     markType: string
     color: string
   }
-
 }
 
 export interface SpanObject {
@@ -127,7 +127,7 @@ export interface DailyComputedSession {
 }
 
 export interface DiaryDay {
-  date: Date,
+  date: Date
   label: string
   events: CaptureEventsList
 }

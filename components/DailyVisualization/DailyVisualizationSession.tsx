@@ -1,4 +1,5 @@
-import type { SpansSettings, DailyComputedSession } from "~types/common";
+import type { DailyComputedSession, SpansSettings } from "~types/common"
+
 interface SessionProps extends DailyComputedSession {
   yScale: Function
   xScale: Function
@@ -21,15 +22,13 @@ const Session = ({
   playingSpans,
   focusSpans,
   activeSpans,
-  spansSettings,
+  spansSettings
 }: SessionProps) => {
-  const x = xScale(columnIndex);
-  let height = yExtent[1] - yExtent[0];
-  height = height > 0 ? height : 0;
+  const x = xScale(columnIndex)
+  let height = yExtent[1] - yExtent[0]
+  height = height > 0 ? height : 0
   return (
-    <g
-      className={`DailyVisualizationSession`}
-    >
+    <g className={`DailyVisualizationSession`}>
       <rect
         x={x + gutter}
         y={yExtent[0]}
@@ -38,48 +37,42 @@ const Session = ({
         className="session-background"
       />
       {[
-        { spanData: playingSpans, spanId: 'playing' },
-        { spanData: focusSpans, spanId: 'focus' },
-        { spanData: activeSpans, spanId: 'activity' },
-      ]
-        .map(({ spanData, spanId }, index) => {
-          return (
-            <g key={index} className={`spans-layer ${spanId}-spans-layer`}>
-              {
-                spanData.map(({
-                  startY,
-                  endY,
-                  start,
-                  end
-                }) => {
-                  if (isNaN(Math.abs(endY - startY))) {
-                    return null;
-                  }
-                  return (
-                    <g
-                      key={startY}
-                      className={`${spanId}-span`}
-                      transform={`translate(${x}, ${startY})`}
-                    >
-                      <rect
-                        data-tooltip-id="daily-vis-tooltip"
-                        data-tooltip-html={spansSettings[spanId].tooltipFn({ start, end })}
-                        // data-too ltip-content={`${className} de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`}
-                        x={gutter}
-                        y={0}
-                        height={Math.abs(endY - startY)}
-                        width={(width) - gutter - index * (width / 4)}
-                        stroke={'white'}
-                        strokeWidth={.5}
-                        fill={`url(#diagonalHatch-for-${spanId})`}
-                      />
-                    </g>
-                  )
-                })
+        { spanData: playingSpans, spanId: "playing" },
+        { spanData: focusSpans, spanId: "focus" },
+        { spanData: activeSpans, spanId: "activity" }
+      ].map(({ spanData, spanId }, index) => {
+        return (
+          <g key={index} className={`spans-layer ${spanId}-spans-layer`}>
+            {spanData.map(({ startY, endY, start, end }) => {
+              if (isNaN(Math.abs(endY - startY))) {
+                return null
               }
-            </g>
-          )
-        })}
+              return (
+                <g
+                  key={startY}
+                  className={`${spanId}-span`}
+                  transform={`translate(${x}, ${startY})`}>
+                  <rect
+                    data-tooltip-id="daily-vis-tooltip"
+                    data-tooltip-html={spansSettings[spanId].tooltipFn({
+                      start,
+                      end
+                    })}
+                    // data-too ltip-content={`${className} de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`}
+                    x={gutter}
+                    y={0}
+                    height={Math.abs(endY - startY)}
+                    width={width - gutter - index * (width / 4)}
+                    stroke={"white"}
+                    strokeWidth={0.5}
+                    fill={`url(#diagonalHatch-for-${spanId})`}
+                  />
+                </g>
+              )
+            })}
+          </g>
+        )
+      })}
       {/* <g className="activity-spans-layer">
         {
           activeSpans.map(({
@@ -149,26 +142,17 @@ const Session = ({
         }
       </g> */}
       <g className="chat-slices-layer">
-        {
-          chatSlices.map(({
-            startY,
-            endY,
-            start,
-            end,
-            messagesCount,
-            platform,
-            timeSpan
-          }) => {
-            const span = (end - start);
-            const coeff = span / timeSpan;
-            const relativeCount = messagesCount / coeff;
+        {chatSlices.map(
+          ({ startY, endY, start, end, messagesCount, platform, timeSpan }) => {
+            const span = end - start
+            const coeff = span / timeSpan
+            const relativeCount = messagesCount / coeff
             // console.log({span, timeSpan, coeff, messagesCount, relativeCount})
             return (
               <g
                 key={startY}
                 className={`chat-slice  ${platform}`}
-                transform={`translate(${x}, ${startY})`}
-              >
+                transform={`translate(${x}, ${startY})`}>
                 <rect
                   data-tooltip-id="daily-vis-tooltip"
                   data-tooltip-content={`${messagesCount} messages sur le chat de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`}
@@ -177,16 +161,16 @@ const Session = ({
                   height={Math.abs(endY - startY - 1)}
                   // width={messageBarWidthScale(messagesCount)}
                   width={messageBarWidthScale(relativeCount)}
-                  stroke={'none'}
+                  stroke={"none"}
                 />
               </g>
             )
-          })
-        }
+          }
+        )}
       </g>
       <g className="browing-events-layer">
-        {
-          browsingEvents.map(({
+        {browsingEvents.map(
+          ({
             platform,
             id,
             metadata = {},
@@ -206,20 +190,23 @@ const Session = ({
             //   `).join('\n')
             //   }
             // </ul>`;
-            const tooltipHTML = computedContents ? `
+            const tooltipHTML = computedContents
+              ? `
             <h2>${computedContents.title}</h2>
             <h3>${computedContents.channel} ${computedContents.platform}</h3>
-            ` : undefined;
+            `
+              : undefined
 
-            const fontSize = computedContents ? 8 / ('' + computedContents.index).length * 1.5 : 5;
+            const fontSize = computedContents
+              ? (8 / ("" + computedContents.index).length) * 1.5
+              : 5
             return (
               <g
-                key={(id as unknown as string)}
+                key={id as unknown as string}
                 className={`browsing-event ${platform}`}
                 transform={`translate(${x + gutter}, ${y})`}
-                data-tooltip-id={'daily-vis-tooltip'}
-                data-tooltip-html={tooltipHTML}
-              >
+                data-tooltip-id={"daily-vis-tooltip"}
+                data-tooltip-html={tooltipHTML}>
                 <line
                   x1={0}
                   x2={0}
@@ -233,14 +220,16 @@ const Session = ({
                   r={computedContents ? 10 : 5}
                   className={`browsing-event-circle`}
                 />
-                {
-                  computedContents ?
-                    <text fill="white" style={{ fontSize }} x={0} y={fontSize * .3} textAnchor="middle">
-                      {computedContents.index}
-
-                    </text>
-                    : null
-                }
+                {computedContents ? (
+                  <text
+                    fill="white"
+                    style={{ fontSize }}
+                    x={0}
+                    y={fontSize * 0.3}
+                    textAnchor="middle">
+                    {computedContents.index}
+                  </text>
+                ) : null}
 
                 {/* <foreignObject
                   x={0}
@@ -259,8 +248,6 @@ const Session = ({
                   </div>
                 </foreignObject> */}
 
-
-
                 {/* <text
                   textAnchor="start"
                   x={width/2 + 10}
@@ -271,11 +258,10 @@ const Session = ({
                 </text> */}
               </g>
             )
-          })
-        }
+          }
+        )}
       </g>
-
     </g>
   )
 }
-export default Session;
+export default Session

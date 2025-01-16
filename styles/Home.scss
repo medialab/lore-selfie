@@ -35,10 +35,10 @@
 
     .ui-group {
       margin: constants.$gutter 0;
-      h5{
+      h5 {
         margin: 0;
         margin-bottom: constants.$gutter-small;
-        font-size: .8rem;
+        font-size: 0.8rem;
       }
       .buttons-row {
         list-style: none;
@@ -171,7 +171,7 @@
         h5 {
           margin: 0;
           padding-left: constants.$gutter * 5;
-          font-size: .8rem;
+          font-size: 0.8rem;
         }
 
         &.legend-row {

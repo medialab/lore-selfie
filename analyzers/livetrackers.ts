@@ -1,31 +1,46 @@
-import { v4 as generateId } from 'uuid';
-import { BLUR_ON_REACTION_INPUT, CHAT_ACTIVITY_RECORD, DEFAULT_SETTINGS, FOCUS_ON_REACTION_INPUT, LIVE_USER_ACTIVITY_RECORD, PLATFORMS } from '~constants';
-import type { BlurOnReactionInputEvent, ChatActivityRecordEvent, FocusOnReactionInputEvent, LiveUserActivityRecordEvent, TwitchMessageRecord } from "~types/captureEventsTypes";
+import { v4 as generateId } from "uuid"
+
 import { Storage } from "@plasmohq/storage"
-import type { Settings } from '~types/settings';
+
+import {
+  BLUR_ON_REACTION_INPUT,
+  CHAT_ACTIVITY_RECORD,
+  DEFAULT_SETTINGS,
+  FOCUS_ON_REACTION_INPUT,
+  LIVE_USER_ACTIVITY_RECORD,
+  PLATFORMS
+} from "~constants"
+import type {
+  BlurOnReactionInputEvent,
+  ChatActivityRecordEvent,
+  FocusOnReactionInputEvent,
+  LiveUserActivityRecordEvent,
+  TwitchMessageRecord
+} from "~types/captureEventsTypes"
+import type { Settings } from "~types/settings"
 
 const storage = new Storage({
-  area: "local",
+  area: "local"
   // copiedKeyList: ["shield-modulation"],
-});
+})
 
-const Platforms = [...PLATFORMS] as const;
-type Platform = (typeof Platforms)[number];
+const Platforms = [...PLATFORMS] as const
+type Platform = (typeof Platforms)[number]
 interface LiveTrackerProps {
-  settings: Settings,
-  injectionId: string,
-  addEvent: Function,
-  platform: Platform,
-  currentURL: string,
-  onCurrentURLChange: Function,
-  activeViewType?: string,
-} 
+  settings: Settings
+  injectionId: string
+  addEvent: Function
+  platform: Platform
+  currentURL: string
+  onCurrentURLChange: Function
+  activeViewType?: string
+}
 
 interface TrackersType {
-  twitch: any,
-  youtube: any,
+  twitch: any
+  youtube: any
 }
-const trackers:TrackersType = {
+const trackers: TrackersType = {
   twitch: {
     live: async ({
       settings,
@@ -33,19 +48,15 @@ const trackers:TrackersType = {
       addEvent,
       platform,
       currentURL,
-      onCurrentURLChange,
+      onCurrentURLChange
     }: LiveTrackerProps) => {
-      const {
-        liveRecordingInterval, 
-        recordTabs,
-        recordMouse,
-        recordChat
-      } = settings;
-      const URL = document.location.href;
+      const { liveRecordingInterval, recordTabs, recordMouse, recordChat } =
+        settings
+      const URL = document.location.href
       if (URL !== currentURL) {
         onCurrentURLChange(URL)
       }
-      const chatInput = document.querySelector('.chat-input__textarea textarea');
+      const chatInput = document.querySelector(".chat-input__textarea textarea")
       // console.log('chat input', chatInput);
       if (chatInput) {
         const onFocus = async () => {
@@ -55,9 +66,9 @@ const trackers:TrackersType = {
             date: new Date(),
             url: window.location.href,
             injectionId,
-            platform,
+            platform
           }
-          await addEvent(focusOnReactionInputEvent);
+          await addEvent(focusOnReactionInputEvent)
         }
         const onBlur = async () => {
           const blurOnReactionInputEvent: BlurOnReactionInputEvent = {
@@ -66,57 +77,75 @@ const trackers:TrackersType = {
             date: new Date(),
             url: window.location.href,
             injectionId,
-            platform,
+            platform
           }
-          await addEvent(blurOnReactionInputEvent);
+          await addEvent(blurOnReactionInputEvent)
         }
-        chatInput.addEventListener('focus', onFocus)
-        chatInput.addEventListener('blur', onBlur)
+        chatInput.addEventListener("focus", onFocus)
+        chatInput.addEventListener("blur", onBlur)
       }
       interface MousePosition {
-        posX: number,
+        posX: number
         posY: number
       }
-      let mousePosition: MousePosition;
-      window.onmousemove = event => {
-        const posX = event.clientX;
-        const posY = event.clientY;
+      let mousePosition: MousePosition
+      window.onmousemove = (event) => {
+        const posX = event.clientX
+        const posY = event.clientY
         mousePosition = { posX, posY }
       }
-      let prevMousePosition = mousePosition;
+      let prevMousePosition = mousePosition
       // let prevIsPlaying = document.querySelector('button[data-a-player-state="paused"]') === null;
-
 
       return setInterval(async () => {
         // check settings still allow recording
-        const settings: Settings = await storage.get("lore-selfie-settings") || DEFAULT_SETTINGS;
-        if (!settings.recordActivity || !settings.recordOnPlatforms.includes(platform)){
-          return;
-        } 
-        console.debug('track live data', new Date().toLocaleTimeString());
+        const settings: Settings =
+          (await storage.get("lore-selfie-settings")) || DEFAULT_SETTINGS
+        if (
+          !settings.recordActivity ||
+          !settings.recordOnPlatforms.includes(platform)
+        ) {
+          return
+        }
+        console.debug("track live data", new Date().toLocaleTimeString())
 
         if (currentURL !== document.location.href) {
-          console.log('url has changed, was it recorded ?')
+          console.log("url has changed, was it recorded ?")
         }
-        const containerSelectors = ['.chat-line__message', '.vod-message']
-        const unparsedMessages = Array.from(document.querySelectorAll(containerSelectors.map(s => s + ':not([data-lore-selfie-parsed])').join(', ')));
+        const containerSelectors = [".chat-line__message", ".vod-message"]
+        const unparsedMessages = Array.from(
+          document.querySelectorAll(
+            containerSelectors
+              .map((s) => s + ":not([data-lore-selfie-parsed])")
+              .join(", ")
+          )
+        )
         // const parsedMessages = Array.from(document.querySelectorAll(containerSelectors.map(s => s + '[data-lore-selfie-parsed="1"]').join(', ')));
         // const allMessages = Array.from(document.querySelectorAll(containerSelectors.join(', ')));
         // console.log({parsedMessages, unparsedMessages, allMessages})
-        const messages = unparsedMessages
-          .map((el): TwitchMessageRecord => {
-            el.setAttribute('data-lore-selfie-parsed', '1');
-            return {
-              message: el.querySelector('[data-a-target="chat-line-message-body"]')?.textContent,
-              author: el.querySelector('.chat-author__display-name')?.textContent,
-              emote: el.querySelector('.chat-image__container') && {
-                alt: el.querySelector('.chat-image__container img')?.getAttribute('alt'),
-                src: el.querySelector('.chat-image__container img')?.getAttribute('src'),
-              }
+        const messages = unparsedMessages.map((el): TwitchMessageRecord => {
+          el.setAttribute("data-lore-selfie-parsed", "1")
+          return {
+            message: el.querySelector(
+              '[data-a-target="chat-line-message-body"]'
+            )?.textContent,
+            author: el.querySelector(".chat-author__display-name")?.textContent,
+            emote: el.querySelector(".chat-image__container") && {
+              alt: el
+                .querySelector(".chat-image__container img")
+                ?.getAttribute("alt"),
+              src: el
+                .querySelector(".chat-image__container img")
+                ?.getAttribute("src")
             }
-          });
+          }
+        })
 
-        const viewersCount = document.querySelector('#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div')?.textContent?.replace(' ', '');
+        const viewersCount = document
+          .querySelector(
+            "#live-channel-stream-information > div > div > div > div > div:nth-child(2n) > div:nth-child(2n) > div:nth-child(2n) > div > div > div > div"
+          )
+          ?.textContent?.replace(" ", "")
         const chatActivityRecordEvent: ChatActivityRecordEvent = {
           type: CHAT_ACTIVITY_RECORD,
           id: generateId(),
@@ -128,23 +157,33 @@ const trackers:TrackersType = {
           messages,
           messagesCount: messages.length,
           viewersCount: +(viewersCount || 0),
-          messagesAverageCharLength: messages.reduce((sum, m) => sum + (m.message ? m.message.length : 0), 0) / messages.length
+          messagesAverageCharLength:
+            messages.reduce(
+              (sum, m) => sum + (m.message ? m.message.length : 0),
+              0
+            ) / messages.length
         }
         if (recordChat) {
-          await addEvent(chatActivityRecordEvent);
+          await addEvent(chatActivityRecordEvent)
         }
 
         // record pause events
-        const isPlaying = document.querySelector('.ytd-player .playing-mode') !== null;
+        const isPlaying =
+          document.querySelector(".ytd-player .playing-mode") !== null
 
-        let mouseHasMoved = false;
+        let mouseHasMoved = false
         if (!prevMousePosition && mousePosition) {
-          mouseHasMoved = true;
+          mouseHasMoved = true
         }
-        if (prevMousePosition && mousePosition && (prevMousePosition.posX !== mousePosition.posX || prevMousePosition.posY !== mousePosition.posY)) {
-          mouseHasMoved = true;
+        if (
+          prevMousePosition &&
+          mousePosition &&
+          (prevMousePosition.posX !== mousePosition.posX ||
+            prevMousePosition.posY !== mousePosition.posY)
+        ) {
+          mouseHasMoved = true
         }
-        const LiveUserActivityRecordEvent:LiveUserActivityRecordEvent = {
+        const LiveUserActivityRecordEvent: LiveUserActivityRecordEvent = {
           type: LIVE_USER_ACTIVITY_RECORD,
           id: generateId(),
           date: new Date(),
@@ -152,11 +191,15 @@ const trackers:TrackersType = {
           injectionId,
           timeSpan: +liveRecordingInterval,
           platform,
-          pointerActivityScore: recordMouse ? mouseHasMoved ? 1 : 0 : undefined,
+          pointerActivityScore: recordMouse
+            ? mouseHasMoved
+              ? 1
+              : 0
+            : undefined,
           hasFocus: recordTabs ? document.hasFocus() : undefined,
           isPlaying
         }
-        prevMousePosition = mousePosition;
+        prevMousePosition = mousePosition
         await addEvent(LiveUserActivityRecordEvent)
 
         // const IsPlayingActivityRecord: IsPlayingActivityRecord = {
@@ -182,48 +225,55 @@ const trackers:TrackersType = {
       addEvent,
       platform,
       currentURL,
-      onCurrentURLChange,
+      onCurrentURLChange
     }: LiveTrackerProps) => {
-      const {
-        liveRecordingInterval, 
-        recordTabs,
-        recordMouse,
-        recordChat
-      } = settings;
-      const URL = document.location.href;
+      const { liveRecordingInterval, recordTabs, recordMouse, recordChat } =
+        settings
+      const URL = document.location.href
       if (URL !== currentURL) {
         onCurrentURLChange(URL)
       }
       interface MousePosition {
-        posX: number,
+        posX: number
         posY: number
       }
-      let mousePosition: MousePosition;
-      window.onmousemove = event => {
-        const posX = event.clientX;
-        const posY = event.clientY;
+      let mousePosition: MousePosition
+      window.onmousemove = (event) => {
+        const posX = event.clientX
+        const posY = event.clientY
         mousePosition = { posX, posY }
       }
-      let prevMousePosition = mousePosition;
+      let prevMousePosition = mousePosition
       // console.log('in video youtube, interval', liveRecordingInterval)
       // let prevIsPlaying = document.querySelector('.ytd-player .playing-mode') !== null;
       return setInterval(async () => {
         // check settings still allow recording
-        const settings: Settings = await storage.get("lore-selfie-settings") || DEFAULT_SETTINGS;
-        if (!settings.recordActivity || !settings.recordOnPlatforms.includes(platform)){
-          return;
-        } 
-        console.debug('track live data', new Date().toLocaleTimeString());
-        const isPlaying = document.querySelector('.ytd-player .playing-mode') !== null;
-        const currentMediaTime = document.querySelector('.ytp-time-current')?.textContent;
-        let mouseHasMoved = false;
+        const settings: Settings =
+          (await storage.get("lore-selfie-settings")) || DEFAULT_SETTINGS
+        if (
+          !settings.recordActivity ||
+          !settings.recordOnPlatforms.includes(platform)
+        ) {
+          return
+        }
+        console.debug("track live data", new Date().toLocaleTimeString())
+        const isPlaying =
+          document.querySelector(".ytd-player .playing-mode") !== null
+        const currentMediaTime =
+          document.querySelector(".ytp-time-current")?.textContent
+        let mouseHasMoved = false
         if (!prevMousePosition && mousePosition) {
-          mouseHasMoved = true;
+          mouseHasMoved = true
         }
-        if (prevMousePosition && mousePosition && (prevMousePosition.posX !== mousePosition.posX || prevMousePosition.posY !== mousePosition.posY)) {
-          mouseHasMoved = true;
+        if (
+          prevMousePosition &&
+          mousePosition &&
+          (prevMousePosition.posX !== mousePosition.posX ||
+            prevMousePosition.posY !== mousePosition.posY)
+        ) {
+          mouseHasMoved = true
         }
-        const LiveUserActivityRecordEvent:LiveUserActivityRecordEvent = {
+        const LiveUserActivityRecordEvent: LiveUserActivityRecordEvent = {
           type: LIVE_USER_ACTIVITY_RECORD,
           id: generateId(),
           date: new Date(),
@@ -231,12 +281,16 @@ const trackers:TrackersType = {
           injectionId,
           timeSpan: +liveRecordingInterval,
           platform,
-          pointerActivityScore: recordMouse ? mouseHasMoved ? 1 : 0 : undefined,
+          pointerActivityScore: recordMouse
+            ? mouseHasMoved
+              ? 1
+              : 0
+            : undefined,
           currentMediaTime,
           hasFocus: recordTabs ? document.hasFocus() : undefined,
           isPlaying
         }
-        prevMousePosition = mousePosition;
+        prevMousePosition = mousePosition
         await addEvent(LiveUserActivityRecordEvent)
 
         // const IsPlayingActivityRecord: IsPlayingActivityRecord = {
@@ -253,7 +307,6 @@ const trackers:TrackersType = {
         // // prevIsPlaying = isPlaying
         // await addEvent(IsPlayingActivityRecord);
         // }
-
       }, +liveRecordingInterval)
     }
   }
@@ -265,10 +318,10 @@ export const updateLiveTracking = ({
   injectionId,
   addEvent,
   currentURL,
-  onCurrentURLChange,
+  onCurrentURLChange
 }: LiveTrackerProps) => {
-  let routine;
-  console.info('update live tracking', platform, activeViewType);
+  let routine
+  console.info("update live tracking", platform, activeViewType)
   if (trackers[platform] && trackers[platform][activeViewType]) {
     // functions return a setInterval() id
     routine = trackers[platform][activeViewType]({
@@ -278,9 +331,9 @@ export const updateLiveTracking = ({
       platform,
       currentURL,
       onCurrentURLChange
-    });
+    })
   } else {
-    clearInterval(routine);
+    clearInterval(routine)
   }
-  return updateLiveTracking;
+  return updateLiveTracking
 }

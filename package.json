@@ -10,6 +10,7 @@
     "dev:firefox": "plasmo dev --target=firefox-mv2",
     "debug": "plasmo dev --verbose",
     "debug:firefox": "plasmo dev --target=firefox-mv2 --verbose",
+    "prettier": "prettier . --write",
     "lint": "eslint '*.ts' '*.tsx' '**/*.ts' '**/*.tsx' '**/**/*.ts' '**/**/*.tsx'",
     "lint:fix": "eslint '*.ts' '*.tsx' '**/*.ts' '**/*.tsx' '**/**/*.ts' '**/**/*.tsx' --fix",
     "build": "plasmo build",

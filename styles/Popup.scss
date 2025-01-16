@@ -110,10 +110,10 @@
             display: flex;
             flex-flow: row nowrap;
             justify-content: stretch;
-            transition: .5s ease all;
+            transition: 0.5s ease all;
             padding: constants.$gutter-small 0;
             &:hover {
-              background: rgba(0,0,0,0.1);
+              background: rgba(0, 0, 0, 0.1);
             }
             .platform-marker-container {
               padding-left: constants.$gutter;
@@ -153,7 +153,8 @@
     display: flex;
     flex-flow: row nowrap;
     justify-content: stretch;
-    button,.btn {
+    button,
+    .btn {
       text-align: left;
       padding: constants.$gutter;
       box-sizing: border-box;
@@ -167,7 +168,7 @@
           background: constants.$color-app-main-accent;
         }
       }
-      
+
       &.special {
         flex: 1;
         background: none;

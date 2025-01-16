@@ -1,3 +1,3 @@
-import DiaryWrapper from "./DiaryWrapper";
+import DiaryWrapper from "./DiaryWrapper"
 
-export default DiaryWrapper;
+export default DiaryWrapper

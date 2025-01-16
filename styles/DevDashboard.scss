@@ -15,7 +15,8 @@
   h4 {
     @include fonts.hammersmith-one-regular;
   }
-  h1, .about {
+  h1,
+  .about {
     background: constants.$color-app-main;
     color: white;
     padding: constants.$gutter;
@@ -38,7 +39,7 @@
     background: #888888;
     &:disabled {
       cursor: not-allowed;
-      opacity: .5;
+      opacity: 0.5;
     }
     &.active {
       background: #333;
@@ -48,10 +49,10 @@
       background: #885053;
     }
     &.warning {
-      background: #FE5F55;
+      background: #fe5f55;
     }
     &.ok {
-      background: #94C9A9;
+      background: #94c9a9;
       color: black;
     }
     &.full-width {
@@ -68,7 +69,7 @@
     }
 
     .ui-section {
-      background: #C9C5C1;
+      background: #c9c5c1;
       padding: constants.$gutter * 2;
       margin-bottom: constants.$gutter;
       margin-top: constants.$gutter;
@@ -78,7 +79,6 @@
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
-        
       }
     }
   }

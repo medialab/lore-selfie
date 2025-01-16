@@ -1,4 +1,4 @@
-import InputToValidate from "./InputToValidate";
+import InputToValidate from "./InputToValidate"
 
 interface FilterInputsListProps {
   value: Array<string>
@@ -10,48 +10,40 @@ interface FilterInputsListProps {
 const FilterInputsList = ({
   value = [],
   onChange,
-  messages: {
-    newItem: newItemMessage
-  }
+  messages: { newItem: newItemMessage }
 }: FilterInputsListProps) => {
   return (
     <ul className="FilterInputsList small-cards-container capped">
-      {
-        value.map((exp, index) => {
-
-          const handleRemove = () => {
-            const newValue = [...value];
-            newValue.splice(index, 1);
-            onChange(newValue)
+      {value.map((exp, index) => {
+        const handleRemove = () => {
+          const newValue = [...value]
+          newValue.splice(index, 1)
+          onChange(newValue)
+        }
+        const handleChange = (val) => {
+          if (!val.length) {
+            return handleRemove()
           }
-          const handleChange = val => {
-            if (!val.length) {
-              return handleRemove();
-            }
-            const newValue = [...value];
-            newValue[index] = val
-            onChange(newValue)
-          }
-          return (
-            <li key={index}>
-              <InputToValidate
-                value={exp}
-                onChange={handleChange}
-                onRemove={handleRemove}
-              />
-            </li>
-          )
-        })
-      }
+          const newValue = [...value]
+          newValue[index] = val
+          onChange(newValue)
+        }
+        return (
+          <li key={index}>
+            <InputToValidate
+              value={exp}
+              onChange={handleChange}
+              onRemove={handleRemove}
+            />
+          </li>
+        )
+      })}
       <li className="small-card">
-        <button onClick={() => {
-          const newValue = [
-            ...value,
-            ''
-          ]
-          onChange(newValue);
-
-        }}>
+        <button
+          onClick={() => {
+            const newValue = [...value, ""]
+            onChange(newValue)
+          }}>
           {newItemMessage}
         </button>
       </li>
@@ -59,4 +51,4 @@ const FilterInputsList = ({
   )
 }
 
-export default FilterInputsList;
+export default FilterInputsList

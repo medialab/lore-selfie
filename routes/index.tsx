@@ -1,11 +1,11 @@
 import { Route, Routes } from "react-router-dom"
 
 import About from "./About"
+import Annotations from "./Annotations"
 import Home from "./Home"
-import Participate from "./Participate";
-import Studio from "./Studio";
-import Annotations from "./Annotations";
-import Settings from "./Settings";
+import Participate from "./Participate"
+import Settings from "./Settings"
+import Studio from "./Studio"
 
 export const Routing = () => (
   <Routes>

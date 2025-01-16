@@ -1,5 +1,3 @@
-
-
 export interface Creator {
   id: string
   channels: Array<string>

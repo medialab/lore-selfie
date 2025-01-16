@@ -8,7 +8,7 @@
     }
     .spans-layer {
       rect {
-        opacity: .5;
+        opacity: 0.5;
         // stroke: black;
       }
     }
@@ -27,60 +27,57 @@
     //     fill: blue;
     //   }
     // }
-    
-   
-    }
-    // .activity-span {
-    //   rect {
-    //     fill: rgba(255, 0, 0, 0.3);
-    //   }
-    // }
-    // .blur-span {
-    //   rect {
-    //     fill: rgba(255, 255, 255, 0.3);
-    //   }
-    // }
-    .chat-slice {
-      &.twitch {
-        rect {
-          fill: constants.$color-twitch;
-        }
-      }
-      &.youtube {
-        rect {
-          fill: constants.$color-youtube;
-        }
+  }
+  // .activity-span {
+  //   rect {
+  //     fill: rgba(255, 0, 0, 0.3);
+  //   }
+  // }
+  // .blur-span {
+  //   rect {
+  //     fill: rgba(255, 255, 255, 0.3);
+  //   }
+  // }
+  .chat-slice {
+    &.twitch {
+      rect {
+        fill: constants.$color-twitch;
       }
     }
-    .browsing-event {
-      text,
-      .event-label {
-        font-size: 0.8rem;
-      }
-      .event-label {
-        text-align: right;
-      }
-      &.twitch {
-        .browsing-event-circle {
-          fill: constants.$color-twitch;
-          stroke: white;
-        }
-        .browsing-event-duration-line {
-          stroke: constants.$color-twitch;
-        }
-      }
-      &.youtube {
-        .browsing-event-circle {
-          fill: constants.$color-youtube;
-          stroke: white;
-        }
-        .browsing-event-duration-line {
-          stroke: constants.$color-youtube;
-        }
+    &.youtube {
+      rect {
+        fill: constants.$color-youtube;
       }
     }
   }
-
+  .browsing-event {
+    text,
+    .event-label {
+      font-size: 0.8rem;
+    }
+    .event-label {
+      text-align: right;
+    }
+    &.twitch {
+      .browsing-event-circle {
+        fill: constants.$color-twitch;
+        stroke: white;
+      }
+      .browsing-event-duration-line {
+        stroke: constants.$color-twitch;
+      }
+    }
+    &.youtube {
+      .browsing-event-circle {
+        fill: constants.$color-youtube;
+        stroke: white;
+      }
+      .browsing-event-duration-line {
+        stroke: constants.$color-youtube;
+      }
+    }
+  }
+}
 
 .event-tooltip-content {
   list-style: none;
