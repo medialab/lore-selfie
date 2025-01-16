@@ -285,7 +285,7 @@ function DayVisualization({
       )
       const chatSlices: Array<ChatSlice> = activityEvents.map(
         (event, index) => {
-          const prev = index > 0 ? chatSlices[index - 1] : undefined
+          const prev = index > 0 ? activityEvents[index - 1] : undefined
           const end = new Date(event.date).getTime()
           // const start = end - event.timeSpan;
           const start =
