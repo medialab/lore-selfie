@@ -6,7 +6,12 @@ interface TagChipProps {
 export default function TagChip({
   tag = { id: "", color: "black", name: "", description: "" }
 }: TagChipProps) {
-  const { id, color, description, name } = tag
+  const {
+    // id,
+    color,
+    // description,
+    name
+  } = tag
   return (
     <div className="TagChip">
       <div className="chip-content">

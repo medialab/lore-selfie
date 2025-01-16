@@ -5,8 +5,6 @@ import { useEffect, useMemo, useState } from "react"
 import { Tooltip } from "react-tooltip"
 import { useInterval } from "usehooks-ts"
 
-import { PLATFORMS } from "~constants"
-
 import "react-tooltip/dist/react-tooltip.css"
 
 import {
@@ -17,7 +15,6 @@ import {
   LIVE_USER_ACTIVITY_RECORD
 } from "~constants"
 import type {
-  BrowseViewEvent,
   CaptureEvent,
   ChatActivityRecordEvent
 } from "~types/captureEventsTypes"
@@ -27,14 +24,11 @@ import type {
   ContentsMapItem,
   DailyBrowseViewEventComputed,
   DailyComputedSession,
-  SpanObject,
   SpansSettings
 } from "~types/common"
 
 import Session from "./DailyVisualizationSession"
 
-const Platforms = [...PLATFORMS] as const
-type Platform = (typeof Platforms)[number]
 interface DayVisualizationProps {
   sessions: Map<string, Array<CaptureEvent>>
   date: Date
@@ -403,26 +397,35 @@ function DayVisualization({
         height={visualizationHeight}>
         {/* <rect x={0} y={0} width={visualizationWidth} height={visualizationHeight} fill="lightgrey" /> */}
         <g className="time-ticks">
-          {timeTicks.map(({ date, label, y }, tickIndex) => {
-            return (
-              <g
-                className="tick-group"
-                key={tickIndex}
-                transform={`translate(0, ${y})`}>
-                <line
-                  stroke="grey"
-                  x1={gutter * 2}
-                  x2={visualizationWidth}
-                  y1={0}
-                  y2={0}
-                  strokeDasharray={"5,5"}
-                />
-                <text textAnchor="end" x={gutter * 1.5} y={0}>
-                  {label}
-                </text>
-              </g>
-            )
-          })}
+          {timeTicks.map(
+            (
+              {
+                // date,
+                label,
+                y
+              },
+              tickIndex
+            ) => {
+              return (
+                <g
+                  className="tick-group"
+                  key={tickIndex}
+                  transform={`translate(0, ${y})`}>
+                  <line
+                    stroke="grey"
+                    x1={gutter * 2}
+                    x2={visualizationWidth}
+                    y1={0}
+                    y2={0}
+                    strokeDasharray={"5,5"}
+                  />
+                  <text textAnchor="end" x={gutter * 1.5} y={0}>
+                    {label}
+                  </text>
+                </g>
+              )
+            }
+          )}
         </g>
         <g className="sessions-container">
           {computedSessions.map((session) => {

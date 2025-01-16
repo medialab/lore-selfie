@@ -1,8 +1,11 @@
-import { useEffect, useMemo } from "react"
+import { useMemo } from "react"
 
 import { BROWSE_VIEW } from "~constants"
 import type { Creator } from "~types/annotations"
-import type { CaptureEventsList } from "~types/captureEventsTypes"
+import type {
+  BrowseViewEvent,
+  CaptureEventsList
+} from "~types/captureEventsTypes"
 import type { ChannelsMapItem, ContentsMapItem } from "~types/common"
 
 interface structuredContents {
@@ -29,7 +32,7 @@ export const useBuildStructuredContentsList = (
     const channels = new Map()
     let index = 0
     let rCount = 0
-    validEvents.forEach((event) => {
+    validEvents.forEach((event: BrowseViewEvent) => {
       let channel = event.metadata.channelName || event.metadata.channelId
       const channelSlug = `${event.metadata.channelId}-${event.platform}`
       const creator = Object.values(creators).find((c) =>

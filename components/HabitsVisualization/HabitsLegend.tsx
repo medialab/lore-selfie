@@ -1,6 +1,6 @@
 import { PLATFORMS_COLORS } from "~constants"
 
-function HabitsLegend({}) {
+function HabitsLegend() {
   return (
     <ul className="legend-container">
       {Object.entries(PLATFORMS_COLORS).map(([id, color]) => {

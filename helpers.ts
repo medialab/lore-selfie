@@ -22,7 +22,7 @@ export function getBrowser(): Browser {
       type: "opera",
       version:
         getFirstMatch(/version\/(\d+(\.\d+)?)/i) ||
-        getFirstMatch(/(?:opera|opr)[\s\/](\d+(\.\d+)?)/i)
+        getFirstMatch(/(?:opera|opr)[\s/](\d+(\.\d+)?)/i)
     }
   } else if (/msie|trident/i.test(ua)) {
     browser = {
@@ -46,7 +46,7 @@ export function getBrowser(): Browser {
     browser = {
       name: "Firefox",
       type: "firefox",
-      version: getFirstMatch(/(?:firefox)[ \/](\d+(\.\d+)?)/i)
+      version: getFirstMatch(/(?:firefox)[ /](\d+(\.\d+)?)/i)
     }
   } else if (!/like android/i.test(ua) && /android/i.test(ua)) {
     browser = {
@@ -116,7 +116,7 @@ export function downloadTextfile(
 export function JSONArrayToCSVStr(items: Array<object> = []): string {
   const replacer = (key, value) => (value === null ? "" : value) // specify how you want to handle null values here
   const header = new Set(Object.keys(items[0]))
-  const outputItems = items.map((item, i) => {
+  const outputItems = items.map((item) => {
     const outputItem = {}
     Object.entries(item).forEach(([key, value]) => {
       let outputValue = value
@@ -235,8 +235,6 @@ export function inferTickTimespan(
   let span
   if (scale < 150000) {
     span = 15000
-  } else if (scale < 300000) {
-    span = 30000
   } else if (scale < 300000) {
     span = 30000
   } else if (scale < 600000) {

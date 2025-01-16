@@ -9,6 +9,7 @@ const storage = new Storage({
   // copiedKeyList: ["shield-modulation"],
 })
 
+// eslint-disable-next-line
 const availableEventTypes = [...EVENT_TYPES] as const
 
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {

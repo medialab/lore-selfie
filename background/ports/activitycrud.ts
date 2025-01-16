@@ -9,7 +9,6 @@ import {
   APPEND_ACTIVITY_EVENTS,
   BROWSE_VIEW,
   DAY_IN_MS,
-  DELETE_ALL_DATA,
   DUPLICATE_DAY_DATA,
   GET_ACTIVITY_EVENTS,
   GET_BINNED_ACTIVITY_OUTLINE,
@@ -212,7 +211,7 @@ const applyChannelSettings = (
   // console.log('hiddenURLs', hiddenURLs);
   return transformedEvents
 }
-
+// eslint-disable-next-line
 const AvailablePlatforms = [...PLATFORMS] as const
 
 interface MessagePayload {
@@ -241,9 +240,9 @@ const filterEvents = (
     timeSpan,
     timeOfDaySpan,
     daysOfWeek,
-    platforms,
-    channelsSettings,
-    excludedTitlePatterns
+    platforms
+    // channelsSettings,
+    // excludedTitlePatterns
   } = payload
   let from, to
   if (!initialFrom && !initialTo && timeSpan) {
@@ -308,6 +307,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         }
       })
       // console.log('filtered events for get channels', filteredEvents, activity.length, payload);
+      // eslint-disable-next-line
       const channelsList = new Map()
       filteredEvents.forEach((event: BrowseViewEvent) => {
         const { channelId, channelName } = event.metadata
@@ -388,6 +388,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         bin: number
       }
     case GET_BINNED_ACTIVITY_OUTLINE:
+      // eslint-disable-next-line
       const {
         bin = DAY_IN_MS, // 'day',
         ...settings
@@ -424,11 +425,13 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       })
       break
     case GET_HABITS_DATA:
+      // eslint-disable-next-line
       const {
         bin: binsDuration, // 'day',
         ...otherSettings
       } = payload as GetBinnedActivityPayload
 
+      // eslint-disable-next-line
       const bins = []
       for (let h = 0; h < 24 * 3600 * 1000; h += binsDuration) {
         bins.push({
@@ -438,11 +441,15 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         })
       }
 
+      // eslint-disable-next-line
       const output: HabitsData = [0, 1, 2, 3, 4, 5, 6].reduce(
         (res1, dayId) => ({
           ...res1,
           [dayId]: bins.reduce((res2, bin) => {
-            const { start, end } = bin
+            const {
+              start
+              // end
+            } = bin
             return {
               ...res2,
               [start]: {
@@ -477,14 +484,13 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         output[day][thatBin].count += 1
         output[day][thatBin].breakdown[platform].count += 1
         if (type === LIVE_USER_ACTIVITY_RECORD) {
-          if (
-            true
-            // event.hasFocus
-          ) {
-            const thatSpan = event.timeSpan
-            output[day][thatBin].duration += thatSpan
-            output[day][thatBin].breakdown[platform].duration += thatSpan
-          }
+          //   if (
+          //     // event.hasFocus
+          //   ) {
+          //     const thatSpan = event.timeSpan
+          //     output[day][thatBin].duration += thatSpan
+          //     output[day][thatBin].breakdown[platform].duration += thatSpan
+          //   }
         } else if (type === BROWSE_VIEW) {
           const channel = event.metadata.channelName || event.metadata.channelId
           const channelSlug = `${channel} (${event.platform})`

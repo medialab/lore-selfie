@@ -7,8 +7,8 @@ interface DaySummaryProps {
   rowsCount: number
 }
 export default function DaySummary({
-  width,
-  height,
+  // width,
+  // height,
   channelsMap,
   rowsCount
 }: DaySummaryProps) {
@@ -27,7 +27,13 @@ export default function DaySummary({
               <h4 className="channel-title">{channel}</h4>
               <ul className="contents-list">
                 {Array.from(contents.values()).map(
-                  ({ url, title, channel, platform, index }) => {
+                  ({
+                    url,
+                    title,
+                    // channel,
+                    platform,
+                    index
+                  }) => {
                     return (
                       <li key={url} className="contents-item">
                         <a target="blank" href={url}>

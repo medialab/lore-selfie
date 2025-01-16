@@ -1,12 +1,10 @@
-import { v4 as generateId } from "uuid"
-
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
 
 import { homepage, version } from "~/package.json"
 import {
   ACTION_END,
-  ACTION_PROGRESS,
+  // ACTION_PROGRESS,
   DEFAULT_ANNOTATIONS,
   DEFAULT_SETTINGS,
   DELETE_ALL_DATA,
@@ -52,7 +50,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
             date: new Date().toJSON(),
             pluginVersion: version,
             learnMoreURL: homepage,
-            activity,
+            activities: activity,
             settings,
             annotations
           } as DataRecord)

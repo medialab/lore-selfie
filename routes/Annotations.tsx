@@ -22,17 +22,15 @@ import "~/styles/Annotations.scss"
 
 import { useInterval } from "usehooks-ts"
 
-import type { PlasmoMessaging } from "@plasmohq/messaging"
-
 import type { Annotations } from "~types/annotations"
 import type { AvailableChannels, Dimensions } from "~types/common"
 
-function Annotations() {
+function AnnotationsView() {
   const annotationsPort = usePort("annotationscrud")
   const activityPort = usePort("activitycrud")
   const [availableChannels, setAvailableChannels] =
     useState<AvailableChannels>()
-  const [dimensions, setDimensions] = useState<Dimensions>({
+  const [, setDimensions] = useState<Dimensions>({
     width: 1000,
     height: 1000
   })
@@ -46,10 +44,16 @@ function Annotations() {
    */
   interface PlasmoPortType {
     data?: any
-    send: Function
-    listen: Function
+    send: (payload: Record<string, any>) => void
+    listen: <T = any>(
+      handler: (msg: T) => void
+    ) => { port: object; disconnect: () => void }
   }
-  const requestPort: Function = useMemo(
+  const requestPort: (
+    port: PlasmoPortType,
+    actionType: string,
+    payload: object
+  ) => void = useMemo(
     () => async (port: PlasmoPortType, actionType: string, payload: object) => {
       const requestId = generateId()
       pendingRequestsIds.add(requestId)
@@ -309,4 +313,4 @@ function Annotations() {
     </div>
   )
 }
-export default Annotations
+export default AnnotationsView

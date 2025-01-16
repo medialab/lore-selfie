@@ -15,7 +15,7 @@ interface DayTimelineProps {
   width: number
   height: number
   timeOfDaySpan: [string, string]
-  date: number
+  date: Date
   format: string
   imposed: boolean
   channelsMap: Map<string, ChannelsMapItem>
@@ -52,14 +52,14 @@ export default function DayTimeline({
     return inferTickTimespan(Math.abs(inMs[1] - inMs[0]))
   }, [timeOfDaySpan])
   const { tickValues, minDate, maxDate } = useMemo(() => {
-    let [fromTimeInMs, toTimeInMs] = timeOfDaySpan.map(timeOfDayToMs)
+    const [fromTimeInMs, toTimeInMsInit] = timeOfDaySpan.map(timeOfDayToMs)
     // if end time is smaller than start time add a day
-
+    let toTimeInMs = toTimeInMsInit
     if (toTimeInMs < fromTimeInMs) {
       toTimeInMs += DAY_IN_MS
     }
-    const realStartInMs = date + fromTimeInMs
-    const realEndInMs = date + toTimeInMs
+    const realStartInMs = new Date(date).getTime() + fromTimeInMs
+    const realEndInMs = new Date(date).getTime() + toTimeInMs
     const niceStartInMs = realStartInMs - (realStartInMs % tickTimespan)
     const niceEndInMs =
       realEndInMs % tickTimespan === 0
@@ -237,7 +237,7 @@ export default function DayTimeline({
                 // style={{pointerEvents: 'none'}}
               >
                 <h4
-                  // @ts-ignore
+                  // @ts-expect-error bc of foreignObject specificities
                   xmlns="http://www.w3.org/1999/xhtml">
                   <span>{label}</span>
                 </h4>
@@ -264,7 +264,13 @@ export default function DayTimeline({
       </g>
       <g className="sequences-container">
         {vizSequences.map(({ start, end, contentData, columnIndex }, i) => {
-          const { index, channel, platform, title, url } = contentData
+          const {
+            index,
+            // channel,
+            platform
+            // title,
+            // url
+          } = contentData
           const y1 = yScale(start.getTime())
           const y2 = yScale(end.getTime())
           const x = xScale(columnIndex)

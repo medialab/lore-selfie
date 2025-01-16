@@ -18,7 +18,7 @@ interface HabitsProps {
 }
 
 export default function Habits({
-  habitsTimespan,
+  // habitsTimespan,
   habitsBinDuration,
   startOfWeekId = 1,
   data
@@ -153,29 +153,38 @@ export default function Habits({
                   </g>
                 )
               })}
-              {bins.map(({ start, end, label }, index) => {
-                const y = rowHeight * (index + 1)
-                return (
-                  <g
-                    className="background-bin"
-                    key={start}
-                    transform={`translate(${0}, ${y})`}>
-                    <text
-                      className="bg-label y-label"
-                      x={columnWidth - 10}
-                      y={rowHeight / 2 + 3}>
-                      {label}
-                    </text>
-                    <line
-                      className="bg-line"
-                      x1={columnWidth}
-                      x2={dimensions.width - columnWidth / 2}
-                      y1={rowHeight / 2}
-                      y2={rowHeight / 2}
-                    />
-                  </g>
-                )
-              })}
+              {bins.map(
+                (
+                  {
+                    start,
+                    // end,
+                    label
+                  },
+                  index
+                ) => {
+                  const y = rowHeight * (index + 1)
+                  return (
+                    <g
+                      className="background-bin"
+                      key={start}
+                      transform={`translate(${0}, ${y})`}>
+                      <text
+                        className="bg-label y-label"
+                        x={columnWidth - 10}
+                        y={rowHeight / 2 + 3}>
+                        {label}
+                      </text>
+                      <line
+                        className="bg-line"
+                        x1={columnWidth}
+                        x2={dimensions.width - columnWidth / 2}
+                        y1={rowHeight / 2}
+                        y2={rowHeight / 2}
+                      />
+                    </g>
+                  )
+                }
+              )}
             </g>
             <g className="main-objects-container">
               {data

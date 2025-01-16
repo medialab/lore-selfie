@@ -1,7 +1,7 @@
 import Slider from "rc-slider"
 import { useEffect, useMemo, useState } from "react"
 import Measure from "react-measure"
-import { Link, useParams, useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router-dom"
 import { v4 as generateId } from "uuid"
 
 import { usePort } from "@plasmohq/messaging/hook"
@@ -18,28 +18,17 @@ import DatePicker from "~components/FormComponents/DatePicker"
 import Habits from "~components/HabitsVisualization/Habits"
 import HabitsLegend from "~components/HabitsVisualization/HabitsLegend"
 import {
-  BROWSE_VIEW,
   DAY_IN_MS,
   GET_ACTIVITY_EVENTS,
   GET_ANNOTATIONS,
   GET_BINNED_ACTIVITY_OUTLINE,
-  GET_HABITS_DATA,
-  PLATFORMS_COLORS
+  GET_HABITS_DATA
 } from "~constants"
 import { buildDateKey, prettyDate } from "~helpers"
 import { useBuildStructuredContentsList } from "~hooks"
 import type { Annotations } from "~types/annotations"
-import type {
-  BrowseViewEvent,
-  CaptureEventsList
-} from "~types/captureEventsTypes"
-import type {
-  ChannelsMapItem,
-  ContentsMapItem,
-  DaysData,
-  Dimensions,
-  HabitsData
-} from "~types/common"
+import type { CaptureEventsList } from "~types/captureEventsTypes"
+import type { DaysData, Dimensions, HabitsData } from "~types/common"
 
 const UPDATE_RATE = 10000
 const MIN_ZOOM = 0.5
@@ -71,7 +60,7 @@ function Home() {
     11: "Décembre"
   }
 
-  const [dimensions, setDimensions] = useState<Dimensions>({
+  const [, setDimensions] = useState<Dimensions>({
     width: 1000,
     height: 1000
   })
@@ -157,10 +146,12 @@ function Home() {
       pendingRequestsIds.delete(response.requestId)
       setPendingRequestsIds(pendingRequestsIds)
       const {
-        result: { data = [] },
-        payload
+        result: { data = [] }
+        // payload
       } = response
       // const today = buildDateKey(new Date());
+
+      let formattedBinnedActivityOutline
       switch (response.actionType) {
         case GET_ACTIVITY_EVENTS:
           setVisibleEvents(data)
@@ -169,21 +160,29 @@ function Home() {
           setAnnotations(data)
           break
         case GET_BINNED_ACTIVITY_OUTLINE:
-          const formatted = data.reduce((cur, { date, eventsCount }) => {
-            const key = buildDateKey(date)
-            return {
-              ...cur,
-              [key]: {
-                value: eventsCount,
-                key,
-                date: new Date(date)
+          formattedBinnedActivityOutline = data.reduce(
+            (cur, { date, eventsCount }) => {
+              const key = buildDateKey(date)
+              return {
+                ...cur,
+                [key]: {
+                  value: eventsCount,
+                  key,
+                  date: new Date(date)
+                }
               }
-            }
-          }, {})
-          setDaysData(formatted)
-          if (!displayedDayDate && Object.entries(formatted).length) {
-            const latestDayKey = Object.keys(formatted).pop()
-            const latestDay = formatted[latestDayKey].date
+            },
+            {}
+          )
+          setDaysData(formattedBinnedActivityOutline)
+          if (
+            !displayedDayDate &&
+            Object.entries(formattedBinnedActivityOutline).length
+          ) {
+            const latestDayKey = Object.keys(
+              formattedBinnedActivityOutline
+            ).pop()
+            const latestDay = formattedBinnedActivityOutline[latestDayKey].date
             latestDay.setHours(0)
             // console.log('set displayed day date to latest day', latestDay)
             setDisplayedDayDate(latestDay)
@@ -285,57 +284,10 @@ function Home() {
     }
   }, UPDATE_RATE * 2)
 
-  const { channelsMap, contentsMap, rowsCount } =
-    useBuildStructuredContentsList(visibleEvents, annotations?.creators)
-
-  // const { channelsMap, contentsMap, rowsCount }: tempDataType = useMemo(() => {
-  //   const { creators = {} } = annotations || {};
-  //   const events = visibleEvents;
-  //   const validEvents = events
-  //     .filter(event => event.type === BROWSE_VIEW && event.url && event.metadata.title
-  //       && ['live', 'video', 'short'].includes(event.viewType)
-  //     );
-  //   const contents = new Map();
-  //   const channels = new Map();
-  //   let index = 0;
-  //   let rCount = 0;
-  //   validEvents.forEach((event: BrowseViewEvent) => {
-  //     let channel = event.metadata.channelName || event.metadata.channelId;
-  //     const channelSlug = `${event.metadata.channelId}-${event.platform}`;
-  //     const creator = Object.values(creators).find(c => c.channels.includes(channelSlug));
-  //     channel = creator ? creator.name : channel;
-  //     // console.log('creators', creators, channelSlug);
-  //     if (!channels.has(channel)) {
-  //       channels.set(channel, new Map());
-  //       rCount++;
-  //     }
-  //     const uniqueContents = channels.get(channel);// || new Map();
-  //     if (!uniqueContents.has(event.url)) {
-  //       index++;
-  //       rCount++;
-  //       uniqueContents.set(event.url, {
-  //         url: event.url,
-  //         title: event.metadata.title,
-  //         channel,
-  //         platform: event.platform,
-  //         index
-  //       })
-  //       contents.set(event.url, {
-  //         url: event.url,
-  //         title: event.metadata.title,
-  //         channel,
-  //         platform: event.platform,
-  //         index
-  //       })
-  //     }
-  //     channels.set(channel, uniqueContents)
-  //   })
-  //   return {
-  //     contentsMap: contents,
-  //     channelsMap: channels,
-  //     rowsCount: rCount
-  //   }
-  // }, [visibleEvents, annotations]);
+  const { channelsMap, contentsMap } = useBuildStructuredContentsList(
+    visibleEvents,
+    annotations?.creators
+  )
 
   const spansSettings = {
     activity: {
@@ -417,15 +369,17 @@ function Home() {
                       : habitsTimespan || [new Date(), new Date()]
                   }
                   onChange={(val) => {
+                    // val is a date
                     if (activeTab === "daily") {
-                      const temp = new Date(val)
+                      const temp = new Date(val as Date)
                       temp.setHours(1)
                       const key = buildDateKey(temp)
                       if (daysData[key]) {
-                        setDisplayedDayDate(val)
+                        setDisplayedDayDate(val as Date)
                       }
+                      // val is a date couple
                     } else {
-                      setHabitsTimespan(val)
+                      setHabitsTimespan(val as [Date, Date])
                     }
                   }}
                   daysData={daysData}
@@ -483,7 +437,7 @@ function Home() {
                                   ({
                                     url,
                                     title,
-                                    channel,
+                                    // channel,
                                     platform,
                                     index
                                   }) => {

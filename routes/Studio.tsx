@@ -28,17 +28,22 @@ import InputToValidate from "~components/FormComponents/InputToValidate"
 import { buildDateKey, downloadTextfile, JSONArrayToCSVStr } from "~helpers"
 import type { Annotations } from "~types/annotations"
 import type { CaptureEventsList } from "~types/captureEventsTypes"
-import type { AvailableChannels, DaysData } from "~types/common"
-import type { Settings } from "~types/settings"
+import type {
+  AvailableChannels,
+  ChannelsSettings,
+  DaysData
+} from "~types/common"
+
+// import type { Settings } from "~types/settings"
 
 interface StudioSettings {
   editionMode: string
-  timeSpan: Array<Date | number>
-  timeOfDaySpan: Array<string>
+  timeSpan: [Date, Date]
+  timeOfDaySpan: [string, string]
   daysOfWeek: Array<number>
   platforms: Array<string>
-  channelsSettings: object
-  excludedTitlePatterns: Array<object>
+  channelsSettings: ChannelsSettings
+  excludedTitlePatterns: Array<string>
   annotationColumnsNames: Array<string>
   editionTitle: string
 }
@@ -48,7 +53,7 @@ const storage = new Storage({
   // copiedKeyList: ["shield-modulation"],
 })
 
-function Studio({}) {
+function Studio() {
   const [visibleEvents, setVisibleEvents] = useState<CaptureEventsList>([])
   const [pendingRequestsIds, setPendingRequestsIds] = useState<Set<string>>(
     new Set()
@@ -123,7 +128,7 @@ function Studio({}) {
     })
   }
 
-  const setEditionMode = (value) => onUpdateSettings("editionMode", value)
+  // const setEditionMode = (value) => onUpdateSettings("editionMode", value)
   const setTimespan = (value) => onUpdateSettings("timeSpan", value)
   const setTimeOfDaySpan = (value) => onUpdateSettings("timeOfDaySpan", value)
   const setDaysOfWeek = (value) => onUpdateSettings("daysOfWeek", value)
@@ -237,6 +242,9 @@ function Studio({}) {
         const {
           result: { data = [] }
         } = response
+
+        let formattedBinnedActivityOutline
+
         switch (response.actionType) {
           case GET_CHANNELS:
             setAvailableChannels(data)
@@ -248,18 +256,21 @@ function Studio({}) {
             setAnnotations(data)
             break
           case GET_BINNED_ACTIVITY_OUTLINE:
-            const formatted = data.reduce((cur, { date, eventsCount }) => {
-              const key = buildDateKey(date)
-              return {
-                ...cur,
-                [key]: {
-                  value: eventsCount,
-                  key,
-                  date: new Date(date)
+            formattedBinnedActivityOutline = data.reduce(
+              (cur, { date, eventsCount }) => {
+                const key = buildDateKey(date)
+                return {
+                  ...cur,
+                  [key]: {
+                    value: eventsCount,
+                    key,
+                    date: new Date(date)
+                  }
                 }
-              }
-            }, {})
-            setDaysData(formatted)
+              },
+              {}
+            )
+            setDaysData(formattedBinnedActivityOutline)
             break
           default:
             break
@@ -311,7 +322,7 @@ function Studio({}) {
                 rangeHover
               /> */}
               <DatePickerCustom
-                value={timeSpan.map((d) => new Date(d))}
+                value={[new Date(timeSpan[0]), new Date(timeSpan[1])]}
                 onChange={(dates) => setTimespan(dates)}
                 daysData={daysData}
                 range

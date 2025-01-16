@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import Measure from "react-measure"
 
-import { BROWSE_VIEW } from "~constants"
 import { useBuildStructuredContentsList } from "~hooks"
 import type { Annotations } from "~types/annotations"
 import type { CaptureEventsList } from "~types/captureEventsTypes"
-import { Dimensions } from "~types/common"
+import type { Dimensions } from "~types/common"
 
 import DaySummary from "./DaySummary"
 import DayTimeline from "./DayTimeline"
@@ -19,7 +18,7 @@ interface DayPageProps {
   timeOfDaySpan: [string, string]
   previewScaleRatio: number
   annotations: Annotations
-  pageNumber: number
+  pageNumber?: number
   annotationColumnsNames: Array<string>
   type: string
 }
@@ -31,13 +30,17 @@ function DayPage({
   format,
   imposed,
   timeOfDaySpan,
-  previewScaleRatio,
+  // previewScaleRatio,
   annotations,
   pageNumber,
   annotationColumnsNames,
   type = "left"
 }: DayPageProps) {
-  const { creators = {}, tags = {}, expressions = {} } = annotations
+  const {
+    creators = {}
+    // tags = {},
+    // expressions = {}
+  } = annotations
   const [vizSpaceDimensions, setVizSpaceDimensions] = useState<Dimensions>({
     width: 100,
     height: 100

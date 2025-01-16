@@ -14,8 +14,8 @@ interface ExpressionsEditionProps {
   creators: {
     [key: string]: Creator
   }
-  onChange: Function
-  onDeleteItem: Function
+  onChange(e: { [key: string]: Expression }): void
+  onDeleteItem(id: string): void
 }
 
 export default function ExpressionsEdition({

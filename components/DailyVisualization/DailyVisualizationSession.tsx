@@ -1,18 +1,18 @@
 import type { DailyComputedSession, SpansSettings } from "~types/common"
 
 interface SessionProps extends DailyComputedSession {
-  yScale: Function
-  xScale: Function
+  yScale(s: number): number
+  xScale(s: number): number
   width: number
   gutter: number
-  messageBarWidthScale: Function
+  messageBarWidthScale(s: number): number
   spansSettings: SpansSettings
 }
 const Session = ({
   browsingEvents,
   yExtent,
   columnIndex,
-  yScale,
+  // yScale,
   xScale,
   width,
   gutter,
@@ -173,10 +173,10 @@ const Session = ({
           ({
             platform,
             id,
-            metadata = {},
-            date,
-            url,
-            viewType,
+            // metadata = {},
+            // date,
+            // url,
+            // viewType,
             endY,
             computedContents,
             y

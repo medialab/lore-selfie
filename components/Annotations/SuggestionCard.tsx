@@ -2,8 +2,8 @@ import type { ActionSuggestion } from "~types/common"
 
 interface SuggestionCardProps {
   suggestion: ActionSuggestion
-  onAccept: Function
-  onDismiss: Function
+  onAccept(): void
+  onDismiss(): void
 }
 
 export default function SuggestionCard({

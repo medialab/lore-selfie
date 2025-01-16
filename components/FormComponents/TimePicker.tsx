@@ -3,8 +3,8 @@ import { useMemo } from "react"
 interface TimePickerProps {
   label: string
   value: string
-  onChange: Function
-  minutesSpan: number
+  onChange(s: string): void
+  minutesSpan?: number
 }
 
 export default function TimePicker({

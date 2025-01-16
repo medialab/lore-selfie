@@ -14,10 +14,10 @@ interface TagsEditionProps {
   expressions: {
     [key: string]: Expression
   }
-  onChange: Function
-  onDeleteItem: Function
-  onLinkCreators: Function
-  onLinkExpressions: Function
+  onChange(tags: { [key: string]: Tag }): void
+  onDeleteItem(id: string): void
+  onLinkCreators(id: string, ids: Array<string>): void
+  onLinkExpressions(id: string, ids: Array<string>): void
 }
 
 export default function TagsEdition({

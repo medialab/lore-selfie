@@ -3,6 +3,7 @@ import type { ReactNode } from "~node_modules/@types/react"
 
 import type { BrowseViewEvent, CaptureEventsList } from "./captureEventsTypes"
 
+// eslint-disable-next-line
 const Platforms = [...PLATFORMS] as const
 type Platform = (typeof Platforms)[number]
 
@@ -20,8 +21,12 @@ export interface AvailableChannel {
 export type ReactChildren = ReactNode
 
 export type AvailableChannels = Array<AvailableChannel>
-export interface AvailableChannelsMap {
-  [key: string]: AvailableChannel
+export interface ChannelsSettings {
+  [key: string]: {
+    label: string
+    status: string
+    platform: Platform
+  }
 }
 
 export interface Dimensions {
@@ -62,6 +67,8 @@ export interface DaysData {
 export interface SuggestionSubItem {
   id: string
   title: string
+  platform: string
+  name: string
   token: string
 }
 export interface ActionSuggestion {
@@ -84,7 +91,7 @@ export type ChannelsMapItem = Map<string, ContentsMapItem>
 export interface SpansSettings {
   [key: string]: {
     legendLabel: string
-    tooltipFn: Function
+    tooltipFn(s: string | object): string
     markType: string
     color: string
   }

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 
 interface InputToValidateProps {
-  value: string
-  onChange: Function
-  onRemove?: Function
+  value: string | number
+  onChange(s: string | number): void
+  onRemove?(): void
   type?: string
-  placeholderFn?: Function
+  placeholderFn?(s: string | number | object): string
 }
 const InputToValidate = ({
   value,
@@ -14,7 +14,7 @@ const InputToValidate = ({
   type = "text",
   placeholderFn
 }: InputToValidateProps) => {
-  const [currentValue, setCurrentValue] = useState<string>(value)
+  const [currentValue, setCurrentValue] = useState<string | number>(value)
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const inputRef = useRef(null)
   useEffect(() => {
@@ -26,7 +26,7 @@ const InputToValidate = ({
   }, [value])
   return (
     <div
-      className={`InputToValidate small-card ${!currentValue || !currentValue.length ? "is-empty" : ""}`}>
+      className={`InputToValidate small-card ${!currentValue || !("" + currentValue).length ? "is-empty" : ""}`}>
       <div className="small-card-body">
         {!isEdited ? (
           <span

@@ -24,15 +24,16 @@ const storage = new Storage({
   // copiedKeyList: ["shield-modulation"],
 })
 
+// eslint-disable-next-line
 const Platforms = [...PLATFORMS] as const
 type Platform = (typeof Platforms)[number]
 interface LiveTrackerProps {
   settings: Settings
   injectionId: string
-  addEvent: Function
+  addEvent(CaptureEvent): void
   platform: Platform
   currentURL: string
-  onCurrentURLChange: Function
+  onCurrentURLChange(string): void
   activeViewType?: string
 }
 
@@ -227,8 +228,12 @@ const trackers: TrackersType = {
       currentURL,
       onCurrentURLChange
     }: LiveTrackerProps) => {
-      const { liveRecordingInterval, recordTabs, recordMouse, recordChat } =
-        settings
+      const {
+        liveRecordingInterval,
+        recordTabs,
+        recordMouse
+        // recordChat
+      } = settings
       const URL = document.location.href
       if (URL !== currentURL) {
         onCurrentURLChange(URL)

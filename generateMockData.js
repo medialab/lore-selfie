@@ -194,7 +194,6 @@ readFile("mockGenerationResources/top-youtubers.txt", "utf8")
     streamersList = streamers.split("\n")
 
     // [10,100,1000]
-
     ;[10].forEach((numberOfPastDays) => {
       const mockHistory = buildMockData({
         streamersList,

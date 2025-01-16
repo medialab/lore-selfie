@@ -80,6 +80,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       })
       break
     case GET_ANNOTATIONS_COLLECTION:
+      // eslint-disable-next-line
       const collectionToGet = payload as unknown
       res.send({
         responseType: ACTION_END,

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import Select from "react-select"
 import TextareaAutosize from "react-textarea-autosize"
-import { v4 as generateId } from "uuid"
 
 import type { Creator, Tag } from "~types/annotations"
 import type {
@@ -19,8 +18,8 @@ interface CreatorCardProps {
   tags: {
     [key: string]: Tag
   }
-  onChange: Function
-  onDelete: Function
+  onChange(c: Creator): void
+  onDelete(): void
 }
 
 export default function CreatorCard({
@@ -67,7 +66,7 @@ export default function CreatorCard({
   }, [soloChannels])
 
   const {
-    id,
+    // id,
     description,
     name,
     channels = [],

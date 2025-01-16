@@ -24,7 +24,7 @@ import Measure from "react-measure"
 import "@react-sigma/core/lib/react-sigma.min.css"
 
 import type { Annotations } from "~types/annotations"
-import { Dimensions, type AvailableChannels } from "~types/common"
+import type { AvailableChannels, Dimensions } from "~types/common"
 
 interface LoadGraphProps {
   annotations: Annotations
@@ -153,7 +153,14 @@ export const LoadGraph = ({
   return null
 }
 
-export default function AnnotationsNetwork({ annotations, channels }) {
+interface AnnotationsNetworkProps {
+  annotations: Annotations
+  channels: AvailableChannels
+}
+export default function AnnotationsNetwork({
+  annotations,
+  channels
+}: AnnotationsNetworkProps) {
   const [dimensions, setDimensions] = useState<Dimensions>({
     width: 1000,
     height: 1000

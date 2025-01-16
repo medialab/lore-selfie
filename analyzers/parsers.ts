@@ -10,7 +10,7 @@ const parsers = {
     // sniffs URL to determine view type
     sniffer: async (url) => {
       let match
-      if ((match = url.match(/https?:\/\/www.twitch.tv\/([^\/]+)/)) !== null) {
+      if ((match = url.match(/https?:\/\/www.twitch.tv\/([^/]+)/)) !== null) {
         console.log(match)
         const channelId = match[1].split("?")[0]
         return {
@@ -97,7 +97,7 @@ const parsers = {
           }
         }
       } else if (
-        (match = url.match(/https:\/\/www\.youtube\.com\/shorts\/([^\/]+)/)) !==
+        (match = url.match(/https:\/\/www\.youtube\.com\/shorts\/([^/]+)/)) !==
         null
       ) {
         const videoId = match[1]

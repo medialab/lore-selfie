@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom"
 
 import About from "./About"
-import Annotations from "./Annotations"
+import AnnotationView from "./Annotations"
 import Home from "./Home"
 import Participate from "./Participate"
-import Settings from "./Settings"
+import SettingsView from "./Settings"
 import Studio from "./Studio"
 
 export const Routing = () => (
@@ -13,8 +13,8 @@ export const Routing = () => (
     <Route path="/" element={<Home />} />
     <Route path="/about" element={<About />} />
     <Route path="/studio" element={<Studio />} />
-    <Route path="/annotations/:tab?" element={<Annotations />} />
-    <Route path="/settings" element={<Settings />} />
+    <Route path="/annotations/:tab?" element={<AnnotationView />} />
+    <Route path="/settings" element={<SettingsView />} />
     <Route path="/participate" element={<Participate />} />
   </Routes>
 )

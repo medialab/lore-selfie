@@ -3,7 +3,7 @@ import levenshtein from "talisman/metrics/levenshtein"
 import { v4 as generateId } from "uuid"
 
 import CollapsibleSection from "~components/CollapsibleSection"
-import type { Annotations, Creator, Tag } from "~types/annotations"
+import type { Creator, Tag } from "~types/annotations"
 import type { ActionSuggestion, AvailableChannels } from "~types/common"
 
 import ChannelCard from "./ChannelCard"
@@ -18,8 +18,8 @@ interface ChannelsEditionProps {
   tags: {
     [key: string]: Tag
   }
-  onChange: Function
-  onDeleteItem: Function
+  onChange(a: AvailableChannels): void
+  onDeleteItem(id: string): void
 }
 
 export default function ChannelsEdition({
@@ -48,7 +48,7 @@ export default function ChannelsEdition({
   }, [creators, availableChannels])
 
   const tokenize = useMemo(
-    (): Function =>
+    () =>
       (term: string): string =>
         term.replace(/\W+/g, "").toLowerCase(),
     []

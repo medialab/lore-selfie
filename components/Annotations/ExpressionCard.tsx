@@ -16,8 +16,8 @@ interface ExpressionCardProps {
   creators: {
     [key: string]: Creator
   }
-  onChange: Function
-  onDelete: Function
+  onChange(e: Expression): void
+  onDelete(): void
 }
 
 export default function ExpressionCard({
@@ -51,7 +51,7 @@ export default function ExpressionCard({
   }, [creators])
 
   const {
-    id,
+    // id,
     definition,
     name,
     queries = [],

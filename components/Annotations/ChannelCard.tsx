@@ -10,8 +10,8 @@ interface CreatorsMap {
 interface ChannelCardProps {
   channel: AvailableChannel
   creators: CreatorsMap
-  onSelect: Function
-  onCreateEponym: Function
+  onSelect(s: string): void
+  onCreateEponym(): void
 }
 export default function ChannelCard({
   channel,

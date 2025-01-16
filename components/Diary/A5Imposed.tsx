@@ -1,7 +1,7 @@
-import { useMemo } from "react"
+import { useMemo, type ReactNode } from "react"
 
 interface A5ImposedProps {
-  renderPage: Function
+  renderPage(index: number): ReactNode
   numberOfPages: number
 }
 function A5Imposed({ renderPage, numberOfPages }: A5ImposedProps) {

@@ -28,8 +28,8 @@ interface DatePickerProps {
       value: number
     }
   }
-  onChange: Function
-  disableDatalessDays: boolean
+  onChange(v: ValueType): void
+  disableDatalessDays?: boolean
 }
 
 export default function DatePicker({
@@ -63,7 +63,7 @@ export default function DatePicker({
     10: "Novembre",
     11: "Décembre"
   }
-  const [currentMonth, setCurrentMonth]: [Array<number>, Function] = useState()
+  const [currentMonth, setCurrentMonth] = useState<Array<number>>()
   const [tempValue, setTempValue] = useState<ValueType>()
   const [isSelecting, setIsSelecting] = useState<boolean>(false)
 

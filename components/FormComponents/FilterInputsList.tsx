@@ -2,7 +2,7 @@ import InputToValidate from "./InputToValidate"
 
 interface FilterInputsListProps {
   value: Array<string>
-  onChange: Function
+  onChange(v: Array<string>): void
   messages: {
     [key: string]: string
   }

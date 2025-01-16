@@ -64,7 +64,6 @@ export const recordNewViewContent = async ({
   )
   await delay(DYNAMIC_LOADING_DELAY)
   // let title = document.title;
-  let browseViewEvent: BrowseViewEvent
   // console.debug('record new view content for platform', platform);
   const { viewType, parsedMetadata = {} } = await parsers[platform].sniffer(url)
   let metadata = {
@@ -86,7 +85,7 @@ export const recordNewViewContent = async ({
     ...metadata,
     ...scrapedMetadata
   }
-  browseViewEvent = {
+  const browseViewEvent: BrowseViewEvent = {
     type: BROWSE_VIEW,
     id: generateId(),
     date: new Date(),

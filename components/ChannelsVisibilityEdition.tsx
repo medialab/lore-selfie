@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react"
 
-import type { AvailableChannelsMap } from "~types/common"
+import type { ChannelsSettings } from "~types/common"
 
 interface ChannelsVisibilityEditionProps {
-  channels: AvailableChannelsMap
-  onChange: Function
+  channels: ChannelsSettings
+  onChange(c: ChannelsSettings): void
 }
 
 function ChannelsVisibilityEdition({
@@ -12,16 +12,16 @@ function ChannelsVisibilityEdition({
   onChange
 }: ChannelsVisibilityEditionProps) {
   const [searchstring, setSearchstring] = useState<string>("")
-  const visibleChannels = useMemo((): AvailableChannelsMap => {
+  const visibleChannels = useMemo((): ChannelsSettings => {
     if (searchstring.length > 2 && Object.entries(channels).length) {
       const str = searchstring.toLowerCase()
       return Object.entries(channels)
-        .filter(([id, { label, platform }]) => {
+        .filter(([, { label, platform }]) => {
           const mark = `${label} (${platform})`.toLowerCase()
           return mark.includes(str)
         })
         .reduce(
-          (res, [id, obj]): AvailableChannelsMap => ({ ...res, [id]: obj }),
+          (res, [id, obj]): ChannelsSettings => ({ ...res, [id]: obj }),
           {}
         )
     }

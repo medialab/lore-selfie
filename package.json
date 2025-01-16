@@ -18,13 +18,15 @@
     "package": "plasmo package",
     "package:firefox": "plasmo package --target=firefox-mv2",
     "start": "web-ext run --source-dir ./build/chrome-mv3-dev -t chromium --start-url chrome://newtab",
-    "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev"
+    "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev",
+    "prepare": "husky"
   },
   "dependencies": {
     "@plasmohq/messaging": "^0.6.2",
     "@plasmohq/storage": "^1.13.0",
     "@react-sigma/core": "^4.0.3",
     "@react-sigma/layout-forceatlas2": "^4.0.3",
+    "@types/d3-scale": "^4.0.8",
     "@uuid-ts/uuid": "^1.0.1",
     "@vaadin/time-picker": "^24.5.5",
     "d3-array": "^3.2.4",
@@ -62,7 +64,9 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-react": "^7.37.4",
     "fs-extra": "^11.2.0",
+    "git-format-staged": "^3.1.1",
     "globals": "^15.14.0",
+    "husky": "^9.1.7",
     "prettier": "3.2.4",
     "prettier-eslint-cli": "^8.0.1",
     "typescript": "5.3.3",

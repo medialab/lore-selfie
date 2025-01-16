@@ -13,13 +13,13 @@ import "~styles/DevDashboard.scss"
 import {
   ACTION_END,
   ACTION_PROGRESS,
-  APPEND_ACTIVITY_EVENTS,
+  // APPEND_ACTIVITY_EVENTS,
   DELETE_ALL_DATA,
   DUPLICATE_DAY_DATA,
   EVENT_TYPES,
   GET_ANNOTATIONS,
   GET_SETTINGS,
-  PREPEND_ACTIVITY_EVENTS,
+  // PREPEND_ACTIVITY_EVENTS,
   REPLACE_ACTIVITY_EVENTS,
   SERIALIZE_ALL_DATA,
   SET_ANNOTATIONS,
@@ -145,7 +145,7 @@ function DevDashboard() {
     ) {
       downloadTextfile(
         data.result.data,
-        `lore-selfie-activity-${new Date().toUTCstring()}.json`,
+        `lore-selfie-activity-${new Date().toUTCString()}.json`,
         "application/json"
       )
       setPendingForDownload(false)

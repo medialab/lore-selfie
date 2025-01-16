@@ -6,11 +6,12 @@ import "./witness.css"
 
 import type { PlasmoCSConfig, PlasmoGetOverlayAnchor } from "plasmo"
 // import { DEFAULT_SETTINGS } from "~constants"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useInterval } from "usehooks-ts"
 
 import { DEFAULT_SETTINGS } from "~constants"
 import { getPlatform } from "~helpers"
+import type { Settings } from "~types/settings"
 
 export {}
 
@@ -58,16 +59,19 @@ const Witness = () => {
   // }, []);
 
   useInterval(() => {
-    storage.get("lore-selfie-settings").then((settings = DEFAULT_SETTINGS) => {
-      const platform = getPlatform(window.location.href)
-      if (
-        settings &&
-        settings.recordActivity &&
-        settings.recordOnPlatforms.includes(platform)
-      ) {
-        setIsActive(true)
-      }
-    })
+    storage
+      .get("lore-selfie-settings")
+      // @ts-expect-error storage returns object instead of string
+      .then((settings: Settings = DEFAULT_SETTINGS) => {
+        const platform = getPlatform(window.location.href)
+        if (
+          settings &&
+          settings.recordActivity &&
+          settings.recordOnPlatforms.includes(platform)
+        ) {
+          setIsActive(true)
+        }
+      })
   }, 10 * 1000)
 
   if (!isActive) {

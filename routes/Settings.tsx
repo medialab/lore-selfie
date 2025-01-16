@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
-import { v4 as generateId } from "uuid"
+import { useEffect, useState } from "react"
 
 import InputToValidate from "~components/FormComponents/InputToValidate"
 import HandlesManager from "~components/HandlesManager"
@@ -13,7 +12,7 @@ import { formatNumber, lengthInUtf8Bytes } from "~helpers"
 import { usePort } from "~node_modules/@plasmohq/messaging/dist/hook"
 import type { Handle, Settings } from "~types/settings"
 
-function Settings() {
+function SettingsView() {
   const [sizeInMb, setSizeInMb] = useState<number>(undefined)
   const [isLoadingSettings, setIsLoadingSettings] = useState<boolean>(true)
   const [settings, setSettings] = useState<Settings>(undefined)
@@ -197,7 +196,7 @@ function Settings() {
                   value={+settings.liveRecordingInterval}
                   type="number"
                   onChange={(val) => {
-                    if (!isNaN(+val) && val >= 1000) {
+                    if (!isNaN(+val) && +val >= 1000) {
                       settingsPort.send({
                         actionType: SET_SETTING,
                         payload: { key: "liveRecordingInterval", value: val }
@@ -240,4 +239,4 @@ function Settings() {
     </div>
   )
 }
-export default Settings
+export default SettingsView

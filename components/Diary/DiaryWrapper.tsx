@@ -13,6 +13,7 @@ import A5Imposed from "./A5Imposed"
 import Cover from "./Cover"
 import DayPage from "./DayPage"
 
+// eslint-disable-next-line
 const Platforms = [...PLATFORMS] as const
 type Platform = (typeof Platforms)[number]
 interface DiaryWrapperProps {
@@ -31,9 +32,9 @@ function DiaryWrapper({
   timeSpan,
   timeOfDaySpan,
   daysOfWeek,
-  platforms,
-  channelsSettings,
-  excludedTitlePatterns,
+  // platforms,
+  // channelsSettings,
+  // excludedTitlePatterns,
   visibleEvents,
   annotations,
   annotationColumnsNames,
@@ -71,7 +72,8 @@ function DiaryWrapper({
     const fromDay = new Date(timeSpan[0]).getTime()
     const toDay = new Date(timeSpan[1]).getTime()
 
-    let [fromTimeInMs, toTimeInMs] = timeOfDaySpan.map(timeOfDayToMs)
+    const [fromTimeInMs, toTimeInMsInit] = timeOfDaySpan.map(timeOfDayToMs)
+    let toTimeInMs = toTimeInMsInit
     // if end time is smaller than start time add a day
     if (toTimeInMs < fromTimeInMs) {
       toTimeInMs += DAY_IN_MS
@@ -234,7 +236,7 @@ function DiaryWrapper({
                       imposed={false}
                     />
                     {Object.entries(dataByDay).map(
-                      ([id, day]: [string, object], index) => {
+                      ([id, day]: [string, DiaryDay], index) => {
                         return (
                           <section
                             key={`day-${id}`}
@@ -285,7 +287,7 @@ function DiaryWrapper({
                       imposed={false}
                     />
                     {Object.entries(dataByDay).map(
-                      ([id, day]: [string, object], index) => {
+                      ([id, day]: [string, DiaryDay], index) => {
                         return (
                           <>
                             <DayPage

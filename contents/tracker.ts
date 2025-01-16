@@ -12,15 +12,12 @@ import {
   OPEN_PLATFORM_IN_TAB
 } from "~constants"
 import { getBrowser, getPlatform } from "~helpers"
-import {
-  Browser,
-  OpenPlatformInTabEvent,
-  type BlurTabEvent,
-  type CaptureEventsList,
-  type ClosePlatformInTabEvent,
-  type EventGeneric,
-  type FocusTabEvent,
-  type PointerActivityRecordEvent
+import type {
+  BlurTabEvent,
+  CaptureEvent,
+  CaptureEventsList,
+  FocusTabEvent,
+  OpenPlatformInTabEvent
 } from "~types/captureEventsTypes"
 import type { Settings } from "~types/settings"
 
@@ -52,7 +49,7 @@ let routine // interval used in live tracking
  * Adds to local storage a record about an activity from the user
  * @param evt event to add to local storage activity history
  */
-const addEvent = async (evt: EventGeneric) => {
+const addEvent = async (evt: CaptureEvent) => {
   const data: CaptureEventsList = await storage.get("lore-selfie-activity")
   let updatedData
   if (data) {
@@ -179,7 +176,7 @@ const main = async () => {
   /**
    * Listen to location changes to trigger view change events
    */
-  const observer = new MutationObserver(async function (mutations) {
+  const observer = new MutationObserver(async function () {
     if (oldHref != document.location.href) {
       oldHref = document.location.href
       console.log("location has been changed, baby: %s", document.location.href)

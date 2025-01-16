@@ -15,10 +15,10 @@ interface TagCardProps {
   expressions: {
     [key: string]: Expression
   }
-  onChange: Function
-  onDelete: Function
-  onLinkCreators: Function
-  onLinkExpressions: Function
+  onChange(t: Tag): void
+  onDelete(): void
+  onLinkCreators(l: Array<string>): void
+  onLinkExpressions(l: Array<string>): void
 }
 
 export default function TagCard({
@@ -26,11 +26,11 @@ export default function TagCard({
   relatedCreators = [],
   relatedExpressions = [],
   creators,
-  expressions,
+  // expressions,
   onChange,
   onDelete,
-  onLinkCreators,
-  onLinkExpressions
+  onLinkCreators
+  // onLinkExpressions
 }: TagCardProps) {
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [tempTag, setTempTag] = useState<Tag>(tag)
@@ -43,18 +43,23 @@ export default function TagCard({
     }))
   }, [creators])
   // @todo put upstream
-  const expressionsOptions: Array<SelectOption> = useMemo(() => {
-    return Object.values(expressions).map(({ id, name }) => ({
-      label: name,
-      value: id
-    }))
-  }, [creators])
+  // const expressionsOptions: Array<SelectOption> = useMemo(() => {
+  //   return Object.values(expressions).map(({ id, name }) => ({
+  //     label: name,
+  //     value: id
+  //   }))
+  // }, [creators])
 
   useEffect(() => {
     setTempTag(tag)
   }, [tag])
 
-  const { id, color, description, name } = tag
+  const {
+    // id,
+    color,
+    description,
+    name
+  } = tag
   return (
     <li className="TagCard card">
       <div className="card-content">
