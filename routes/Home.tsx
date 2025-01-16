@@ -12,12 +12,13 @@ import { BROWSE_VIEW, GET_ACTIVITY_EVENTS, GET_ANNOTATIONS, GET_BINNED_ACTIVITY_
 import { useInterval } from "usehooks-ts";
 import DatePicker from "~components/FormComponents/DatePicker";
 import { prettyDate, buildDateKey } from "~helpers";
-import Habits from "~components/Habits";
+import Habits from "~components/HabitsVisualization/Habits";
 import DailyLegend from "~components/DailyVisualization/DailyLegend";
 import HabitsLegend from "~components/HabitsVisualization/HabitsLegend";
-import type { HabitsData, Dimensions, DaysData } from "~types/common";
+import type { HabitsData, Dimensions, DaysData, ContentsMapItem, ChannelsMapItem } from "~types/common";
 import type { BrowseViewEvent, CaptureEventsList } from "~types/captureEventsTypes";
 import type { Annotations } from "~types/annotations";
+import { useBuildStructuredContentsList } from "~hooks";
 
 const UPDATE_RATE = 10000;
 const MIN_ZOOM = .5;
@@ -253,55 +254,57 @@ function Home() {
     }
   }, UPDATE_RATE * 2);
 
+  
+  const { channelsMap, contentsMap, rowsCount } = useBuildStructuredContentsList(visibleEvents, annotations?.creators)
 
-  const { channelsMap, contentsMap, rowsCount } = useMemo(() => {
-    const { creators = {} } = annotations || {};
-    const events = visibleEvents;
-    const validEvents = events
-      .filter(event => event.type === BROWSE_VIEW && event.url && event.metadata.title
-        && ['live', 'video', 'short'].includes(event.viewType)
-      );
-    const contents = new Map();
-    const channels = new Map();
-    let index = 0;
-    let rCount = 0;
-    validEvents.forEach((event: BrowseViewEvent) => {
-      let channel = event.metadata.channelName || event.metadata.channelId;
-      const channelSlug = `${event.metadata.channelId}-${event.platform}`;
-      const creator = Object.values(creators).find(c => c.channels.includes(channelSlug));
-      channel = creator ? creator.name : channel;
-      // console.log('creators', creators, channelSlug);
-      if (!channels.has(channel)) {
-        channels.set(channel, new Map());
-        rCount++;
-      }
-      const uniqueContents = channels.get(channel);// || new Map();
-      if (!uniqueContents.has(event.url)) {
-        index++;
-        rCount++;
-        uniqueContents.set(event.url, {
-          url: event.url,
-          title: event.metadata.title,
-          channel,
-          platform: event.platform,
-          index
-        })
-        contents.set(event.url, {
-          url: event.url,
-          title: event.metadata.title,
-          channel,
-          platform: event.platform,
-          index
-        })
-      }
-      channels.set(channel, uniqueContents)
-    })
-    return {
-      contentsMap: contents,
-      channelsMap: channels,
-      rowsCount: rCount
-    }
-  }, [visibleEvents, annotations]);
+  // const { channelsMap, contentsMap, rowsCount }: tempDataType = useMemo(() => {
+  //   const { creators = {} } = annotations || {};
+  //   const events = visibleEvents;
+  //   const validEvents = events
+  //     .filter(event => event.type === BROWSE_VIEW && event.url && event.metadata.title
+  //       && ['live', 'video', 'short'].includes(event.viewType)
+  //     );
+  //   const contents = new Map();
+  //   const channels = new Map();
+  //   let index = 0;
+  //   let rCount = 0;
+  //   validEvents.forEach((event: BrowseViewEvent) => {
+  //     let channel = event.metadata.channelName || event.metadata.channelId;
+  //     const channelSlug = `${event.metadata.channelId}-${event.platform}`;
+  //     const creator = Object.values(creators).find(c => c.channels.includes(channelSlug));
+  //     channel = creator ? creator.name : channel;
+  //     // console.log('creators', creators, channelSlug);
+  //     if (!channels.has(channel)) {
+  //       channels.set(channel, new Map());
+  //       rCount++;
+  //     }
+  //     const uniqueContents = channels.get(channel);// || new Map();
+  //     if (!uniqueContents.has(event.url)) {
+  //       index++;
+  //       rCount++;
+  //       uniqueContents.set(event.url, {
+  //         url: event.url,
+  //         title: event.metadata.title,
+  //         channel,
+  //         platform: event.platform,
+  //         index
+  //       })
+  //       contents.set(event.url, {
+  //         url: event.url,
+  //         title: event.metadata.title,
+  //         channel,
+  //         platform: event.platform,
+  //         index
+  //       })
+  //     }
+  //     channels.set(channel, uniqueContents)
+  //   })
+  //   return {
+  //     contentsMap: contents,
+  //     channelsMap: channels,
+  //     rowsCount: rCount
+  //   }
+  // }, [visibleEvents, annotations]);
 
   const spansSettings = {
     activity: {
@@ -500,7 +503,8 @@ function Home() {
                         visibleEvents,
                         zoomLevel,
                         roundDay,
-                        contentsMap, channelsMap,
+                        contentsMap, 
+                        channelsMap,
                         spansSettings,
                       }
                       }

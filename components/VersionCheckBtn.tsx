@@ -3,7 +3,8 @@ import {version} from '~/package.json';
 import { getBrowser } from "~helpers";
 
 function VersionCheckBtn() {
-  const [updateAvailable, setUpdateAvailable] = useState(false);
+
+  const [updateAvailable, setUpdateAvailable] = useState<boolean>(false);
   useEffect(() => {
     fetch(`https://raw.githubusercontent.com/medialab/lore-selfie/refs/heads/prod/package.json`)
     .then(response => {

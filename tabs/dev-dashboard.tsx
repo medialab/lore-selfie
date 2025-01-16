@@ -10,8 +10,8 @@ import { downloadTextfile, formatNumber, buildDateKey } from "~helpers";
 import '~styles/DevDashboard.scss';
 import { EVENT_TYPES, ACTION_END, ACTION_PROGRESS, APPEND_ACTIVITY_EVENTS, DELETE_ALL_DATA, DUPLICATE_DAY_DATA, PREPEND_ACTIVITY_EVENTS, REPLACE_ACTIVITY_EVENTS, SERIALIZE_ALL_DATA, SET_SETTINGS, SET_ANNOTATIONS, GET_SETTINGS, GET_ANNOTATIONS } from "~constants";
 import type { CaptureEvent, CaptureEventsList } from "~types/captureEventsTypes";
-import { Settings } from "http2";
-import { Annotations } from "~types/annotations";
+import type { Settings } from "~types/settings";
+import type { Annotations } from "~types/annotations";
 // import { useInterval } from "usehooks-ts";
 
 const PAGINATION_COUNT = 25;
@@ -167,7 +167,7 @@ function DevDashboard() {
     reader.addEventListener(
       "load",
       () => {
-        const str = reader.result.tostring();
+        const str = reader.result.toString();
         try {
           const data = JSON.parse(str);
           // @todo improve that with proper schema-like validation

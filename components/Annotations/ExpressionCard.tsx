@@ -3,43 +3,67 @@ import { v4 as generateId } from 'uuid';
 import TextareaAutosize from 'react-textarea-autosize';
 import Select from 'react-select';
 import TagChip from './TagChip';
+import type { Creator, Expression, Tag } from '~types/annotations';
+import type { SelectOption } from '~types/common';
+
+interface ExpressionCardProps {
+  expression: Expression
+  tags: {
+    [key: string]: Tag
+  }
+  creators: {
+    [key: string]: Creator
+  }
+  onChange: Function
+  onDelete: Function
+}
+
 export default function ExpressionCard({
   expression,
   tags,
   creators,
   onChange,
   onDelete
-}) {
-  const [isEdited, setIsEdited] = useState();
-  const [tempExpression, setTempExpression] = useState(expression);
-  const [tempQuery, setTempQuery] = useState('');
+}: ExpressionCardProps) {
+  const [isEdited, setIsEdited] = useState<boolean>();
+  const [tempExpression, setTempExpression] = useState<Expression>(expression);
+  const [tempQuery, setTempQuery] = useState<string>('');
 
   useEffect(() => {
     setTempExpression(expression);
     setTempQuery('');
   }, [expression]);
 
-  const tagsOptions = useMemo(() => {
+  const tagsOptions: Array<SelectOption> = useMemo(() => {
     return Object.values(tags).map(({ id, name }) => ({
       label: name,
       value: id,
     }))
   }, [tags]);
   // @todo put upstream
-  const creatorsOptions = useMemo(() => {
+  const creatorsOptions: Array<SelectOption> = useMemo(() => {
     return Object.values(creators).map(({ id, name }) => ({
       label: name,
       value: id,
     }))
   }, [creators]);
 
-  const { id, definition, name, queries = [], links = {} } = tempExpression;
+  const { 
+    id, 
+    definition, 
+    name, 
+    queries = [], 
+    links = {
+      tags: [],
+      creators: []
+    } 
+  } = tempExpression;
   const {
     tags: linkedTagsIds = [],
     creators: linkedCreatorsIds = [],
   } = links;
 
-  const handleCreateQuery = () => {
+  const handleCreateQuery = (): void => {
     if (tempQuery.length) {
       const newQueries = [...queries, { id: generateId(), query: tempQuery }];
       const newExpression = {

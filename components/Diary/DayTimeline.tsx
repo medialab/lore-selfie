@@ -1,9 +1,22 @@
 import { useMemo } from "react"
 import { inferTickTimespan, timeOfDayToMs } from "~helpers"
 import { scaleLinear } from 'd3-scale';
-import Measure from 'react-measure';
 import { BROWSE_VIEW, LIVE_USER_ACTIVITY_RECORD, PLATFORMS_COLORS, DAY_IN_MS } from "~constants";
+import type { CaptureEventsList } from "~types/captureEventsTypes";
+import type { ChannelsMapItem, ContentsMapItem } from "~types/common";
 
+interface DayTimelineProps {
+  width: number
+  height: number
+  timeOfDaySpan: [string, string]
+  date: number
+  format: string
+  imposed: boolean
+  channelsMap: Map<string, ChannelsMapItem>
+  contentsMap: Map<string, ContentsMapItem>
+  annotationColumnsNames: Array<string>
+  events: CaptureEventsList
+}
 export default function DayTimeline({
   width: inputWidth,
   height: inputHeight,
@@ -15,15 +28,12 @@ export default function DayTimeline({
   contentsMap,
   annotationColumnsNames,
   events,
-}) {
+}: DayTimelineProps) {
   // @todo solve this non-sensical mystery with page dimensions
   const width = imposed ? inputWidth * 1.666 : format === 'A5' ? inputWidth * .8 : inputWidth * 1;
   const height = imposed ? inputHeight * 1.666 : format === 'A5' ? inputHeight * .8 : inputHeight * 1;
 
-  
-
-
-  const tickTimespan = useMemo(() => {
+  const tickTimespan: number = useMemo(() => {
     const inMs = timeOfDaySpan.map(timeOfDayToMs);
     return inferTickTimespan(Math.abs(inMs[1] - inMs[0]))
   }, [timeOfDaySpan]);
@@ -60,7 +70,7 @@ export default function DayTimeline({
   const gutter = 5;
   const ticksX = 40;
   const marginsStart = width - width * annotationColumnsNames.length * .2;
-  const vizSpaceX = useMemo(() => [ticksX + gutter * 4, marginsStart], [ticksX, marginsStart, gutter]);
+  const vizSpaceX: [number, number] = useMemo(() => [ticksX + gutter * 4, marginsStart], [ticksX, marginsStart, gutter]);
 
   const yScale = useMemo(() => {
     return scaleLinear()
@@ -135,11 +145,11 @@ export default function DayTimeline({
     return computed;
   }, [events, contentsMap, channelsMap, yScale]);
 
-  const numberOfVizColumns = useMemo(() => Math.max(...vizSequences.map(v => v.columnIndex)) + 1, [vizSequences]);
+  const numberOfVizColumns:number = useMemo(() => Math.max(...vizSequences.map(v => v.columnIndex)) + 1, [vizSequences]);
   const xScale = useMemo(() => scaleLinear().domain([0, numberOfVizColumns]).range(vizSpaceX), [numberOfVizColumns, vizSpaceX])
   
 
-  const marginsFields = annotationColumnsNames;
+  const marginsFields:Array<string> = annotationColumnsNames;
   const marginsData = marginsFields
     .map((label, index) => {
       const totalWidth = width - marginsStart;
@@ -211,6 +221,7 @@ export default function DayTimeline({
                 // style={{pointerEvents: 'none'}}
                 >
                   <h4
+                    // @ts-ignore
                     xmlns="http://www.w3.org/1999/xhtml"
                   >
                     <span>

@@ -1,12 +1,23 @@
 import { useMemo, useState, useEffect } from "react";
-import 'rc-slider/assets/index.css';
-
 import Measure from 'react-measure';
 import { useRef } from 'react';
 
 import DayVisualization from "./DayVisualization"
 
+import 'rc-slider/assets/index.css';
 import "~/styles/Daily.scss";
+import type { CaptureEventsList } from "~types/captureEventsTypes";
+import type { Dimensions, ChannelsMapItem, ContentsMapItem, SpansSettings } from "~types/common";
+
+interface DailyProps {
+  displayedDayDate: Date
+  visibleEvents: CaptureEventsList
+  zoomLevel: number
+  roundDay: boolean
+  contentsMap: Map<string, ContentsMapItem>
+  channelsMap: Map<string, ChannelsMapItem>
+  spansSettings: SpansSettings
+}
 
 function Daily({
   displayedDayDate,
@@ -16,20 +27,12 @@ function Daily({
   contentsMap,
   channelsMap,
   spansSettings,
-}) {
+}: DailyProps) {
   let dailyRef = useRef(null);
-  const [offset, setOffset] = useState(0);
-  const [scrollHeight, setScrollHeight] = useState(100);
-  // console.log('daily ref', dailyRef.current?.scrollTop);
-  const [dimensions, setDimensions] = useState({ width: 100, height: 100 });
-
-  const [prevOffset, setPrevOffset] = useState(offset);
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setPrevOffset(offset);
-  //   }, 500)
-  // }, [offset])
+  const [offset, setOffset] = useState<number>(0);
+  const [scrollHeight, setScrollHeight] = useState<number>(100);
+  const [dimensions, setDimensions] = useState<Dimensions>({ width: 100, height: 100 });
+  const [prevOffset, setPrevOffset] = useState<number>(offset);
 
   useEffect(() => {
     const newScrollHeight = dailyRef.current.scrollHeight;
@@ -64,7 +67,7 @@ function Daily({
     }
   }, [dailyRef, dimensions.height,])
 
-  const currentDaySessions = useMemo(() => {
+  const currentDaySessions: Map<string, CaptureEventsList> = useMemo(() => {
     if (visibleEvents) {
       const sessions = new Map();
       visibleEvents.forEach(event => {
@@ -78,51 +81,6 @@ function Daily({
       return sessions;
     }
   }, [visibleEvents]);
-
-  // const datesDomain = useMemo(() => {
-  //   const date = new Date(displayedDayDate);
-  //   let min, max;
-  //   if (roundDay) {
-  //     const midnight = date;
-  //     midnight.setHours(0);
-  //     min = midnight.getTime();
-  //     let nextDay = midnight.getTime();
-  //     nextDay = nextDay + 23 * 3600 * 1000;
-  //     // let max = min;
-  //     max = nextDay;
-  //     for (let events of currentDaySessions.values()) {
-  //       events.forEach(({ date }) => {
-  //         const dateTime = new Date(date).getTime();
-  //         if (dateTime > max) {
-  //           max = dateTime;
-  //         }
-  //       })
-  //     }
-  //   } else {
-  //     min = Infinity;
-  //     max = -Infinity;
-  //     for (let events of currentDaySessions.values()) {
-  //       events.forEach(({ date }) => {
-  //         const dateTime = new Date(date).getTime();
-  //         if (dateTime > max) {
-  //           max = dateTime;
-  //         }
-  //         if (dateTime < min) {
-  //           min = dateTime;
-  //         }
-  //       })
-  //     }
-  //     const inferedTickTimeSpan = inferTickTimespan(max - min, zoomLevel);
-  //     min = min - min % inferedTickTimeSpan;
-  //     max = max - max % inferedTickTimeSpan + inferedTickTimeSpan;
-  //   }
-  //   return [min, max]
-  // }, [displayedDayDate, currentDaySessions, roundDay, zoomLevel]);
-
-  // const scrollScale = useMemo(() => scaleLinear().range(datesDomain).domain([0, scrollHeight]), [datesDomain, scrollHeight]);
-
-
-  // const [prevZoomLevel, setPrevZoomLevel] = useState(zoomLevel);
 
   return (
     <Measure
@@ -146,7 +104,8 @@ function Daily({
                     roundDay,
                     width: dimensions.width,
                     height: dimensions.height,
-                    contentsMap, channelsMap,
+                    contentsMap, 
+                    channelsMap,
                     spansSettings
                   }}
                 />

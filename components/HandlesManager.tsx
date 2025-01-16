@@ -1,11 +1,17 @@
 import { PLATFORMS } from "~constants";
 import HandleEditor from "./HandleEditor";
 import {v4 as generateId} from 'uuid';
+import type { Handle } from "~types/settings";
 
+
+interface HandlesManagerProps {
+  handles: Array<Handle>
+  onChange: ((h: Array<Handle>) => void)
+}
 function HandlesManager({
   handles = [],
   onChange
-}) {
+}: HandlesManagerProps) {
   const handleCreate = () => {
     const newHandle = {
       platform: PLATFORMS[0],

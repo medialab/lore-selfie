@@ -7,12 +7,28 @@ import 'react-tooltip/dist/react-tooltip.css'
 import {buildDateKey} from '~helpers';
 import { DAY_IN_MS } from '~constants';
 
-const formatDatepickerDate = d => {
+const formatDatepickerDate = (d: Date): Date => {
   d.setHours(0);
   d.setMinutes(0);
   d.setSeconds(0);
   d.setMilliseconds(0);
   return d;
+}
+
+
+type ValueType = Date|[Date, Date]|[]|undefined
+
+interface DatePickerProps {
+  value: ValueType
+  range: boolean
+  startOfWeekId?: number
+  daysData: {
+    [key: number]: {
+      value: number
+    }
+  }
+  onChange: Function
+  disableDatalessDays: boolean
 }
 
 export default function DatePicker({
@@ -22,7 +38,7 @@ export default function DatePicker({
   daysData = {},
   onChange,
   disableDatalessDays = false,
-}) {
+}: DatePickerProps) {
   const daysMap = {
     1: 'Lundi',
     2: 'Mardi',
@@ -46,9 +62,9 @@ export default function DatePicker({
     10: 'Novembre',
     11: 'Décembre',
   }
-  const [currentMonth, setCurrentMonth]: [Array<Number>, Function] = useState();
-  const [tempValue, setTempValue] = useState();
-  const [isSelecting, setIsSelecting] = useState(false);
+  const [currentMonth, setCurrentMonth]: [Array<number>, Function] = useState();
+  const [tempValue, setTempValue] = useState<ValueType>();
+  const [isSelecting, setIsSelecting] = useState<boolean>(false);
 
   const resetTempValue = useMemo(() => () => {
     const now = formatDatepickerDate(new Date());
@@ -68,16 +84,16 @@ export default function DatePicker({
         } else {
           cleanValues.push(now);
         }
-        setTempValue(cleanValues);
+        setTempValue(cleanValues as ValueType);
       } else {
         setTempValue([]);
       }
     } else {
-      if (value?.getTime && value.getTime()) {
+      if ((value as Date)?.getTime && (value as Date).getTime()) {
         setTempValue(value);
-        currentMonthDate = value;
+        currentMonthDate = value as Date;
       } else {
-        setTempValue();
+        setTempValue(undefined);
       }
     }
     const currentMonthYear = currentMonthDate.getFullYear();
@@ -265,7 +281,7 @@ export default function DatePicker({
                       }) => {
                         const isSelected = range ? tempValue ?
                           date >= tempValue[0] && date <= tempValue[1] : false
-                          : date.getTime() === value?.getTime();
+                          : date.getTime() === (value as Date)?.getTime();
                         const key = date ? buildDateKey(new Date(date.getTime() + DAY_IN_MS)) : '';
                         const data = daysData[key];
                         const isDisabled = disableDatalessDays && !data;
@@ -342,8 +358,17 @@ export default function DatePicker({
                 <span></span>
                 {
                   range ?
-                    <span>du <strong dangerouslySetInnerHTML={{ __html: tempValue?.length ? prettyDate(tempValue[0], daysMap, monthsMap) : null }} /> au <strong dangerouslySetInnerHTML={{ __html: tempValue?.length ? prettyDate(tempValue[1], daysMap, monthsMap) : null }} /></span>
-                    : <span dangerouslySetInnerHTML={{ __html: tempValue ? prettyDate(tempValue, daysMap, monthsMap) : null }} />
+                    <span>du <strong 
+                    dangerouslySetInnerHTML={{ 
+                      __html: 
+                      (tempValue as Array<Date>)?.length ? 
+                        prettyDate(tempValue[0], daysMap, monthsMap) : null 
+                    }} /> au <strong 
+                            dangerouslySetInnerHTML={{ 
+                              __html: (tempValue as Array<Date>)?.length ? 
+                                prettyDate(tempValue[1], daysMap, monthsMap) : null 
+                              }} /></span>
+                    : <span dangerouslySetInnerHTML={{ __html: tempValue ? prettyDate(tempValue as Date, daysMap, monthsMap) : null }} />
                 }
               </div>
               : null

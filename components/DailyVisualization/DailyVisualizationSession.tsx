@@ -1,10 +1,14 @@
-
-
+import type { SpansSettings, DailyComputedSession } from "~types/common";
+interface SessionProps extends DailyComputedSession {
+  yScale: Function
+  xScale: Function
+  width: number
+  gutter: number
+  messageBarWidthScale: Function
+  spansSettings: SpansSettings
+}
 const Session = ({
-  dateExtent,
   browsingEvents,
-  // activitySpans,
-  // blurSpans,
   yExtent,
   columnIndex,
   yScale,
@@ -18,7 +22,7 @@ const Session = ({
   focusSpans,
   activeSpans,
   spansSettings,
-}) => {
+}: SessionProps) => {
   const x = xScale(columnIndex);
   let height = yExtent[1] - yExtent[0];
   height = height > 0 ? height : 0;
@@ -59,7 +63,7 @@ const Session = ({
                     >
                       <rect
                         data-tooltip-id="daily-vis-tooltip"
-                        data-tooltip-html={spansSettings[spanId].tooltipFn({start, end})}
+                        data-tooltip-html={spansSettings[spanId].tooltipFn({ start, end })}
                         // data-too ltip-content={`${className} de ${new Date(start).toLocaleTimeString()} à ${new Date(end).toLocaleTimeString()}`}
                         x={gutter}
                         y={0}
@@ -210,11 +214,11 @@ const Session = ({
             const fontSize = computedContents ? 8 / ('' + computedContents.index).length * 1.5 : 5;
             return (
               <g
-                key={id}
+                key={(id as unknown as string)}
                 className={`browsing-event ${platform}`}
                 transform={`translate(${x + gutter}, ${y})`}
                 data-tooltip-id={'daily-vis-tooltip'}
-                    data-tooltip-html={tooltipHTML}
+                data-tooltip-html={tooltipHTML}
               >
                 <line
                   x1={0}
@@ -231,7 +235,7 @@ const Session = ({
                 />
                 {
                   computedContents ?
-                    <text fill="white" style={{fontSize}} x={0} y={fontSize * .3} textAnchor="middle">
+                    <text fill="white" style={{ fontSize }} x={0} y={fontSize * .3} textAnchor="middle">
                       {computedContents.index}
 
                     </text>

@@ -5,8 +5,25 @@ import Cover from './Cover';
 import DayPage from './DayPage';
 import A5Imposed from './A5Imposed';
 import { formatNumber, timeOfDayToMs } from '~helpers';
-import { DAY_IN_MS } from '~constants';
+import { DAY_IN_MS, PLATFORMS } from '~constants';
+import type { CaptureEventsList } from '~types/captureEventsTypes';
+import type { Annotations } from '~types/annotations';
+import type { DiaryDataByDayType, DiaryDay } from '~types/common';
 
+const Platforms = [...PLATFORMS] as const;
+type Platform = (typeof Platforms)[number];
+interface DiaryWrapperProps {
+  timeSpan: [Date, Date]
+  timeOfDaySpan: [string, string]
+  daysOfWeek: Array<number>
+  platforms: Array<Platform>
+  channelsSettings: object
+  excludedTitlePatterns: Array<string>
+  visibleEvents: CaptureEventsList
+  annotations: Annotations
+  annotationColumnsNames: Array<string>
+  editionTitle: string
+}
 function DiaryWrapper({
   timeSpan,
   timeOfDaySpan,
@@ -18,7 +35,7 @@ function DiaryWrapper({
   annotations,
   annotationColumnsNames,
   editionTitle,
-}) {
+}: DiaryWrapperProps) {
   const previewerRef = useRef(null);
   const [format, setFormat] = useState('A4-landscape');
   const [dimensions, setDimensions] = useState({ width: 100, height: 100 })
@@ -45,8 +62,10 @@ function DiaryWrapper({
     10: 'Novembre',
     11: 'Décembre',
   }
+
+  
   // @todo compute that in a worker
-  const dataByDay = useMemo(() => {
+  const dataByDay: DiaryDataByDayType = useMemo(() => {
     const fromDay = new Date(timeSpan[0]).getTime();
     const toDay = new Date(timeSpan[1]).getTime();
     
@@ -159,7 +178,7 @@ function DiaryWrapper({
                       } else {
                         const roundIndex = index + index % 2;
                         const dayIndex = (roundIndex / 2) - 1;
-                        const [id, day] = Object.entries(dataByDay)[dayIndex];
+                        const [id, day]: [string, DiaryDay] = Object.entries(dataByDay)[dayIndex];
                         const isOdd = index % 2 !== 0;
                         const type = isOdd ? 'left' : 'right';
                         // console.log('render page index %s gets day index %s', index, dayIndex)

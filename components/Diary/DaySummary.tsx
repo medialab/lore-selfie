@@ -1,11 +1,19 @@
+import type { ChannelsMapItem } from "~types/common";
 
 
+
+interface DaySummaryProps {
+  width: number
+  height: number
+  channelsMap: Map<string, ChannelsMapItem>
+  rowsCount: number
+}
 export default function DaySummary({
   width,
   height,
   channelsMap,
   rowsCount,
-}) {
+}: DaySummaryProps) {
   let size = 'normal';
   if (rowsCount > 30) {
     size = 'very-dense';

@@ -1,13 +1,17 @@
-import { useState, useEffect, useMemo } from 'react';
-import { v4 as generateId } from 'uuid';
-import TextareaAutosize from 'react-textarea-autosize';
-import Select from 'react-select';
+import type { ActionSuggestion } from "~types/common";
+
+
+interface SuggestionCardProps {
+  suggestion: ActionSuggestion
+  onAccept: Function 
+  onDismiss: Function
+}
 
 export default function SuggestionCard({
   suggestion,
   onAccept,
   onDismiss,
-}) {
+}: SuggestionCardProps) {
   const {type, title, items} = suggestion;
   return (
     <li className="SuggestionCard card">

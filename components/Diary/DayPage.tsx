@@ -1,8 +1,26 @@
 import Measure from 'react-measure';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import DayTimeline from './DayTimeline';
 import DaySummary from './DaySummary';
 import { BROWSE_VIEW } from '~constants';
+import type { CaptureEventsList } from '~types/captureEventsTypes';
+import type { Annotations } from '~types/annotations';
+import { Dimensions } from '~types/common';
+import { useBuildStructuredContentsList } from '~hooks';
+
+interface DayPageProps {
+  date: Date
+  label: string
+  events: CaptureEventsList
+  format: string
+  imposed: boolean
+  timeOfDaySpan: [string, string]
+  previewScaleRatio: number
+  annotations: Annotations
+  pageNumber: number
+  annotationColumnsNames: Array<string>
+  type: string
+}
 
 function DayPage({
   date,
@@ -12,61 +30,15 @@ function DayPage({
   imposed,
   timeOfDaySpan,
   previewScaleRatio,
-  annotations = {},
+  annotations,
   pageNumber,
   annotationColumnsNames,
   type = 'left'
-}) {
+}: DayPageProps) {
   const {creators = {}, tags = {}, expressions = {}} = annotations;
-  const [vizSpaceDimensions, setVizSpaceDimensions] = useState({ width: 100, height: 100 });
-  // @todo factorize that with home view
-  const {channelsMap, contentsMap, rowsCount} = useMemo(() => {
-    const validEvents = events
-      .filter(event => event.type === BROWSE_VIEW && event.url && event.metadata.title
+  const [vizSpaceDimensions, setVizSpaceDimensions] = useState<Dimensions>({ width: 100, height: 100 });
 
-        && ['live', 'video', 'short'].includes(event.viewType)
-      );
-      const contents = new Map();
-    const channels = new Map();
-    let index = 0;
-    let rCount = 0;
-    validEvents.forEach(event => {
-      let channel = event.metadata.channelName || event.metadata.channelId;
-      const channelSlug = `${event.metadata.channelId}-${event.platform}`;
-      const creator = Object.values(creators).find(c => c.channels.includes(channelSlug));
-      channel = creator ? creator.name : channel;
-      // console.log('creators', creators, channelSlug);
-      if (!channels.has(channel)) {
-        channels.set(channel, new Map());
-        rCount++;
-      }
-      const uniqueContents = channels.get(channel);// || new Map();
-      if (!uniqueContents.has(event.url)) {
-        index++;
-        rCount++;
-        uniqueContents.set(event.url, {
-          url: event.url,
-          title: event.metadata.title,
-          channel,
-          platform: event.platform,
-          index
-        })
-        contents.set(event.url, {
-          url: event.url,
-          title: event.metadata.title,
-          channel,
-          platform: event.platform,
-          index
-        })
-      }
-      channels.set(channel, uniqueContents)
-    })
-    return {
-      contentsMap: contents,
-      channelsMap: channels,
-      rowsCount: rCount
-    }
-  }, [events, creators]);
+  const {channelsMap, contentsMap, rowsCount} = useBuildStructuredContentsList(events, creators)
   return (
     <section className={`page DayPage ${format}  ${imposed ? 'is-imposed' : ''} ${type}`}>
       <div className="page-content">

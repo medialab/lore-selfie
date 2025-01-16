@@ -1,6 +1,24 @@
 import { useState, useEffect, useMemo } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import Select from 'react-select';
+import type { Creator, Expression, Tag } from '~types/annotations';
+import type { SelectOption } from '~types/common';
+
+interface TagCardProps {
+  tag: Tag
+  relatedCreators: Array<Creator>
+  relatedExpressions: Array<Expression>
+  creators: {
+    [key: string]: Creator
+  }
+  expressions: {
+    [key: string]: Expression
+  }
+  onChange: Function
+  onDelete: Function
+  onLinkCreators: Function
+  onLinkExpressions: Function
+}
 
 export default function TagCard({
   tag,
@@ -12,19 +30,19 @@ export default function TagCard({
   onDelete,
   onLinkCreators,
   onLinkExpressions,
-}) {
-  const [isEdited, setIsEdited] = useState();
-  const [tempTag, setTempTag] = useState(tag);
+}: TagCardProps) {
+  const [isEdited, setIsEdited] = useState<boolean>(false);
+  const [tempTag, setTempTag] = useState<Tag>(tag);
 
   // @todo put upstream
-  const creatorsOptions = useMemo(() => {
+  const creatorsOptions: Array<SelectOption> = useMemo(() => {
     return Object.values(creators).map(({ id, name }) => ({
       label: name,
       value: id,
     }))
   }, [creators]);
   // @todo put upstream
-  const expressionsOptions = useMemo(() => {
+  const expressionsOptions: Array<SelectOption> = useMemo(() => {
     return Object.values(expressions).map(({ id, name }) => ({
       label: name,
       value: id,
@@ -69,7 +87,6 @@ export default function TagCard({
                 <div className="input-group">
                   <label>Description</label>
                   <TextareaAutosize
-                    type="text"
                     placeholder="Description"
                     value={tempTag.description}
                     onChange={e => setTempTag({ ...tempTag, description: e.target.value })}

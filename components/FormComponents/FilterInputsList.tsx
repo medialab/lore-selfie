@@ -1,17 +1,24 @@
 import InputToValidate from "./InputToValidate";
 
+interface FilterInputsListProps {
+  value: Array<string>
+  onChange: Function
+  messages: {
+    [key: string]: string
+  }
+}
 const FilterInputsList = ({
   value = [],
   onChange,
   messages: {
     newItem: newItemMessage
   }
-}) => {
+}: FilterInputsListProps) => {
   return (
     <ul className="FilterInputsList small-cards-container capped">
       {
         value.map((exp, index) => {
-         
+
           const handleRemove = () => {
             const newValue = [...value];
             newValue.splice(index, 1);

@@ -1,7 +1,20 @@
 import { v4 as generateId } from 'uuid';
 import ExpressionCard from "./ExpressionCard";
-import type { Expression } from '~types/annotations';
+import type { Creator, Expression, Tag } from '~types/annotations';
 
+interface ExpressionsEditionProps {
+  expressions: {
+    [key: string]: Expression
+  }
+  tags: {
+    [key: string]: Tag
+  }
+  creators: {
+    [key: string]: Creator
+  }
+  onChange: Function
+  onDeleteItem: Function
+}
 
 export default function ExpressionsEdition({
   expressions,
@@ -9,7 +22,7 @@ export default function ExpressionsEdition({
   creators,
   onChange,
   onDeleteItem,
-}) {
+}: ExpressionsEditionProps) {
   return (
     <section className="ExpressionsEdition annotation-form">
       <div className="form-header">

@@ -1,8 +1,12 @@
+import type { SpansSettings } from "~types/common";
 
 
 
+interface DailyLegendProps {
+  spansSettings: SpansSettings
+}
 
-function DailyLegend({ spansSettings }) {
+function DailyLegend({ spansSettings }: DailyLegendProps) {
   return (
     <ul className="legend-container">
       {

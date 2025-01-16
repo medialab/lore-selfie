@@ -18,9 +18,29 @@ import { MdFilterCenterFocus } from "react-icons/md";
 
 
 import "@react-sigma/core/lib/react-sigma.min.css";
+import type { Annotations } from '~types/annotations';
+import { Dimensions, type AvailableChannels } from '~types/common';
 
+interface LoadGraphProps {
+  annotations: Annotations
+  channels: AvailableChannels
+  legend: {
+    tag: {
+      color: string
+    },
+    expression: {
+      color: string
+    },
+    channel: {
+      color: string
+    },
+    creator: {
+      color: string
+    }
+  }
+}
 // Component that load the graph
-export const LoadGraph = ({ annotations, channels, legend }) => {
+export const LoadGraph = ({ annotations, channels, legend }: LoadGraphProps) => {
   const loadGraph = useLoadGraph();
 
   useEffect(() => {
@@ -89,7 +109,7 @@ export default function AnnotationsNetwork({
   annotations,
   channels
 }) {
-  const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
+  const [dimensions, setDimensions] = useState<Dimensions>({ width: 1000, height: 1000 });
   const [faTime, setFaTime] = useState<number>(2000);
 
   useEffect(() => {
@@ -98,6 +118,7 @@ export default function AnnotationsNetwork({
     const time = params.get("faTime");
     setFaTime(Number.parseInt(time ?? "2000") || 2000);
   }, [window.location]);
+  
   const legend = {
     channel: {
       color: 'red',

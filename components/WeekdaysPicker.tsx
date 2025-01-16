@@ -11,7 +11,16 @@ const DAYS_OF_WEEK_MAP_REVERSE = {
   6: 'Samedi',
 }
 
-const WeekdaysPicker = ({state = [], setState}) => {
+interface WeekdaysPickerProps {
+  state: Array<number>
+  setState: ((s: Array<number>) => void)
+}
+
+const WeekdaysPicker = ({
+  state = [], 
+  setState
+
+}: WeekdaysPickerProps) => {
   // const withName = state.map(key => ({key, label: DAYS_OF_WEEK_MAP_REVERSE[key]}))
   return (
     <ul className="WeekdaysPicker tags-list">

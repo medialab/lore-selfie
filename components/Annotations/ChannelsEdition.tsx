@@ -1,11 +1,26 @@
 import CollapsibleSection from "~components/CollapsibleSection";
 import { v4 as generateId } from 'uuid';
-import type { Creator } from "~types/annotations";
+import type { Annotations, Creator, Tag } from "~types/annotations";
 import { useMemo, useState } from "react";
 import CreatorCard from "./CreatorCard";
 import ChannelCard from "./ChannelCard";
 import levenshtein from 'talisman/metrics/levenshtein'
 import SuggestionCard from "./SuggestionCard";
+import type { ActionSuggestion, AvailableChannels } from "~types/common";
+
+interface ChannelsEditionProps {
+  availableChannels: AvailableChannels
+  creators: {
+    [key: string]: Creator
+  }
+  tags: {
+    [key: string]: Tag
+  }
+  onChange: Function
+  onDeleteItem: Function
+}
+
+
 
 export default function ChannelsEdition({
   availableChannels,
@@ -13,11 +28,11 @@ export default function ChannelsEdition({
   tags,
   onChange,
   onDeleteItem,
-}) {
-  const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set());
-  const [creatorSearchTerm, setCreatorSearchTerm] = useState('');
-  const [channelSearchTerm, setChannelSearchTerm] = useState('');
-  const soloChannels = useMemo(() => {
+}: ChannelsEditionProps) {
+  const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
+  const [creatorSearchTerm, setCreatorSearchTerm] = useState<string>('');
+  const [channelSearchTerm, setChannelSearchTerm] = useState<string>('');
+  const soloChannels: AvailableChannels = useMemo(() => {
     const attributedChannelsIds = new Set();
     Object.values(creators).forEach(({ channels }) => {
       channels.forEach(channelId => attributedChannelsIds.add(channelId));
@@ -29,9 +44,10 @@ export default function ChannelsEdition({
       return true;
     })
   }, [creators, availableChannels]);
-  const tokenize = useMemo(() => (term) => term.replace(/\W+/g, '').toLowerCase(), []);
 
-  const suggestions = useMemo(() => {
+  const tokenize = useMemo(() : Function => (term: string) : string => term.replace(/\W+/g, '').toLowerCase(), []);
+
+  const suggestions: Array<ActionSuggestion> = useMemo(() => {
     const isAcceptableMatch = (term1, term2) => {
       const lev = levenshtein(term1, term2);
       return lev <= 1 || term1.includes(term2) || term2.includes(term1);
@@ -75,10 +91,11 @@ export default function ChannelsEdition({
     }
     return sugg;
   }, [soloChannels, tokenize, creators]);
-  const visibleSuggestions = useMemo(() => {
+  const visibleSuggestions: Array<ActionSuggestion> = useMemo(() => {
     return suggestions
       .filter(s => !dismissedSuggestions.has(s.id))
-  }, [suggestions, dismissedSuggestions])
+  }, [suggestions, dismissedSuggestions]);
+
   return (
     <section className="ChannelsEdition annotation-form">
       <div className="form-header">

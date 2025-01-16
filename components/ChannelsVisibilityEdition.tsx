@@ -1,18 +1,24 @@
 import { useMemo, useState } from "react";
+import type { AvailableChannelsMap } from "~types/common";
+
+interface ChannelsVisibilityEditionProps {
+  channels: AvailableChannelsMap
+  onChange: Function
+}
 
 function ChannelsVisibilityEdition({
   channels,
   onChange
-}) {
-  const [searchstring, setSearchstring] = useState('');
-  const visibleChannels = useMemo(() => {
+}: ChannelsVisibilityEditionProps) {
+  const [searchstring, setSearchstring] = useState<string>('');
+  const visibleChannels = useMemo((): AvailableChannelsMap => {
     if (searchstring.length > 2 && Object.entries(channels).length) {
       const str = searchstring.toLowerCase();
       return Object.entries(channels).filter(([id, {label, platform}]) => {
         const mark = `${label} (${platform})`.toLowerCase();
         return mark.includes(str);
       })
-      .reduce((res, [id, obj]) => ({...res, [id]: obj}), {})
+      .reduce((res, [id, obj]): AvailableChannelsMap => ({...res, [id]: obj}), {})
     }
     return channels;
   }, [searchstring, channels]);

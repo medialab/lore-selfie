@@ -1,12 +1,19 @@
 import { useMemo } from "react"
 
 
+interface TimePickerProps {
+  label: string
+  value: string
+  onChange: Function
+  minutesSpan: number
+}
+
 export default function TimePicker({
   label,
   value,
   onChange,
   minutesSpan = 15
-}) {
+}: TimePickerProps) {
   const hoursValues = useMemo(() => {
     let hours = {
       0: {
@@ -33,7 +40,7 @@ export default function TimePicker({
     return minutes;
   }, [minutesSpan]);
 
-  const actualValues = useMemo(() => {
+  const actualValues: [number, number] = useMemo(() => {
     let [hours = 0, minutes = 0] = value.split(':');
     if (isNaN(+hours)) {
       hours = 0;

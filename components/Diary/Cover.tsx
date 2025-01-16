@@ -1,14 +1,20 @@
 import { useMemo } from "react";
+import type { DiaryDataByDayType } from "~types/common";
 
-
+interface CoverProps {
+  format: string,
+  days: DiaryDataByDayType,
+  imposed: boolean,
+  editionTitle: string
+}
 function Cover({
   format,
   days,
   imposed,
   editionTitle='lore selfie'
-}) {
-  const firstDay = useMemo(() => Object.keys(days).length ? days[Object.keys(days)[0]].label : null, [days])
-  const lastDay = useMemo(() => Object.keys(days).length ? days[Object.keys(days)[Object.keys(days).length - 1]].label : null, [days])
+}: CoverProps) {
+  const firstDay: string = useMemo(() => Object.keys(days).length ? days[Object.keys(days)[0]].label : null, [days])
+  const lastDay: string = useMemo(() => Object.keys(days).length ? days[Object.keys(days)[Object.keys(days).length - 1]].label : null, [days])
   if (!firstDay || !lastDay) {
     return (
       <section className={`page cover ${format} ${imposed ? 'is-imposed' : ''}`}>

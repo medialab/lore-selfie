@@ -1,15 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 
-
+interface InputToValidateProps {
+  value: string,
+  onChange: Function,
+  onRemove?: Function,
+  type?: string,
+  placeholderFn?: Function
+}
 const InputToValidate = ({
   value,
   onChange,
   onRemove,
   type = "text",
   placeholderFn
-}) => {
-  const [currentValue, setCurrentValue] = useState(value);
-  const [isEdited, setIsEdited] = useState(false);
+}: InputToValidateProps) => {
+  const [currentValue, setCurrentValue] = useState<string>(value);
+  const [isEdited, setIsEdited] = useState<boolean>(false);
   const inputRef = useRef(null);
   useEffect(() => {
     setCurrentValue(value);

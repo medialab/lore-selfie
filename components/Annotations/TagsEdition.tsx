@@ -1,16 +1,33 @@
+import type { Creator, Expression, Tag } from "~types/annotations";
 import TagCard from "./TagCard";
 import {v4 as generateId} from 'uuid';
+
+interface TagsEditionProps {
+  tags: {
+    [key: string]: Tag
+  }
+  creators: {
+    [key: string]: Creator
+  }
+  expressions: {
+    [key: string]: Expression
+  }
+  onChange: Function
+  onDeleteItem: Function
+  onLinkCreators: Function
+  onLinkExpressions: Function
+}
 
 export default function TagsEdition({
   tags,
   creators,
   expressions,
+
   onChange,
   onDeleteItem,
-
   onLinkCreators,
   onLinkExpressions,
-}) {
+}: TagsEditionProps) {
   return (
     <section className="TagsEdition annotation-form">
       <div className="form-header">

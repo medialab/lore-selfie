@@ -3,6 +3,19 @@ import { v4 as generateId } from 'uuid';
 import TextareaAutosize from 'react-textarea-autosize';
 import Select from 'react-select';
 import TagChip from './TagChip';
+import type { Creator, Tag } from '~types/annotations';
+import type { AvailableChannel, AvailableChannels, SelectOption } from '~types/common';
+
+interface CreatorCardProps {
+  creator: Creator
+  availableChannels: AvailableChannels
+  soloChannels: AvailableChannels
+  tags: {
+    [key: string]: Tag
+  }
+  onChange: Function
+  onDelete: Function
+}
 
 export default function CreatorCard({
   creator,
@@ -12,33 +25,43 @@ export default function CreatorCard({
   // creators,
   onChange,
   onDelete
-}) {
-  const [isEdited, setIsEdited] = useState();
-  const [tempCreator, setTempCreator] = useState(creator);
+}: CreatorCardProps) {
+  const [isEdited, setIsEdited] = useState<boolean>();
+  const [tempCreator, setTempCreator] = useState<Creator>(creator);
 
   useEffect(() => {
     setTempCreator(creator);
   }, [creator]);
 
+  interface AvilableChannelsMapType {
+    [key: string]: AvailableChannel
+  }
 
-  const availableChannelsMap = useMemo(() => {
+  const availableChannelsMap: AvilableChannelsMapType = useMemo(() => {
     return availableChannels.reduce((res, channel) => ({ ...res, [channel.id]: channel }), {})
-  }, [availableChannels])
-  const tagsOptions = useMemo(() => {
+  }, [availableChannels]);
+
+  const tagsOptions: Array<SelectOption> = useMemo(() => {
     return Object.values(tags).map(({ id, name }) => ({
       label: name,
       value: id,
-    }))
+    }));
   }, [tags]);
 
-  const channelsOptions = useMemo(() => {
+  const channelsOptions: Array<SelectOption> = useMemo(() => {
     return Object.values(soloChannels).map(({ id, channelName, channelId, platform }) => ({
       label: `${channelName  || channelId} (${platform})`,
       value: id,
-    }))
+    }));
   }, [soloChannels]);
 
-  const { id, description, name, channels = [], links = {} } = useMemo(() => tempCreator, [tempCreator]);
+  const { 
+    id, 
+    description, 
+    name, 
+    channels = [], 
+    links = {tags: []} 
+  } = useMemo((): Creator => tempCreator, [tempCreator]);
   const {
     tags: linkedTagsIds = [],
     // creators: linkedCreatorsIds = [],

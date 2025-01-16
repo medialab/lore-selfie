@@ -4,11 +4,17 @@ import type { Handle } from "~types/settings";
 import {useState, useEffect} from 'react';
 import { PLATFORMS } from "~constants";
 
+
+interface HandleEditorProps {
+  handle: Handle,
+  onChange: ((h: Handle) => void)
+  onDelete: (() => void)
+}
 function HandleEditor({
   handle: inputHandle,
   onChange,
   onDelete,
-}) {
+}: HandleEditorProps) {
   const [handle, setHandle] = useState<Handle>(inputHandle);
   useEffect(() => {
     setHandle(inputHandle);
@@ -16,7 +22,7 @@ function HandleEditor({
 
   const {
     platform,
-    internalId,
+    // internalId,
     id,
     alias
   } = handle;

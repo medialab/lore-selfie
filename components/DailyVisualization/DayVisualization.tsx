@@ -4,11 +4,30 @@ import { extent, max } from 'd3-array';
 import { Tooltip } from 'react-tooltip';
 import { useInterval } from 'usehooks-ts'
 import { inferTickTimespan } from 'helpers';
+import { PLATFORMS } from "~constants"
+
 
 import 'react-tooltip/dist/react-tooltip.css'
 
 import Session from './DailyVisualizationSession'
-import { BLUR_TAB, BROWSE_VIEW, FOCUS_TAB, LIVE_USER_ACTIVITY_RECORD } from "~constants";
+import { BLUR_TAB, BROWSE_VIEW, CHAT_ACTIVITY_RECORD, FOCUS_TAB, LIVE_USER_ACTIVITY_RECORD } from "~constants";
+import type { BrowseViewEvent, CaptureEvent, ChatActivityRecordEvent } from "~types/captureEventsTypes";
+import type { ChannelsMapItem, ChatSlice, ContentsMapItem, DailyBrowseViewEventComputed, DailyComputedSession, SpanObject, SpansSettings } from "~types/common";
+
+
+const Platforms = [...PLATFORMS] as const;
+type Platform = (typeof Platforms)[number];
+interface DayVisualizationProps {
+  sessions: Map<string, Array<CaptureEvent>>
+  date: Date
+  zoomLevel: number
+  roundDay: boolean
+  width: number
+  height: number
+  contentsMap: Map<string, ContentsMapItem>
+  channelsMap: Map<string, ChannelsMapItem>
+  spansSettings: SpansSettings
+}
 
 function DayVisualization({
   sessions = new Map(),
@@ -17,11 +36,12 @@ function DayVisualization({
   roundDay,
   width,
   height,
-  contentsMap, channelsMap,
+  contentsMap, 
+  channelsMap,
   spansSettings,
-}) {
-  const [nowLineY, setNowLineY] = useState();
-  const datesDomain = useMemo(() => {
+}: DayVisualizationProps) {
+  const [nowLineY, setNowLineY] = useState<number>();
+  const datesDomain: [number, number] = useMemo(() => {
     let min, max;
     if (roundDay) {
       const midnight = date;
@@ -87,7 +107,7 @@ function DayVisualization({
     return ticks;
   }, [datesDomain, yScale, tickTimeSpan]);
 
-  const computedSessions = useMemo(() => {
+  const computedSessions: Array<DailyComputedSession> = useMemo(() => {
     const computed = [];
     for (let [sessionId, events] of sessions.entries()) {
       const dateExtent = extent(events.map(e => new Date(e.date).getTime()));
@@ -175,12 +195,23 @@ function DayVisualization({
         }
       });
       // browse events
-      let browsingEvents = events.filter(event => event.type === BROWSE_VIEW)
-        .map(({ platform, metadata, date, url, viewType, id }) => {
+      const browsingEvents = events.filter(event => event.type === BROWSE_VIEW)
+        .map(({ 
+          platform, 
+          metadata, 
+          date, 
+          url, 
+          viewType, 
+          id, 
+          type,
+          injectionId, 
+        }) => {
           const y = yScale(new Date(date).getTime());
           const computedContents = contentsMap.get(url);
           // console.log('contents', thatContents);
           return {
+            type,
+            injectionId,
             platform,
             id,
             metadata,
@@ -191,8 +222,8 @@ function DayVisualization({
             y
           }
         })
-      browsingEvents = browsingEvents
-        .map((event, eventIndex) => {
+      const browsingEventsComputed: Array<DailyBrowseViewEventComputed> = browsingEvents
+        .map((event, eventIndex): DailyBrowseViewEventComputed => {
           const next = eventIndex < browsingEvents.length - 1 ? browsingEvents[eventIndex + 1] : undefined;
           if (next) {
             return {
@@ -208,13 +239,13 @@ function DayVisualization({
             }
           }
         });
-      let chatSlices = events.filter(event => event.type === 'CHAT_ACTIVITY_RECORD')
-      chatSlices = chatSlices
+      const activityEvents: Array<ChatActivityRecordEvent> = events.filter(event => event.type === CHAT_ACTIVITY_RECORD)
+      const chatSlices: Array<ChatSlice> = activityEvents
         .map((event, index) => {
-          const prev = index > 0 ? chatSlices[index - 1] : undefined;
+          const prev = index > 0 ? chatSlices[index - 1] : undefined ;
           const end = new Date(event.date).getTime();
           // const start = end - event.timeSpan;
-          const start = prev && prev.url === event.url ? new Date(prev.date).getTime() : end - event.timeSpan;
+          const start = prev && (prev as unknown as ChatActivityRecordEvent).url === event.url ? new Date((prev as unknown as ChatActivityRecordEvent).date).getTime() : end - event.timeSpan;
           return {
             start,
             end,
@@ -225,24 +256,20 @@ function DayVisualization({
             timeSpan: event.timeSpan,
 
           }
-        })
+        });
 
-      computed.push({
+      const session: DailyComputedSession = {
         id: sessionId,
         dateExtent,
         yExtent: dateExtent.map(d => yScale(d)),
         columnIndex,
-        browsingEvents,
-        // //
-        // activitySpans,
-        // blurSpans,
-        //
+        browsingEvents: browsingEventsComputed,
         playingSpans: playingSpans.map(d => ({ ...d, startY: yScale(d.start), endY: yScale(d.end) })),
         focusSpans: focusSpans.map(d => ({ ...d, startY: yScale(d.start), endY: yScale(d.end) })),
         activeSpans: activeSpans.map(d => ({ ...d, startY: yScale(d.start), endY: yScale(d.end) })),
-        //
         chatSlices,
-      })
+      }
+      computed.push(session)
     }
     return computed;
   }, [sessions, yScale, contentsMap, channelsMap]);

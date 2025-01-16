@@ -1,7 +1,10 @@
+import type { Tag } from "~types/annotations";
 
 
-
-export default function TagChip({tag = {}}) {
+interface TagChipProps {
+  tag: Tag
+}
+export default function TagChip({tag = {id: '', color: 'black', name: '', description: ''}}: TagChipProps) {
   const { id, color, description, name } = tag;
   return (
     <div className="TagChip">

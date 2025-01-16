@@ -1,12 +1,14 @@
 import { useMemo } from "react";
 
-
-
+interface A5ImposedProps {
+  renderPage: Function
+  numberOfPages: number
+}
 function A5Imposed({
   renderPage,
   numberOfPages,
-}) {
-  const doublePagesIndexes = useMemo(() => {
+}: A5ImposedProps) {
+  const doublePagesIndexes: Array<[number, number]> = useMemo(() => {
     // const renderedPages = pages();
     // let numberOfPages = (frontPage ? 1 : 0) + renderedPages.length;
     const roundNumberOfPages = numberOfPages%4 === 0 ? numberOfPages : numberOfPages - numberOfPages%4 + 4;

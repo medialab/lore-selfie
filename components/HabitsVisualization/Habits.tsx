@@ -4,18 +4,26 @@ import { scaleLinear } from 'd3-scale';
 import partialCircle from 'svg-partial-circle';
 import { Tooltip } from 'react-tooltip';
 
-import '../styles/Habits.scss';
+import '~/styles/Habits.scss';
 import { PLATFORMS_COLORS } from '~constants';
 import { msToNiceDuration } from '~helpers';
+import type { Dimensions, HabitsData } from '~types/common';
+
+interface HabitsProps {
+  habitsTimespan: [Date, Date]
+  habitsBinDuration: number
+  data: HabitsData
+  startOfWeekId?: number
+}
 
 export default function Habits({
   habitsTimespan,
   habitsBinDuration,
   startOfWeekId = 1,
   data,
-}) {
+}: HabitsProps) {
   const valueField = "duration";
-  const [dimensions, setDimensions] = useState({ width: 100, height: 100 });
+  const [dimensions, setDimensions] = useState<Dimensions>({ width: 100, height: 100 });
   const daysMap = {
     0: 'Dimanche',
     1: 'Lundi',
@@ -25,7 +33,18 @@ export default function Habits({
     5: 'Vendredi',
     6: 'Samedi',
   }
-  const { days, daysToColumn } = useMemo(() => {
+
+  interface DayMeta {
+    id: number 
+    label: string
+  }
+  interface DaysComputed {
+    days: Array<DayMeta>
+    daysToColumn: {
+      [key: string]: number
+    }
+  }
+  const { days, daysToColumn }: DaysComputed = useMemo(() => {
     const m = {}
     let d = [];
     if (startOfWeekId) {
@@ -40,7 +59,10 @@ export default function Habits({
     }
     const daysOutput = d.map((dat, index) => {
       m[dat] = index;
-      return { id: +dat, label: daysMap[dat] }
+      return { 
+        id: +dat, 
+        label: daysMap[dat] 
+      }
     });
     return {
       days: daysOutput,

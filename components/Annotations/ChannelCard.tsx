@@ -1,21 +1,35 @@
-import { useState, useEffect, useMemo } from 'react';
-import { v4 as generateId } from 'uuid';
-import TextareaAutosize from 'react-textarea-autosize';
+import { useMemo } from 'react';
 import Select from 'react-select';
+import type { AvailableChannel } from '~types/common';
+import type { Creator } from '~types/annotations';
 
+interface CreatorsMap {
+  [key: string]: Creator
+}
+interface ChannelCardProps {
+  channel: AvailableChannel,
+  creators: CreatorsMap,
+  onSelect: Function
+  onCreateEponym: Function
+}
 export default function ChannelCard({
   channel,
   creators,
   onSelect,
   onCreateEponym
-}) {
-  const creatorsOptions = useMemo(() => {
+}: ChannelCardProps) {
+  interface CreatorOption {
+    value: string
+    label: string
+  }
+  const creatorsOptions: Array<CreatorOption> = useMemo(() => {
     return Object.values(creators)
     .map(creator => ({
       value: creator.id,
       label: `${creator.name}`
     }))
-  }, [creators])
+  }, [creators]);
+
   return (
     <li className="TagCard card">
       <div className="card-content">
@@ -32,7 +46,7 @@ export default function ChannelCard({
             noOptionsMessage={() => 'Rien à afficher'}
             placeholder={'Sélectionner ou rechercher une créatrice ou un créateur existant'}
           />
-          <button onClick={onCreateEponym}>
+          <button onClick={() => onCreateEponym()}>
             Créer une entrée créatrice/créateur avec le nom de cette chaîne
           </button>
         </div>
