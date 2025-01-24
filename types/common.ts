@@ -149,7 +149,6 @@ export interface DiaryDataByDayType {
   [key: number]: DiaryDay
 }
 
-
 export interface FilterEventsPayload {
   from: number
   to: number

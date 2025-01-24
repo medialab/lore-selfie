@@ -91,7 +91,7 @@ function Studio() {
       ...settings,
       channelsSettings: undefined
     })
-  }, [settings]);
+  }, [settings])
   useEffect(() => {
     storage
       .get<object>("lore-selfie-studio-settings")
@@ -140,7 +140,8 @@ function Studio() {
     onUpdateSettings("excludedTitlePatterns", value)
   const setAnnotationsColumnsNames = (value) =>
     onUpdateSettings("annotationColumnsNames", value)
-  const setEditionTitle = (value: string) => onUpdateSettings("editionTitle", value)
+  const setEditionTitle = (value: string) =>
+    onUpdateSettings("editionTitle", value)
 
   /**
    * Sendings activity cud requests
@@ -213,22 +214,26 @@ function Studio() {
     requestBinnedData()
     requestFromAnnotationsCrud(GET_ANNOTATIONS, {})
     // console.debug('request get channels in interval', JSON.parse(settingsWithoutChannelsstringified))
-    const cleanSettings: FilterEventsPayload = JSON.parse(settingsWithoutChannelsstringified);
-    cleanSettings.timeSpan = cleanSettings.timeSpan.map(d => new Date(d)) as [Date, Date];
-    requestFromActivityCrud(
-      GET_CHANNELS,
-      cleanSettings
+    const cleanSettings: FilterEventsPayload = JSON.parse(
+      settingsWithoutChannelsstringified
     )
+    cleanSettings.timeSpan = cleanSettings.timeSpan.map((d) => new Date(d)) as [
+      Date,
+      Date
+    ]
+    requestFromActivityCrud(GET_CHANNELS, cleanSettings)
   }, 10000)
 
   useEffect(() => {
     // console.debug('request get channels', JSON.parse(settingsWithoutChannelsstringified))
-    const cleanSettings: FilterEventsPayload = JSON.parse(settingsWithoutChannelsstringified);
-    cleanSettings.timeSpan = cleanSettings.timeSpan.map(d => new Date(d)) as [Date, Date];
-    requestFromActivityCrud(
-      GET_CHANNELS,
-      cleanSettings
+    const cleanSettings: FilterEventsPayload = JSON.parse(
+      settingsWithoutChannelsstringified
     )
+    cleanSettings.timeSpan = cleanSettings.timeSpan.map((d) => new Date(d)) as [
+      Date,
+      Date
+    ]
+    requestFromActivityCrud(GET_CHANNELS, cleanSettings)
   }, [settingsWithoutChannelsstringified])
 
   useEffect(() => {
@@ -323,17 +328,16 @@ function Studio() {
                 range={true}
                 value={[new Date(timeSpan[0]), new Date(timeSpan[1])]}
                 onChange={(dates) => {
-                  console.log('on change dates', dates);
+                  console.log("on change dates", dates)
                   setTimespan(
-                  (dates as Array<Date>)
-                  .sort((a, b) => {
-                    if (a?.getTime() > b?.getTime()) {
-                      return 1;
-                    }
-                    return -1;
-                  })
-
-                )}}
+                    (dates as Array<Date>).sort((a, b) => {
+                      if (a?.getTime() > b?.getTime()) {
+                        return 1
+                      }
+                      return -1
+                    })
+                  )
+                }}
                 daysData={daysData}
               />
             </div>

@@ -575,15 +575,11 @@ function Home() {
         )}
       </Measure>
 
-      {
-        pendingRequestsIds.size ?
+      {pendingRequestsIds.size ? (
         <div className="fullscreen-loader-wrapper">
-              <div className="fullscreen-loader-container">
-                Chargement ...
-              </div>
-            </div>
-        : null
-      }
+          <div className="fullscreen-loader-container">Chargement ...</div>
+        </div>
+      ) : null}
     </div>
   )
 }

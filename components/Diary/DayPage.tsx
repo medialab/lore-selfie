@@ -34,7 +34,7 @@ function DayPage({
   annotations = {
     creators: {},
     tags: {},
-    expressions: {},
+    expressions: {}
   },
   pageNumber,
   annotationColumnsNames,
@@ -44,7 +44,7 @@ function DayPage({
     creators = {}
     // tags = {},
     // expressions = {}
-  } = annotations;
+  } = annotations
   const [vizSpaceDimensions, setVizSpaceDimensions] = useState<Dimensions>({
     width: 100,
     height: 100

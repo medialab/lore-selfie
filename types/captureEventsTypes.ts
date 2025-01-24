@@ -1,4 +1,3 @@
-
 export interface Browser {
   name: string
   type: string
@@ -118,7 +117,7 @@ export interface ChatActivityRecordEvent extends GenericEvent {
 // }
 
 export interface LiveUserActivityRecordEvent extends GenericEvent {
-  type: 'LIVE_USER_ACTIVITY_RECORD',
+  type: "LIVE_USER_ACTIVITY_RECORD"
   timeSpan: number // timespan of measure provided, in ms
   currentMediaTime?: string
   pointerActivityScore: number

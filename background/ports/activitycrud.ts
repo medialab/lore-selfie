@@ -32,8 +32,8 @@ import {
 import type {
   AvailableChannel,
   AvailableChannels,
-  HabitsData,
-  FilterEventsPayload
+  FilterEventsPayload,
+  HabitsData
 } from "~types/common"
 import type { AllData } from "~types/io"
 
@@ -86,10 +86,10 @@ const applyExcludedTitlePatterns = (
     }: {
       url: string
       metadata:
-      | YoutubeVideoMetadata
-      | YoutubeShortMetadata
-      | TwitchLiveMetadata
-      | GenericViewEventMetadata
+        | YoutubeVideoMetadata
+        | YoutubeShortMetadata
+        | TwitchLiveMetadata
+        | GenericViewEventMetadata
     } = event
     const { title } = metadata
     let passes = true
@@ -222,7 +222,6 @@ interface MessagePayload {
   requestId: string
 }
 
-
 const filterEvents = (
   events: CaptureEventsList,
   payload: FilterEventsPayload
@@ -262,9 +261,7 @@ const filterEvents = (
     const matchesDaysOfWeek =
       daysOfWeek === undefined ? true : checkDaysOfWeek(date, daysOfWeek)
     const matchesPlatforms =
-      platforms === undefined
-        ? true
-        : platforms.includes(event.platform)
+      platforms === undefined ? true : platforms.includes(event.platform)
     // console.log('matches platforms', matchesPlatforms, event.platform)
     // if (tag === GET_CHANNELS) {
     //   console.log('test for event in filters', matchesTimespan && matchesTimeOfDaySpan && matchesDaysOfWeek && matchesPlatforms, {matchesTimespan, matchesTimeOfDaySpan, matchesDaysOfWeek, matchesPlatforms}, event, {timeOfDaySpan, date: new Date(event.date), from: new Date(from), to: new Date(to)})
@@ -299,7 +296,6 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
           return event.metadata && event.metadata.channelId
         }
       })
-      console.log('filtered events for get channels', filteredEvents, activity.length, payload);
       // eslint-disable-next-line
       const channelsList = new Map()
       filteredEvents.forEach((event: BrowseViewEvent) => {
@@ -327,7 +323,6 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
           channelsList.set(id, updated)
         }
       })
-      console.log('channels list map values', Array.from(channelsList.values()))
       res.send({
         responseType: ACTION_END,
         actionType,
@@ -470,7 +465,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
       filteredEvents = filterEvents(activity, otherSettings)
 
       // eslint-disable-next-line
-      const urlToChannelSlug = new Map();
+      const urlToChannelSlug = new Map()
       // eslint-disable-next-line
       const output: HabitsData = filteredEvents.reduce((tempOutput, event) => {
         const date = new Date(event.date)
@@ -480,39 +475,42 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         tempOutput[day][thatBin].count += 1
         tempOutput[day][thatBin].breakdown[platform].count += 1
         if (type === LIVE_USER_ACTIVITY_RECORD) {
-
           if (
-            platform === 'twitch' || (event as LiveUserActivityRecordEvent).isPlaying
+            platform === "twitch" ||
+            (event as LiveUserActivityRecordEvent).isPlaying
           ) {
-            const thatSpan = event.timeSpan;
-            tempOutput[day][thatBin].count += 1;
-            tempOutput[day][thatBin].duration += thatSpan;
+            const thatSpan = event.timeSpan
+            tempOutput[day][thatBin].count += 1
+            tempOutput[day][thatBin].duration += thatSpan
 
-            tempOutput[day][thatBin].breakdown[platform].count += 1;
-            tempOutput[day][thatBin].breakdown[platform].duration += thatSpan;
-            const channelSlug = urlToChannelSlug.get(url);
+            tempOutput[day][thatBin].breakdown[platform].count += 1
+            tempOutput[day][thatBin].breakdown[platform].duration += thatSpan
+            const channelSlug = urlToChannelSlug.get(url)
             // console.log('test', channelSlug, tempOutput[day][thatBin].channels, tempOutput[day][thatBin].channels[channelSlug])
             if (channelSlug && tempOutput[day][thatBin].channels[channelSlug]) {
               // console.log('obj', tempOutput[day][thatBin].channels[channelSlug])
-              tempOutput[day][thatBin].channels[channelSlug].count += 1;
-              tempOutput[day][thatBin].channels[channelSlug].duration += thatSpan;
+              tempOutput[day][thatBin].channels[channelSlug].count += 1
+              tempOutput[day][thatBin].channels[channelSlug].duration +=
+                thatSpan
               // video was browsed before bin start
-            } else if (channelSlug && !tempOutput[day][thatBin].channels[channelSlug]) {
+            } else if (
+              channelSlug &&
+              !tempOutput[day][thatBin].channels[channelSlug]
+            ) {
               tempOutput[day][thatBin].channels[channelSlug] = {
                 channel: channelSlug,
                 platform,
                 duration: thatSpan,
                 count: 1
               }
-
             } else {
-              console.warn('did not count event for url:', event.url)
+              console.warn("did not count event for url:", event.url)
             }
           }
         } else if (type === BROWSE_VIEW) {
           const channel = event.metadata.channelName || event.metadata.channelId
           if (channel) {
-            const channelSlug = `${channel} (${event.platform})`;
+            const channelSlug = `${channel} (${event.platform})`
             if (!tempOutput[day][thatBin].channels[channelSlug]) {
               tempOutput[day][thatBin].channels[channelSlug] = {
                 channel,
@@ -520,17 +518,14 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
                 duration: 0,
                 count: 0
               }
-
             }
             if (!urlToChannelSlug.has(url)) {
               urlToChannelSlug.set(url, channelSlug)
             }
           }
         }
-        return tempOutput;
-      }, initOutput);
-
-      
+        return tempOutput
+      }, initOutput)
 
       // units = filteredEvents.reduce((cur, event) => {
       //   const time = new Date(event.date).getTime();

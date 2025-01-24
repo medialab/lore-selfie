@@ -3,6 +3,8 @@ import Measure from "react-measure"
 
 import "./Diary.scss"
 
+import { useDebounce } from "use-debounce"
+
 import { DAY_IN_MS, PLATFORMS } from "~constants"
 import { formatNumber, timeOfDayToMs } from "~helpers"
 import type { Annotations } from "~types/annotations"
@@ -12,7 +14,6 @@ import type { DiaryDataByDayType, DiaryDay } from "~types/common"
 import A5Imposed from "./A5Imposed"
 import Cover from "./Cover"
 import DayPage from "./DayPage"
-import { useDebounce } from "use-debounce"
 
 // eslint-disable-next-line
 const Platforms = [...PLATFORMS] as const
@@ -43,9 +44,9 @@ function DiaryWrapper({
 }: DiaryWrapperProps) {
   const previewerRef = useRef(null)
   const [format, setFormat] = useState("A4-landscape")
-  const [dimensions, setDimensions] = useState({ width: 100, height: 100 });
+  const [dimensions, setDimensions] = useState({ width: 100, height: 100 })
 
-  const [visibleEvents] = useDebounce(inputVisibleEvents, 1000);
+  const [visibleEvents] = useDebounce(inputVisibleEvents, 1000)
   const daysMap = {
     0: "Dimanche",
     1: "Lundi",
@@ -126,14 +127,17 @@ function DiaryWrapper({
   return (
     <div className="DiaryWrapper">
       <div className="header">
-        <div>{Object.keys(dataByDay).length} jour{Object.keys(dataByDay).length > 1 ? 's' : ''}, </div>
+        <div>
+          {Object.keys(dataByDay).length} jour
+          {Object.keys(dataByDay).length > 1 ? "s" : ""},{" "}
+        </div>
         <div>
           <span dangerouslySetInnerHTML={{ __html: "&nbsp;" }} />
           {formatNumber(visibleEvents.length)} évènements.
         </div>
         <ul className="settings">
           <li>
-          <span className="format-label">format</span>
+            <span className="format-label">format</span>
           </li>
           <li className="format-picker">
             <button

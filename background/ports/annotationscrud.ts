@@ -38,7 +38,7 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
     id: string
     value: any
   }
-  const { collection, id, value } = payload as AnnotationPayload || {}
+  const { collection, id, value } = (payload as AnnotationPayload) || {}
   let newCollection, newAnnotations
   switch (actionType) {
     case DELETE_ALL_DATA:

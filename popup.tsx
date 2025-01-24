@@ -31,7 +31,9 @@ function Popup() {
     channel: string
     platform: string
   }
-  const [recentContents, setRecentContents] = useState<Array<RecentContentItem>>([])
+  const [recentContents, setRecentContents] = useState<
+    Array<RecentContentItem>
+  >([])
   const [settings, setSettings] = useState<Settings>()
 
   useEffect(() => {

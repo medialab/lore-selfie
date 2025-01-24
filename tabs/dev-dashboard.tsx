@@ -193,7 +193,6 @@ function DevDashboard() {
     }
   })
 
-
   const onFileInputChange = (event) => {
     const { files } = event.target
     const [file] = files
@@ -204,7 +203,7 @@ function DevDashboard() {
       () => {
         const str = reader.result.toString()
         try {
-          const data = JSON.parse(str);
+          const data = JSON.parse(str)
           // @todo following is commented because currently event types are too strict
           // console.debug('validate data', data)
           // const valid = validateDataDump(data);
