@@ -281,6 +281,8 @@
 
           min-width: 210mm;
           min-height: 297mm;
+          page-break-after: always;
+          break-after: page;
         }
         &.A4-landscape {
           page: page-A4-landscape;
@@ -293,6 +295,15 @@
           // min-width: 297mm;
           // min-height: 210mm;
           page-break-after: always;
+          break-after: page;
+
+          // &:nth-child(even) {
+          //   background: pink;
+          // }
+          // &:nth-child(odd) {
+          //   background: lightgreen;
+          // }
+          overflow: hidden;
         }
         &.A5 {
           page: page-A5;
@@ -300,6 +311,25 @@
           height: 210mm;
           min-width: 148mm;
           min-height: 210mm;
+          &:not(.is-imposed) {
+            page-break-after: always;
+            break-after: page;
+          }
+        }
+      }
+
+      // @todo fix this firefox workaround
+      &.firefox {
+        .pages-container {
+          .page {
+            &.A4-landscape {
+              // @todo fix this workaround
+              min-height: 210mm;
+              max-height: 210mm;
+              min-width: 297mm;
+              max-width: 297mm;
+            }
+          }
         }
       }
     }
@@ -395,13 +425,16 @@
 @page page-A4 {
   format: A4;
   margin: 0;
+  padding: 0;
 }
 @page page-A4-landscape {
   format: A4;
   orientation: landscape;
   margin: 0;
+  padding: 0;
 }
 @page page-A5 {
   format: A5;
   margin: 0;
+  padding: 0;
 }

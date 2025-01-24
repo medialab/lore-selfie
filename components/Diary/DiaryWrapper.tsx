@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import Measure from "react-measure"
 
+import { getBrowser } from "~helpers"
+
+// import {Previewer} from 'pagedjs';
+
 import "./Diary.scss"
 
 import { useDebounce } from "use-debounce"
@@ -14,6 +18,8 @@ import type { DiaryDataByDayType, DiaryDay } from "~types/common"
 import A5Imposed from "./A5Imposed"
 import Cover from "./Cover"
 import DayPage from "./DayPage"
+
+const { name: browser } = getBrowser()
 
 // eslint-disable-next-line
 const Platforms = [...PLATFORMS] as const
@@ -124,6 +130,15 @@ function DiaryWrapper({
     return dimensions.width / contentWidth
   }, [format, dimensions])
 
+  // useEffect(() => {
+  //   let paged = new Previewer();
+  //   let DOMContent = document.querySelector('pages-container');
+
+  //   paged.preview(DOMContent, [], document.body).then((flow) => {
+  //     console.log('Rendered', flow.total, 'pages.');
+  //   });
+  // }, []);
+
   return (
     <div className="DiaryWrapper">
       <div className="header">
@@ -179,7 +194,9 @@ function DiaryWrapper({
           setDimensions(contentRect.bounds)
         }}>
         {({ measureRef }) => (
-          <div ref={measureRef} className={`document-space ${format}`}>
+          <div
+            ref={measureRef}
+            className={`document-space ${format} ${browser.toLowerCase()}`}>
             {Object.keys(dataByDay).length ? (
               <div
                 ref={previewerRef}

@@ -87,7 +87,7 @@ function Daily({
       })
       return sessions
     }
-  }, [visibleEvents])
+  }, [visibleEvents]);
 
   return (
     <Measure
