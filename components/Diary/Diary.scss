@@ -130,7 +130,7 @@
             flex-flow: row nowrap;
             .channel-title {
               margin: 0;
-              margin-top: constants.$gutter-small;
+              margin-top: constants.$gutter;
               padding-right: constants.$gutter-small;
               padding: 0;
               font-size: 0.8rem;
@@ -180,7 +180,7 @@
                     flex: 1;
                     .title {
                       margin: 0;
-                      margin-top: constants.$gutter-small;
+                      margin-top: constants.$gutter;
                       padding: 0;
                       font-size: 0.8rem;
                       @include fonts.kanit-regular;
@@ -192,7 +192,10 @@
           }
         }
         &.size-very-dense {
-          margin-bottom: constants.$gutter-small;
+          margin-bottom: 0; // constants.$gutter-small;
+          .channel {
+            margin-bottom: constants.$gutter-small;
+          }
           .channel .channel-title {
             font-size: 0.5rem;
           }
@@ -217,6 +220,7 @@
           border: 1px solid black;
           padding: constants.$gutter * 2;
           height: 33%;
+          opacity: 0;
           h3 {
             margin: 0;
             padding: 0;

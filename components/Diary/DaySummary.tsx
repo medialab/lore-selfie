@@ -13,6 +13,7 @@ export default function DaySummary({
   rowsCount
 }: DaySummaryProps) {
   let size = "normal"
+  console.log(rowsCount)
   if (rowsCount > 30) {
     size = "very-dense"
   } else if (rowsCount > 15) {
