@@ -19,7 +19,8 @@
     "package:firefox": "plasmo package --target=firefox-mv2",
     "start": "web-ext run --source-dir ./build/chrome-mv3-dev -t chromium --start-url chrome://newtab",
     "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev",
-    "prepare": "husky && husky install",
+    "prepare": "husky",
+    "pre-commit": "lint-staged",
     "generate-json-schemas": "typescript-json-schema types/io.ts AllData -o schemas/all-data.json --refs; prettier schemas/all-data.json --write;ajv compile -s schemas/all-data.json -o schemas/validateDataDump.js --all-errors  -c ajv-formats"
   },
   "dependencies": {
