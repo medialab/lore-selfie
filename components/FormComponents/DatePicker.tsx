@@ -107,8 +107,9 @@ export default function DatePicker({
 
   // value or range has changed
   useEffect(() => {
+    if (!isSelecting)
     resetTempValue()
-    setIsSelecting(false)
+    // setIsSelecting(false)
   }, [value, range])
 
   const weeks = useMemo(() => {
@@ -206,15 +207,17 @@ export default function DatePicker({
       {isSelecting ? (
         <div
           className="selecting-placeholder"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             setIsSelecting(false)
-            resetTempValue()
+            resetTempValue();
           }}
         />
       ) : null}
       <div className="month-picker">
         <button
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             const [month, year] = currentMonth
             if (+month === 0) {
               setCurrentMonth([11, +year - 1])
@@ -232,7 +235,8 @@ export default function DatePicker({
           </span>
         </div>
         <button
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             const [month, year] = currentMonth
             if (+month === 11) {
               setCurrentMonth([0, +year + 1])
@@ -268,13 +272,16 @@ export default function DatePicker({
                       ? buildDateKey(new Date(date.getTime() + DAY_IN_MS))
                       : ""
                     const data = daysData[key]
-                    const isDisabled = disableDatalessDays && !data
+                    const isDisabled = (disableDatalessDays && !data)
+                    || range && isSelecting && (tempValue as Array<Date>)?.length && date.getTime() < tempValue[0].getTime()
                     const count = data?.value || 0
                     const radius = count ? radiusScale(count) : 0
                     // console.log({radius, count, data, key, daysData})
-                    const handleClick = () => {
+                    const handleClick = (e) => {
+                      e.stopPropagation();
+
                       if (isDisabled) {
-                        return
+                        return;
                       }
                       if (range) {
                         if (isSelecting) {
@@ -294,8 +301,9 @@ export default function DatePicker({
                         setIsSelecting(false)
                       }
                     }
-                    const handleMouseEnter = () => {
-                      if (range && isSelecting) {
+                    const handleMouseEnter = (e) => {
+                      e.stopPropagation();
+                      if (range && isSelecting && date.getTime() > tempValue[0]) {
                         setTempValue([tempValue[0], date])
                       }
                     }
@@ -312,8 +320,8 @@ export default function DatePicker({
                             <div
                               className="value-indicator"
                               style={{
-                                width: radius * 0.5 * 100 + "%",
-                                height: radius * 0.5 * 200 + "%"
+                                width: radius * 0.3 * 100 + "px",
+                                height: radius * 0.3 * 100 + "px"
                               }}
                             />
                           </div>
