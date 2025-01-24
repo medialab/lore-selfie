@@ -340,7 +340,6 @@ function DevDashboard() {
         numberOfDays
       }
     })
-    // console.debug('done');
   }
   const previewedItemsStr = useMemo(
     () => JSON.stringify(previewedItems, null, 2),

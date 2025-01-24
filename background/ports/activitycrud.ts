@@ -561,6 +561,14 @@ const handler: PlasmoMessaging.PortHandler = async (req, res) => {
         data: AllData
       }
       if ((payload as ReplaceActivityPayload).data) {
+        res.send({
+          responseType: ACTION_PROGRESS,
+          requestId,
+          actionType,
+          payload,
+          current: 0,
+          total: 1
+        })
         await storage.set(
           "lore-selfie-activity",
           (payload as ReplaceActivityPayload).data
