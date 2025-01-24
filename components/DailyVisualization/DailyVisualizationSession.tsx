@@ -32,7 +32,7 @@ const Session = ({
       <rect
         x={x + gutter}
         y={yExtent[0]}
-        width={width - gutter}
+        width={Math.abs(width - gutter)}
         height={height}
         className="session-background"
       />
@@ -62,7 +62,7 @@ const Session = ({
                     x={gutter}
                     y={0}
                     height={Math.abs(endY - startY)}
-                    width={width - gutter - index * (width / 4)}
+                    width={Math.abs(width - gutter - index * (width / 4))}
                     stroke={"white"}
                     strokeWidth={0.5}
                     fill={`url(#diagonalHatch-for-${spanId})`}
@@ -160,7 +160,7 @@ const Session = ({
                   y={0}
                   height={Math.abs(endY - startY - 1)}
                   // width={messageBarWidthScale(messagesCount)}
-                  width={messageBarWidthScale(relativeCount)}
+                  width={Math.abs(messageBarWidthScale(relativeCount))}
                   stroke={"none"}
                 />
               </g>

@@ -7,7 +7,7 @@ import partialCircle from "svg-partial-circle"
 import "~/styles/Habits.scss"
 
 import { PLATFORMS_COLORS } from "~constants"
-import { msToNiceDuration, numberToDoubleDigit } from "~helpers"
+import { msToNiceDuration } from "~helpers"
 import type { Dimensions, HabitsData } from "~types/common"
 
 interface HabitsProps {
@@ -219,7 +219,6 @@ export default function Habits({
                               }
                             }
                           )
-
                           return (
                             <g key={id} transform={`translate(${x}, ${y})`}>
                               <circle
@@ -232,14 +231,19 @@ export default function Habits({
 
                                 // .filter(({portion}) => portion)
                                 .map(({ key, position, portion }) => {
-                                  let tooltipContent = `<div>Environ ${msToNiceDuration(datum[valueField])} cumulées (${Math.round(portion * 100)}%) enregistrées sur ${key} pour ce créneau.</div>`
+                                  let tooltipContent
+
                                   if (Object.values(datum.channels).length) {
                                     const channelsTotalDuration = Object.values(
                                       datum.channels
-                                    ).reduce((sum, c) => sum + c.duration, 0)
+                                    )
+                                      .filter((c) => c.platform === key)
+                                      .reduce((sum, c) => sum + c.duration, 0)
+                                    tooltipContent = `<div>Vous avez passé <strong>${Math.round(portion * 100)}%</strong> de votre temps de fréquentation de vidéos connectées sur <strong>${key}</strong> (${msToNiceDuration(channelsTotalDuration)} sur ${msToNiceDuration(datum[valueField])} cumulées enregistrées) pour ce créneau.</div>`
                                     tooltipContent += `<div>Chaînes regardées : 
                                     <ol>
                                     ${Object.values(datum.channels)
+                                      .filter((c) => c.platform === key)
                                       .sort((a, b) => {
                                         if (a.duration > b.duration) {
                                           return -1
@@ -249,13 +253,15 @@ export default function Habits({
                                       .map(({ channel, duration }) => {
                                         return `
                                         <li>
-                                      ${numberToDoubleDigit(Math.round((duration / channelsTotalDuration) * 100))}% - ${channel} (${msToNiceDuration(duration)})
+                                      ${Math.round((duration / channelsTotalDuration) * 100)}% - ${channel} (${msToNiceDuration(duration)})
                                         </li>
                                         `
                                       })
                                       .join("\n")}
                                     </ol>
                                     </div>`
+                                  } else {
+                                    tooltipContent = `<div>Vous avez passé environ ${Math.round(portion * 100)}% (${msToNiceDuration(datum[valueField])} cumulées) enregistrées sur ${key} pour ce créneau.</div>`
                                   }
                                   const d = [
                                     ...partialCircle(
