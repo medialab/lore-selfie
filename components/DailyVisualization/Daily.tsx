@@ -99,7 +99,9 @@ function Daily({
       {({ measureRef }) => {
         return (
           <div ref={measureRef} className="Daily">
-            {currentDaySessions ? (
+            
+            {
+            currentDaySessions ? (
               <DayVisualization
                 sessions={currentDaySessions}
                 date={new Date(displayedDayDate)}
@@ -113,7 +115,12 @@ function Daily({
                   spansSettings
                 }}
               />
-            ) : null}
+            ) : 
+             <div className="stretching-loader-wrapper">
+              <div className="stretching-loader-container">
+                Chargement ...
+              </div>
+            </div>}
           </div>
         )
       }}

@@ -530,4 +530,29 @@
     }
     animation: flicker 2s infinite;
   }
+
+  .stretching-loader-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    .stretching-loader-container {
+    }
+  }
+  .fullscreen-loader-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.1);
+    .fullscreen-loader-container {
+    }
+  }
 }

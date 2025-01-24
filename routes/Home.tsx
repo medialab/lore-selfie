@@ -574,6 +574,16 @@ function Home() {
           </div>
         )}
       </Measure>
+
+      {
+        pendingRequestsIds.size ?
+        <div className="fullscreen-loader-wrapper">
+              <div className="fullscreen-loader-container">
+                Chargement ...
+              </div>
+            </div>
+        : null
+      }
     </div>
   )
 }
