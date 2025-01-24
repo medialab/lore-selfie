@@ -9,7 +9,7 @@
   overflow: hidden;
   .header {
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     justify-content: space-between;
     align-items: center;
     padding: constants.$gutter;
@@ -24,6 +24,20 @@
       padding: 0;
       margin: 0;
       flex: 1;
+      li {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+      }
+      .format-picker {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        button {
+          // height: constants.$gutter * 6;
+        }
+      }
       .format-label {
         margin-right: constants.$gutter;
       }

@@ -53,6 +53,7 @@
     "sigma": "^3.0.0",
     "svg-partial-circle": "^1.0.0",
     "talisman": "^1.1.4",
+    "use-debounce": "^10.0.4",
     "usehooks-ts": "^3.1.0"
   },
   "devDependencies": {

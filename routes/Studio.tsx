@@ -319,18 +319,22 @@ function Studio() {
           <div className="body">
             <div className="form-group">
               <h3>Dates de début et de fin</h3>
-              {/* <DatePicker
-                value={timeSpan}
-                onChange={dates => setTimespan(dates.map(formatDatepickerDate))}
-                range
-                // numberOfMonths={3}
-                rangeHover
-              /> */}
               <DatePickerCustom
+                range={true}
                 value={[new Date(timeSpan[0]), new Date(timeSpan[1])]}
-                onChange={(dates) => setTimespan(dates)}
+                onChange={(dates) => {
+                  console.log('on change dates', dates);
+                  setTimespan(
+                  (dates as Array<Date>)
+                  .sort((a, b) => {
+                    if (a?.getTime() > b?.getTime()) {
+                      return 1;
+                    }
+                    return -1;
+                  })
+
+                )}}
                 daysData={daysData}
-                range
               />
             </div>
             <div className="form-group">
