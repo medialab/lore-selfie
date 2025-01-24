@@ -191,7 +191,7 @@ function SettingsView() {
                   Fréquence de l'enregistrement de l'activité (en milisecondes)
                 </p>
                 <InputToValidate
-                  placeholderFn={(val) => val + " milisecondes"}
+                  placeholderFn={(val) => formatNumber(val) + " milisecondes"}
                   onRemove={undefined}
                   value={+settings.liveRecordingInterval}
                   type="number"
