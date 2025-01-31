@@ -277,14 +277,15 @@ const filterEvents = (
   return filtered
 }
 
+let baseActivity: CaptureEventsList
+let activity: CaptureEventsList
+let filteredEvents: CaptureEventsList, units: any, loadedUnits: any
+
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
   const { actionType, payload = {}, requestId }: MessagePayload = req.body
   // console.log('req body', req.body);
-  const baseActivity: CaptureEventsList = await storage.get(
-    "lore-selfie-activity"
-  )
-  const activity = baseActivity || []
-  let filteredEvents: CaptureEventsList, units: any, loadedUnits: any
+  baseActivity = await storage.get("lore-selfie-activity")
+  activity = baseActivity || []
   switch (actionType) {
     case GET_CHANNELS:
       // console.debug('filter events in get channels', payload, filterEvents(activity, payload, GET_CHANNELS))
