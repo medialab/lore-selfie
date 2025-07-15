@@ -21,11 +21,12 @@
       <div>
         <section>
           <h2>Présentation</h2>
-          <p>
+          <p class="emphasis">
             Qu'apprendriez-vous sur vous-même si vous pouviez explorer
-            l'auto-portrait que font les traces laissées par votre activité en
+            l'auto-portrait que font les traces laissées par&nbsp;votre activité en
             ligne sur les plateformes de vidéo connectée ?
           </p>
+          
           <p>
             Lore selfie est une extension de navigateur expérimentale développée sous licence libre
             dans un contexte de recherche au
@@ -59,6 +60,27 @@
             afin de les partager ou de les réutiliser avec d'autres outils
             d'analyse ou de visualisation.
           </p>
+          <div class="gallery-container">
+            <a class=""thumbnail data-fslightbox="gallery" href="assets/screenshot-01.png">
+              <img src="assets/screenshot-01.png" alt="Image">
+            </a>
+            <a class=""thumbnail data-fslightbox="gallery" href="assets/screenshot-02.png">
+              <img src="assets/screenshot-02.png" alt="Image">
+            </a>
+            <a class="thumbnail" data-fslightbox="gallery" href="assets/screenshot-03.png">
+              <img src="assets/screenshot-03.png" alt="Image">
+            </a>
+            <a class="thumbnail" data-fslightbox="gallery" href="assets/screenshot-04.png">
+              <img src="assets/screenshot-04.png" alt="Image">
+            </a>
+            <a class="thumbnail" data-fslightbox="gallery" href="assets/screenshot-05.png">
+              <img src="assets/screenshot-05.png" alt="Image">
+            </a>
+            <a class="thumbnail" data-fslightbox="gallery" href="assets/screenshot-06.png">
+              <img src="assets/screenshot-06.png" alt="Image">
+            </a>
+            
+          </div>
         </section>
         <section>
           <h2>Installation</h2>
@@ -263,6 +285,7 @@
       </div>
     </footer>
   </body>
+    <script src="fslightbox.js"></script>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Hammersmith+One&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
     body {
@@ -349,6 +372,25 @@
       background: #9147ff;
       color: white;
       padding: 1rem;
+    }
+
+    .gallery-container {
+      display: flex;
+      max-width: 100%;
+      flex-flow: row wrap;
+    }
+
+    .gallery-container a img {
+      max-height: 10vw;
+      margin-right: 10px;
+    }
+
+    .emphasis {
+      border-left: grey solid 3px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.1);
+      font-size: 1.1em;
+      font-weight: 800;
     }
   </style>
 </html>
